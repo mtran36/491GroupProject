@@ -38,5 +38,67 @@ class fly {
 
 	draw() {
 		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+		//Label for during testing. Remove in full game.
+		this.game.ctx.font = "48px serif";
+		this.game.ctx.fillText("F", this.x + 16, this.y + 48);
+	}
+}
+
+class beetle {
+	constructor(game, x, y) {
+		Object.assign(this, { game, x, y });
+		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
+
+		this.faceRight = true;
+
+		this.animations = [];
+		this.loadAnimations();
+	}
+
+	loadAnimations() {
+		this.animations[0] = new Animator(this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+	}
+
+	update() {
+		if (this.faceRight) {
+			this.x += 2;
+		} else {
+			this.x -= 2;
+		}
+		if (this.x >= this.game.surfaceWidth - 64) {
+			this.faceRight = false;
+		} else if (this.x <= 0) {
+			this.faceRight = true;
+		}
+	}
+
+	draw() {
+		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+		//Test Label. Remove after getting proper sprites.
+		this.game.font = '48px serif';
+		this.game.ctx.fillText("B", this.x + 16, this.y + 48);
+	}
+
+}
+
+class hopper {
+	constructor(game, x, y) {
+		Object.assign(this, { game, x, y });
+		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
+	}
+
+	loadAnimations() {
+		this.animations[0] = new Animator(this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+	}
+
+	update() {
+
+	}
+
+	draw() {
+		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+		//Test Label. Remove after getting proper sprites.
+		this.game.font = '48px serif';
+		this.game.ctx.fillText("H", this.x + 16, this.y + 48);
 	}
 }

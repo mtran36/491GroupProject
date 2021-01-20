@@ -7,8 +7,8 @@ class SceneManager {
 	}
 
 	loadTestLevel() {
-		var player = new druid(this.game, 300, 100);
+		var player = new druid(this.game, randomInt(800), randomInt(600));
 		this.game.addEntity(player)
-		this.game.addEntity(new fly(this.game, player, 200, 200));
+		this.game.addEntity(new fly(this.game, player, randomInt(800), randomInt(600)));
 	}
 }

@@ -44,6 +44,7 @@ class fly {
 	}
 }
 
+//Moves back and forth
 class beetle {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
@@ -81,10 +82,15 @@ class beetle {
 
 }
 
+//Hops towareds the druid
 class hopper {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
+		this.velocity = 0;
+		this.hop = false;
+		this.hoptick = params.velocityTick;
+		this.landLag = 0.2;
 	}
 
 	loadAnimations() {
@@ -92,7 +98,48 @@ class hopper {
 	}
 
 	update() {
-
+		//Keeps the hopper grounded for a brief moment before it can jump again.
+		this.landLag -= this.game.clockTick;
+		if (this.landLag >= 0 && this.hop == false) {
+			return;
+		}
+		var xdist = this.x - this.druid.x;
+		var ydist = this.y - this.druid.y;
+		//If the hopper is hopping then check if it is time to increment the velocity, then move the hopper
+		//based on velocity and speed.
+		if (this.hop == true) {
+			this.hoptick -= this.game.clockTick;
+			if (this.hoptick <= 0) {
+				this.velocity--;
+				this.velocity = Math.min(this.velocity, this.params.velocityMin);
+				this.hoptick = params.velocityTick;
+			}
+			this.x += this.speed;
+			this.y -= velocity;
+		} else if (Math.abs(xdist) < 300 && Math.abs(ydist) < 300) {
+			//If not hopping and the player is close enough
+			this.hop == true;
+			this.velocity = params.velocityStart;
+			this.hoptick = 0;
+			this.speed = xdist <= 0 ? 3 : -3;
+			this.x += this.speed;
+			this.y -= this.velocity;
+		}
+		if (this.y >= this.game.surfaceHeight - 64) {
+			this.y = this.game.surfaceHeight - 64;
+			this.hop = false;
+			this.landLag = 0.2;
+		}
+		if (this.y <= 0) {
+			this.y = 0;
+			this.velocity = Math.min(this.velocity, 2);
+		}
+		if (this.x <= 0) {
+			this.x = 0;
+		}
+		if (this.x >= this.game.surfaceWidth - 64) {
+			this.x = this.game.surfaceWidth - 64;
+		}
 	}
 
 	draw() {

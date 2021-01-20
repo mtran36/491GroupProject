@@ -27,6 +27,6 @@ window.requestAnimFrame = (function () {
 
 // add global parameters here
 
-//var params = {
-// 
-//};
+var params = {
+    velocityStart: 10, velocityTick: 0.1, velocityMin: -10
+};

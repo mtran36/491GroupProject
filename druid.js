@@ -6,6 +6,7 @@ class druid {
 
 		this.animations = [];
 		this.loadAnimations();
+		this.speed = 250;
 	}
 
 	loadAnimations() {
@@ -13,17 +14,19 @@ class druid {
 	}
 
 	update() {
+		var xmove = this.game.clockTick * this.speed;
+		var ymove = this.game.clockTick * this.speed;
 		if (this.game.left) {
-			this.x -= 4;
+			this.x -= xmove;
 		}
 		if (this.game.right) {
-			this.x += 4;
+			this.x += xmove;
 		}
 		if (this.game.up) {
-			this.y -= 4;
+			this.y -= ymove;
 		}
 		if (this.game.down) {
-			this.y += 4;
+			this.y += ymove;
 		}
 	}
 

@@ -5,9 +5,12 @@ class fly {
 	constructor(game, druid, x, y) {
 		Object.assign(this, { game, druid, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.flyTime = 0;
+		this.flyTimeTotal = 0.4;
+		this.flyTimeRemain = this.flyTimeTotal;
 		this.xchange = 0;
 		this.ychange = 0;
+		this.speed = 160;
+		this.range = 350;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -17,20 +20,23 @@ class fly {
 	}
 
 	update() {
-		this.flyTime += this.game.clockTick;
-		if (this.flyTime > 0.75) {
+		this.flyTimeRemain -= this.game.clockTick;
+		console.log
+		if (this.flyTimeRemain <= 0) {
 			var xdist = this.x - this.druid.x;
 			var ydist = this.y - this.druid.y;
-			if (Math.abs(xdist) < 300 && Math.abs(ydist) < 300) {
-				if (xdist < 0) { this.xchange = 3; }
-				if (xdist > 0) { this.xchange = -3; }
-				if (ydist < 0) { this.ychange = 3; }
-				if (ydist > 0) { this.ychange = -3; }
+			var xmove = this.game.clockTick * this.speed;
+			var ymove = this.game.clockTick * this.speed;
+			if (Math.abs(xdist) < this.range && Math.abs(ydist) < this.range) {
+				if (xdist < 0) { this.xchange = xmove; }
+				if (xdist > 0) { this.xchange = 0 - xmove; }
+				if (ydist < 0) { this.ychange = ymove; }
+				if (ydist > 0) { this.ychange = 0 - ymove; }
 			} else {
 				this.xchange = 0;
 				this.ychange = 0;
 			}
-			this.flyTime = 0;
+			this.flyTimeRemain = this.flyTimeTotal;
 		}
 		this.x += this.xchange;
 		this.y += this.ychange;
@@ -51,6 +57,7 @@ class beetle {
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
 
 		this.faceRight = true;
+		this.speed = 100;
 
 		this.animations = [];
 		this.loadAnimations();
@@ -61,14 +68,17 @@ class beetle {
 	}
 
 	update() {
+		var xmove = this.game.clockTick * this.speed;
 		if (this.faceRight) {
-			this.x += 2;
+			this.x += xmove;
 		} else {
-			this.x -= 2;
+			this.x -= xmove;
 		}
 		if (this.x >= this.game.surfaceWidth - 64) {
+			this.x = this.game.surfaceWidth - 64;
 			this.faceRight = false;
 		} else if (this.x <= 0) {
+			this.x = 0;
 			this.faceRight = true;
 		}
 	}
@@ -82,15 +92,23 @@ class beetle {
 
 }
 
-//Hops towareds the druid
+//Hops towards the druid
 class hopper {
-	constructor(game, x, y) {
-		Object.assign(this, { game, x, y });
+	constructor(game, druid, x, y) {
+		Object.assign(this, { game, druid, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.velocity = 0;
+		this.xspeed = 400;
+		this.yspeed = 0;
+		this.yspeedStart = 500;
 		this.hop = false;
-		this.hoptick = params.velocityTick;
-		this.landLag = 0.2;
+		this.hoptick = 0.01;
+		this.hoptime = 0;
+		this.landLag = 0.3;
+		this.airtime = 0;
+		this.airstall = 2;
+		this.stallTime = 0;
+		this.animations = [];
+		this.loadAnimations();
 	}
 
 	loadAnimations() {
@@ -108,31 +126,37 @@ class hopper {
 		//If the hopper is hopping then check if it is time to increment the velocity, then move the hopper
 		//based on velocity and speed.
 		if (this.hop == true) {
-			this.hoptick -= this.game.clockTick;
-			if (this.hoptick <= 0) {
-				this.velocity--;
-				this.velocity = Math.min(this.velocity, this.params.velocityMin);
-				this.hoptick = params.velocityTick;
+			this.hoptime += this.game.clockTick;
+			this.airtime += this.game.clockTick;
+			if (this.hoptime >= this.hoptick) {
+				this.yspeed += params.velocityACC * this.airtime;
+				this.yspeed = this.yspeed < params.velocityMin ? params.velocityMin : this.yspeed;
+				this.hoptime = 0;
 			}
-			this.x += this.speed;
-			this.y -= velocity;
+			this.x += this.xspeed * this.game.clockTick;
+			this.y -= this.yspeed * this.game.clockTick;
 		} else if (Math.abs(xdist) < 300 && Math.abs(ydist) < 300) {
 			//If not hopping and the player is close enough
-			this.hop == true;
-			this.velocity = params.velocityStart;
-			this.hoptick = 0;
-			this.speed = xdist <= 0 ? 3 : -3;
-			this.x += this.speed;
-			this.y -= this.velocity;
+			this.hop = true;
+			this.yspeed = this.yspeedStart;
+			this.hoptime = 0;
+			if (xdist >= 0) {
+				this.xspeed = Math.min(this.xspeed, -1 * this.xspeed);
+			} else {
+				this.xspeed = Math.max(this.xspeed, -1 * this.xspeed);
+			}
+			this.x += this.xspeed * this.game.clockTick;
+			this.y -= this.yspeed * this.game.clockTick;
 		}
 		if (this.y >= this.game.surfaceHeight - 64) {
 			this.y = this.game.surfaceHeight - 64;
 			this.hop = false;
 			this.landLag = 0.2;
+			this.airtime = 0;
 		}
 		if (this.y <= 0) {
 			this.y = 0;
-			this.velocity = Math.min(this.velocity, 2);
+			this.yspeed = Math.min(this.yspeed, 25);
 		}
 		if (this.x <= 0) {
 			this.x = 0;

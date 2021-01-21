@@ -11,5 +11,6 @@ class SceneManager {
 		this.game.addEntity(player)
 		this.game.addEntity(new fly(this.game, player, randomInt(800), randomInt(600)));
 		this.game.addEntity(new beetle(this.game, 0, this.game.surfaceHeight - 64));
+		this.game.addEntity(new hopper(this.game, player, 0, randomInt(600)))
 	}
 }

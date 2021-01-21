@@ -1,11 +1,12 @@
-// JavaScript source code
 class Animator {
-    constructor(spritesheet, xStart, yStart, width, height, frameCount, frameDuration, framePadding, reverse, loop, flip) {
-        Object.assign(this, { spritesheet, xStart, yStart, height, width, frameCount, frameDuration, framePadding, reverse, loop, flip});
-
+    constructor(spritesheet, xStart, yStart, width, height, frameCount,
+        frameDuration, framePadding, reverse, loop, flip) {
+        Object.assign(this, {
+            spritesheet, xStart, yStart, height, width,
+            frameCount, frameDuration, framePadding, reverse, loop, flip
+        });
         this.elapsedTime = 0;
         this.totalTime = this.frameCount * this.frameDuration;
-
     };
 
     drawFrame(tick, ctx, x, y, scale) {
@@ -21,7 +22,6 @@ class Animator {
 
         let frame = this.currentFrame();
         if (this.reverse) frame = this.frameCount - frame - 1;
-
         if (this.flip) {
             ctx.save();
             ctx.scale(-1, 1);
@@ -29,7 +29,7 @@ class Animator {
         }
 
         ctx.drawImage(this.spritesheet,
-            this.xStart + frame * (this.width + this.framePadding), this.yStart, //source from sheet
+            this.xStart + frame * (this.width + this.framePadding), this.yStart,
             this.width, this.height,
             x, y,
             this.width * scale,
@@ -39,10 +39,10 @@ class Animator {
             ctx.restore();
         }
 
-/*        if (PARAMS.DEBUG) {
+        /* if (PARAMS.DEBUG) {
             ctx.strokeStyle = 'Green';
             ctx.strokeRect(x, y, this.width * scale, this.height * scale);
-        }*/
+        } */
     };
 
     currentFrame() {

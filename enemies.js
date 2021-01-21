@@ -1,7 +1,7 @@
 // Enemies File.
 
-//Flies straight at druid.
-class fly {
+// Flies straight at druid.
+class Fly {
 	constructor(game, druid, x, y) {
 		Object.assign(this, { game, druid, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
@@ -16,7 +16,8 @@ class fly {
 	}
 
 	loadAnimations() {
-		this.animations[0] = new Animator(this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
 	}
 
 	update() {
@@ -43,15 +44,16 @@ class fly {
 	}
 
 	draw() {
-		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
-		//Label for during testing. Remove in full game.
+		this.animations[0].drawFrame(
+			this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+		// Label for during testing. Remove in full game.
 		this.game.ctx.font = "48px serif";
 		this.game.ctx.fillText("F", this.x + 16, this.y + 48);
 	}
 }
 
-//Moves back and forth
-class beetle {
+// Moves back and forth
+class Beetle {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
@@ -64,7 +66,8 @@ class beetle {
 	}
 
 	loadAnimations() {
-		this.animations[0] = new Animator(this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
 	}
 
 	update() {
@@ -84,16 +87,17 @@ class beetle {
 	}
 
 	draw() {
-		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
-		//Test Label. Remove after getting proper sprites.
+		this.animations[0].drawFrame(
+			this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+		// Test Label. Remove after getting proper sprites.
 		this.game.font = '48px serif';
 		this.game.ctx.fillText("B", this.x + 16, this.y + 48);
 	}
 
 }
 
-//Hops towards the druid
-class hopper {
+// Hops towards the druid
+class Hopper {
 	constructor(game, druid, x, y) {
 		Object.assign(this, { game, druid, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
@@ -111,19 +115,21 @@ class hopper {
 	}
 
 	loadAnimations() {
-		this.animations[0] = new Animator(this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
 	}
 
 	update() {
-		//Keeps the hopper grounded for a brief moment before it can jump again.
+		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landLag -= this.game.clockTick;
 		if (this.landLag >= 0 && this.hop == false) {
 			return;
 		}
 		var xdist = this.x - this.druid.x;
 		var ydist = this.y - this.druid.y;
-		//If the hopper is hopping then check if it is time to increment the velocity, then move the hopper
-		//based on acceleration and gametime.
+		/* If the hopper is hopping then check if it is time to increment the
+		 * velocity, then move the hopper based on acceleration and gametime. 
+		 */
 		if (this.hop == true) {
 			this.hoptime += this.game.clockTick;
 			this.airtime += this.game.clockTick;
@@ -135,7 +141,7 @@ class hopper {
 			this.x += this.xspeed * this.game.clockTick;
 			this.y -= this.yspeed * this.game.clockTick;
 		} else if (Math.abs(xdist) < this.range && Math.abs(ydist) < this.range) {
-			//If not hopping and the player is close enough
+			// If not hopping and the player is close enough
 			this.hop = true;
 			this.yspeed = this.yspeedStart;
 			this.hoptime = 0;
@@ -167,7 +173,7 @@ class hopper {
 
 	draw() {
 		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
-		//Test Label. Remove after getting proper sprites.
+		// Test Label. Remove after getting proper sprites.
 		this.game.font = '48px serif';
 		this.game.ctx.fillText("H", this.x + 16, this.y + 48);
 	}

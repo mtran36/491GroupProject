@@ -105,8 +105,7 @@ class hopper {
 		this.hoptime = 0;
 		this.landLag = 0.3;
 		this.airtime = 0;
-		this.airstall = 2;
-		this.stallTime = 0;
+		this.range = 450;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -124,7 +123,7 @@ class hopper {
 		var xdist = this.x - this.druid.x;
 		var ydist = this.y - this.druid.y;
 		//If the hopper is hopping then check if it is time to increment the velocity, then move the hopper
-		//based on velocity and speed.
+		//based on acceleration and gametime.
 		if (this.hop == true) {
 			this.hoptime += this.game.clockTick;
 			this.airtime += this.game.clockTick;
@@ -135,7 +134,7 @@ class hopper {
 			}
 			this.x += this.xspeed * this.game.clockTick;
 			this.y -= this.yspeed * this.game.clockTick;
-		} else if (Math.abs(xdist) < 300 && Math.abs(ydist) < 300) {
+		} else if (Math.abs(xdist) < this.range && Math.abs(ydist) < this.range) {
 			//If not hopping and the player is close enough
 			this.hop = true;
 			this.yspeed = this.yspeedStart;

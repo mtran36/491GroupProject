@@ -126,6 +126,7 @@ class Hopper {
 		this.range = { x: 300, y: 300 };
 		this.status = 0; // 0 is idle, 1 is noticed player, 2 is start jump, 3 is mid-jump.
 		this.landLag = 0.3;
+		this.landingTime = this.landLag;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -137,10 +138,10 @@ class Hopper {
 
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
-		this.landLag -= this.game.clockTick;
+		this.landingTime -= this.game.clockTick;
 		var xdist = this.x - this.druid.x;
 		var ydist = this.y - this.druid.y;
-		if (this.landLag >= 0 && this.status === 2) {
+		if (this.landingTime >= 0 && this.status === 2) {
 			return;
 		}
 		var velocityChangeY = this.ACC.y * this.game.clockTick;
@@ -173,6 +174,7 @@ class Hopper {
 					if (this.y === this.game.surfaceHeight - 64) {
 						this.status = 0;
 					}
+					this.landingTime = this.landLag;
 				}
 				break;
 			default:

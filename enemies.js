@@ -5,12 +5,13 @@ class fly {
 	constructor(game, druid, x, y) {
 		Object.assign(this, { game, druid, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.flyTimeTotal = 0.4;
-		this.flyTimeRemain = this.flyTimeTotal;
-		this.xchange = 0;
-		this.ychange = 0;
-		this.speed = 160;
-		this.range = 350;
+		this.range = { x: 400, y: 400 };
+		this.ACC = {x: 7, y: 7}
+		this.velocityMAX = { x: 15, y: 15 };
+		this.velocity = { x: 0, y: 0 };
+		this.left = false;
+		this.up = false;
+		this.accelerate = false;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -20,26 +21,50 @@ class fly {
 	}
 
 	update() {
-		this.flyTimeRemain -= this.game.clockTick;
-		console.log
-		if (this.flyTimeRemain <= 0) {
-			var xdist = this.x - this.druid.x;
-			var ydist = this.y - this.druid.y;
-			var xmove = this.game.clockTick * this.speed;
-			var ymove = this.game.clockTick * this.speed;
-			if (Math.abs(xdist) < this.range && Math.abs(ydist) < this.range) {
-				if (xdist < 0) { this.xchange = xmove; }
-				if (xdist > 0) { this.xchange = 0 - xmove; }
-				if (ydist < 0) { this.ychange = ymove; }
-				if (ydist > 0) { this.ychange = 0 - ymove; }
+		var xdist = this.x - this.druid.x;
+		var ydist = this.y - this.druid.y;
+		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
+			if (xdist > 0) {
+				this.left = true;
 			} else {
-				this.xchange = 0;
-				this.ychange = 0;
+				this.left = false;
 			}
-			this.flyTimeRemain = this.flyTimeTotal;
+			if (ydist > 0) {
+				this.up = true;
+			} else {
+				this.up = false;
+			}
+			this.accelerate = true;
+		} else {
+			this.accelerate = false;
 		}
-		this.x += this.xchange;
-		this.y += this.ychange;
+		var velocityChangeX = this.ACC.x * this.game.clockTick;
+		var velocityChangeY = this.ACC.y * this.game.clockTick;
+		if (this.accelerate) {
+			if (this.left) {
+				this.velocity.x = Math.max(-1 * this.velocityMAX.x, this.velocity.x - velocityChangeX);
+			} else {
+				this.velocity.x = Math.min(this.velocityMAX.x, this.velocity.x + velocityChangeX);
+			}
+			if (this.up) {
+				this.velocity.y = Math.max(-1 * this.velocityMAX.y, this.velocity.y - velocityChangeY);
+			} else {
+				this.velocity.y = Math.min(this.velocityMAX.y, this.velocity.y + velocityChangeY);
+			}
+		} else {
+			if (this.velocity.x > 0) {
+				this.velocity.x = Math.max(0, this.velocity.x - velocityChangeX);
+			} else {
+				this.velocity.x = Math.min(0, this.velocity.x + velocityChangeX);
+			}
+			if (this.velocity.y > 0) {
+				this.velocity.y = Math.max(0, this.velocity.y - velocityChangeY);
+			} else {
+				this.velocity.y = Math.min(0, this.velocity.y + velocityChangeY);
+			}
+		}
+		this.x += this.velocity.x;
+		this.y += this.velocity.y;
 	}
 
 	draw() {
@@ -101,8 +126,8 @@ class hopper {
 		this.yspeed = 0;
 		this.yspeedStart = 500;
 		this.hop = false;
-		this.hoptick = 0.01;
-		this.hoptime = 0;
+		this.hoptime = 0.01;
+		this.hoptick = 0;
 		this.landLag = 0.3;
 		this.airtime = 0;
 		this.range = 450;
@@ -125,12 +150,12 @@ class hopper {
 		//If the hopper is hopping then check if it is time to increment the velocity, then move the hopper
 		//based on acceleration and gametime.
 		if (this.hop == true) {
-			this.hoptime += this.game.clockTick;
+			this.hoptick += this.game.clockTick;
 			this.airtime += this.game.clockTick;
-			if (this.hoptime >= this.hoptick) {
-				this.yspeed += params.velocityACC * this.airtime;
-				this.yspeed = this.yspeed < params.velocityMin ? params.velocityMin : this.yspeed;
-				this.hoptime = 0;
+			if (this.hoptick >= this.hoptime) {
+				this.yspeed += params.velocityACCy * this.airtime;
+				this.yspeed = this.yspeed < params.velocityMINy ? params.velocityMINy : this.yspeed;
+				this.hoptick = 0;
 			}
 			this.x += this.xspeed * this.game.clockTick;
 			this.y -= this.yspeed * this.game.clockTick;
@@ -138,7 +163,7 @@ class hopper {
 			//If not hopping and the player is close enough
 			this.hop = true;
 			this.yspeed = this.yspeedStart;
-			this.hoptime = 0;
+			this.hoptick = 0;
 			if (xdist >= 0) {
 				this.xspeed = Math.min(this.xspeed, -1 * this.xspeed);
 			} else {

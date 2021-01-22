@@ -4,6 +4,7 @@
 class Druid {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
+		this.game.druid = this;
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestPlayer.png");
 
 		this.animations = [];

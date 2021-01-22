@@ -2,8 +2,8 @@
 
 // Flies straight at druid.
 class Fly {
-	constructor(game, druid, x, y) {
-		Object.assign(this, { game, druid, x, y });
+	constructor(game, x, y) {
+		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
 		this.range = { x: 400, y: 400 };
 		this.ACC = {x: 1000, y: 1000}
@@ -22,8 +22,8 @@ class Fly {
 	}
 
 	update() {
-		var xdist = this.x - this.druid.x;
-		var ydist = this.y - this.druid.y;
+		var xdist = this.x - this.game.druid.x;
+		var ydist = this.y - this.game.druid.y;
 		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
 			this.left = xdist > 0;
 			this.up = ydist > 0;
@@ -115,8 +115,8 @@ class Beetle {
 
 // Hops towards the druid
 class Hopper {
-	constructor(game, druid, x, y) {
-		Object.assign(this, { game, druid, x, y });
+	constructor(game, x, y) {
+		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
 		this.velocityMAX = { y: 5000 };
 		this.jumpForce = 700;
@@ -139,8 +139,8 @@ class Hopper {
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landingTime -= this.game.clockTick;
-		var xdist = this.x - this.druid.x;
-		var ydist = this.y - this.druid.y;
+		var xdist = this.x - this.game.druid.x;
+		var ydist = this.y - this.game.druid.y;
 		if (this.landingTime >= 0 && this.status === 2) {
 			return;
 		}

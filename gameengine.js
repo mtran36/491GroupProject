@@ -10,10 +10,12 @@ class GameEngine {
         this.wheel = null;
         this.surfaceWidth = null;
         this.surfaceHeight = null;
+
         this.left = false;
         this.right = false;
         this.up = false;
         this.down = false;
+        this.B = false;
     };
 
     init(ctx) {
@@ -68,34 +70,58 @@ class GameEngine {
         this.ctx.canvas.addEventListener("keydown", function (e) {
             switch (e.code) {
                 case "ArrowLeft":
+                case "KeyA":
                     that.left = true;
                     break;
                 case "ArrowRight":
+                case "KeyD":
                     that.right = true;
                     break;
                 case "ArrowUp":
+                case "KeyW":
                     that.up = true;
                     break;
                 case "ArrowDown":
+                case "KeyS":
                     that.down = true;
                     break;
+                case "KeyZ":
+                case "KeyK":
+                    that.B = true;
+                    break;
+                //case "KeyX":
+                //case "KeyJ":
+                //    that.A = true;
+                //    break;
             }
         });
 
         this.ctx.canvas.addEventListener("keyup", function (e) {
             switch (e.code) {
                 case "ArrowLeft":
+                case "KeyA":
                     that.left = false;
                     break;
                 case "ArrowRight":
+                case "KeyD":
                     that.right = false;
                     break;
                 case "ArrowUp":
+                case "KeyW":
                     that.up = false;
                     break;
                 case "ArrowDown":
+                case "KeyS":
                     that.down = false;
                     break;
+                case "KeyZ":
+                case "KeyK":
+                    that.B = false;
+                    break;
+                //case "KeyX":
+                //case "KeyJ":
+                //    that.A = false;
+                //    break;
             }
         });
     };
@@ -121,6 +147,8 @@ class GameEngine {
                 entity.update();
             }
         }
+
+        this.camera.update();
 
         for (var i = this.entities.length - 1; i >= 0; --i) {
             if (this.entities[i].removeFromWorld) {

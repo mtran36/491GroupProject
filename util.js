@@ -28,5 +28,10 @@ window.requestAnimFrame = (function () {
 // add global parameters here
 
 var params = {
-    velocityACC: -75, velocityMin: -700
+    velocityACC: -75,
+    velocityMin: -700,
+    tileWidth: 64,
+    canvasWidth: 1024,
+    canvasHeight: 768,
+    debug: false
 };

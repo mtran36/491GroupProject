@@ -1,5 +1,7 @@
-//Player character
-class druid {
+/*
+ * Player character
+ */
+class Druid {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestPlayer.png");

@@ -16,11 +16,12 @@ class AssetManager {
     };
 
     downloadAll(callback) {
-        if (this.downloadQueue.length === 0) setTimeout(callback, 10);
+        if (this.downloadQueue.length === 0) {
+            setTimeout(callback, 10);
+        }
         for (var i = 0; i < this.downloadQueue.length; i++) {
             var img = new Image();
             var that = this;
-
             var path = this.downloadQueue[i];
             console.log(path);
 
@@ -29,7 +30,6 @@ class AssetManager {
                 that.successCount++;
                 if (that.isDone()) callback();
             });
-
             img.addEventListener("error", function () {
                 console.log("Error loading " + this.src);
                 that.errorCount++;

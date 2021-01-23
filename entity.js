@@ -9,7 +9,8 @@ class Entity {
         this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
         this.dim = { x: PARAMS.TILE_WIDTH, y: PARAMS.TILE_WIDTH };
         this.pos = { x: x, y: y };
-        this.worldBB = this.makeDefaultBoundingBox();
+        this.worldBB = new BoundingBox(
+            this.pos.x, this.pos.y, this.dim.x, this.dim.y);
         this.lastWorldBB = this.worldBB;
         this.animations = [];
     }
@@ -176,12 +177,10 @@ class BoundingBox {
      * @param {BoundingBox} other Bounds to collide with.
      */
     collide(other) {
-        if (this.right > other.left
+        return (this.right > other.left
             && this.left < other.right
             && this.top < other.bottom
-            && this.bottom > other.top) {
-            return true;
-        } else return false;
+            && this.bottom > other.top);
     }
 
     /**
@@ -214,9 +213,7 @@ class BoundingCircle {
         let dx = this.x - other.x;
         let dy = this.y - other.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < this.radius + other.radius) {
-            return true;
-        } else return false;
+        return (distance < this.radius + other.radius);
     }
 
     /**

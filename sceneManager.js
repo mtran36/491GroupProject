@@ -5,7 +5,7 @@ class SceneManager {
 		// connect sceneManager to game engine so game engine can update sceneManager
 		this.game.camera = this;
 
-		this.druid = new Druid(this.game, params.canvasWidth - 700, params.canvasHeight - params.tileWidth - 160);
+		this.druid = new Druid(this.game, params.canvasWidth - 700, 50);
 
 		this.loadTestLevel();
 	}
@@ -19,7 +19,13 @@ class SceneManager {
 		let ground = new Ground(this.game, 0, params.canvasHeight - params.tileWidth, 16);
 		this.game.addEntity(ground);
 
-		ground = new Ground(this.game, 0, params.canvasHeight - params.tileWidth * 5, 3);
+		ground = new Ground(this.game, 0, params.canvasHeight - params.tileWidth * 2, 1);
+		this.game.addEntity(ground);
+
+		ground = new Ground(this.game, params.canvasWidth - params.tileWidth, params.canvasHeight - params.tileWidth *2, 1);
+		this.game.addEntity(ground);
+
+		ground = new Ground(this.game, params.canvasWidth - params.tileWidth * 5, params.canvasHeight - params.tileWidth * 5, 3);
 		this.game.addEntity(ground);
 
 		this.game.addEntity(this.druid);
@@ -28,7 +34,5 @@ class SceneManager {
 	update() {
 		// debug check box detection
 		params.debug = document.getElementById("debug").checked;
-		// debug check box testing
-		console.log(params.debug);
 	};
 }

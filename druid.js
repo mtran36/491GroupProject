@@ -1,72 +1,82 @@
-/*
- * Player character
- */
-class Druid {
+/** Player character */
+class Druid extends Agent {
 	constructor(game, x, y) {
-		Object.assign(this, { game, x, y });
+		super(game, x, y, "./Sprites/druid.png");
+		this.setDimensions(97, 157);
 		this.game.druid = this;
-		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestPlayer.png");
-		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/druid.png");
 
 		this.facing = 0;	// 0 is left 1 is right
 		this.velocity = { x: 0, y: 0 };
 		this.animations = [];
 		this.loadAnimations();
 		this.isJumping = false;
-		this.fallAcc = 600;
+		this.loadAnimations();
 	}
 
+	/** @override */
+	checkCollisions() {
+		let that = this;
+		this.game.entities.forEach(function (entity) {
+			if (that.vel.y > 0) {
+				if (entity.worldBB && that.worldBB.collide(entity.worldBB)) {
+					if (entity instanceof Ground) {
+						that.isJumping = false;
+						that.pos.y = entity.worldBB.top - that.dim.y;
+						that.vel.y = 0;
+					}
+				}
+			}
+		});
+	}
+
+	/** @override */
 	loadAnimations() {
-		this.animations[0] = new Animator(this.spritesheet, 610, 780, 94, 160, 1, 0.25, 0 , false, true, false);
-
-
-		//this.animations[0] = new Animator(this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, false);
+		this.animations[1] = new Animator(
+			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, false);
 	}
 
+	/** @override */
 	update() {
+		const FALL_ACC = 1500;
 		const WALK_SPEED = 300;
+		const JUMP_VEL = 700;
 		const TICK = this.game.clockTick;
-		if (!this.isJumping) {
+
+		if (!this.isJumping) { 
 			if (this.game.B) {
-				this.velocity.y = -500;
+				this.vel.y = -JUMP_VEL;
 				this.isJumping = true;
 			}
 		} else {
-			this.velocity.y += this.fallAcc * TICK;
-        }
-		if (this.game.right) {
-			this.velocity.x = WALK_SPEED;
+			this.vel.y += FALL_ACC * TICK;
+		}
+		if (this.game.right) { 
+			this.vel.x = WALK_SPEED;
 		} else if (this.game.left) {
-			this.velocity.x = -WALK_SPEED;
+			this.vel.x = -WALK_SPEED;
 		} else {
-			this.velocity.x = 0;
+			this.vel.x = 0;
 		}
-
-		// for flying
-		//if (this.game.up) {
-		//	this.velocity.y = -WALK_SPEED;
-		//} else if (this.game.down) {
-		//	this.velocity.y = WALK_SPEED;
-		//} else {
-		//	this.velocity.y = 0;
-		//}
-
-		this.x += this.velocity.x * TICK;
-		this.y += this.velocity.y * TICK;
-
-		// collision detection haven't implemented, hard code landing
-		if (this.y > params.canvasHeight - params.tileWidth * 3.5) {
-			this.velocity.y = 0;
-			this.y = params.canvasHeight - params.tileWidth * 3.5;
-			this.isJumping = false;
-		}
-
-		// update direction
-		if (this.velocity.x < 0) this.facing = 0;
-		if (this.velocity.x > 0) this.facing = 1;
+		this.move(TICK);
 	}
 
-	draw(ctx) {
-		this.animations[0].drawFrame(this.game.clockTick, ctx, this.x, this.y, 1);
+	/** @override */
+	draw(context) {
+		// Display normally when facing left.
+		if (this.facing === 0) {
+			this.animations[this.facing].drawFrame(
+				this.game.clockTick, context, this.pos.x, this.pos.y, 1);
+		// Flip animation when facing right.
+		} else {
+			context.save();
+			context.scale(-1, 1);
+			this.animations[this.facing].drawFrame(
+				this.game.clockTick, context, -this.pos.x - this.dim.x, this.pos.y, 1);
+			context.restore();
+		}
+		this.worldBB.display(context);
+		this.agentBB.display(context);
 	}
 }

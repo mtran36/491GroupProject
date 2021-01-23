@@ -1,6 +1,4 @@
-// Enemies File.
-
-// Flies straight at druid.
+/** Flies straight at druid. */
 class Fly {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
@@ -69,7 +67,7 @@ class Fly {
 	}
 }
 
-// Moves back and forth
+/** Moves back and forth. */
 class Beetle {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
@@ -113,7 +111,7 @@ class Beetle {
 
 }
 
-// Hops towards the druid
+/** Hops towards the druid. */
 class Hopper {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });

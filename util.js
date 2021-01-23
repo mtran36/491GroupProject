@@ -1,37 +1,37 @@
-// returns a random integer between 0 and n-1
+/** Returns a random integer between 0 and n-1. */
 function randomInt(n) {
     return Math.floor(Math.random() * n);
-};
+}
 
-// returns a string that can be used as a rgb web color
+/** Returns a string that can be used as a rgb web color. */
 function rgb(r, g, b) {
     return "rgb(" + r + "," + g + "," + b + ")";
-};
+}
 
-// returns a string that can be used as a hsl web color
+/** Returns a string that can be used as a hsl web color. */
 function hsl(h, s, l) {
     return "hsl(" + h + "," + s + "%," + l + "%)";
-};
+}
 
-// creates an alias for requestAnimationFrame for backwards compatibility
+/** Creates an alias for requestAnimationFrame for backwards compatibility. */
 window.requestAnimFrame = (function () {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function (/* function */ callback, /* DOMElement */ element) {
+    return window.requestAnimationFrame
+        || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame
+        || window.oRequestAnimationFrame
+        || window.msRequestAnimationFrame
+        || function (/* function */ callback, /* DOMElement */ element) {
             window.setTimeout(callback, 1000 / 60);
         };
 })();
 
-// add global parameters here
-
-var params = {
-    velocityACC: -75,
-    velocityMin: -700,
-    tileWidth: 64,
-    canvasWidth: 1024,
-    canvasHeight: 768,
-    debug: false
+/** Add global parameters here */
+var PARAMS = {
+    VELOCITY_ACC: -75,
+    VELOCITY_MIN: -700,
+    TILE_WIDTH: 64,
+    CANVAS_WIDTH: 1024,
+    CANVAS_HEIGHT: 768,
+    BB_LINE_WIDTH: 5,
+    DEBUG: false
 };

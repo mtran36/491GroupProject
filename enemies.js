@@ -1,6 +1,4 @@
-// Enemies File.
-
-// Flies straight at druid.
+/** Flies straight at druid. */
 class Fly {
 	constructor(game, druid, x, y) {
 		Object.assign(this, { game, druid, x, y });
@@ -52,7 +50,7 @@ class Fly {
 	}
 }
 
-// Moves back and forth
+/** Moves back and forth. */
 class Beetle {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
@@ -96,7 +94,7 @@ class Beetle {
 
 }
 
-// Hops towards the druid
+/** Hops towards the druid. */
 class Hopper {
 	constructor(game, druid, x, y) {
 		Object.assign(this, { game, druid, x, y });
@@ -134,8 +132,8 @@ class Hopper {
 			this.hoptime += this.game.clockTick;
 			this.airtime += this.game.clockTick;
 			if (this.hoptime >= this.hoptick) {
-				this.yspeed += params.velocityACC * this.airtime;
-				this.yspeed = this.yspeed < params.velocityMin ? params.velocityMin : this.yspeed;
+				this.yspeed += PARAMS.VELOCITY_ACC * this.airtime;
+				this.yspeed = this.yspeed < PARAMS.VELOCITY_MIN ? PARAMS.VELOCITY_MIN : this.yspeed;
 				this.hoptime = 0;
 			}
 			this.x += this.xspeed * this.game.clockTick;

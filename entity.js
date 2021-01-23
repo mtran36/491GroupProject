@@ -9,7 +9,8 @@ class Entity {
         this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
         this.dim = { x: PARAMS.TILE_WIDTH, y: PARAMS.TILE_WIDTH };
         this.pos = { x: x, y: y };
-        this.worldBB = this.makeDefaultBoundingBox();
+        this.worldBB = new BoundingBox(
+            this.pos.x, this.pos.y, this.dim.x, this.dim.y);
         this.lastWorldBB = this.worldBB;
         this.animations = [];
     }

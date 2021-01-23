@@ -12,9 +12,9 @@ class SceneManager {
 
 	loadTestLevel() {
 	
-		//this.game.addEntity(new Fly(this.game, randomInt(800), randomInt(600)));
-		//this.game.addEntity(new Beetle(this.game, 0, params.tileWidth));
-		//this.game.addEntity(new Hopper(this.game, params.tileWidth, randomInt(600)))
+		//this.game.addEntity(new Fly(this.game, player, randomInt(800), randomInt(600)));
+		//this.game.addEntity(new Beetle(this.game, 0, this.game.surfaceHeight - 64));
+		//this.game.addEntity(new Hopper(this.game, player, 0, randomInt(600)))
 
 		let ground = new Ground(this.game, 0, params.canvasHeight - params.tileWidth, 16);
 		this.game.addEntity(ground);

@@ -1,16 +1,15 @@
-// Enemies File.
-
-// Flies straight at druid.
+/** Flies straight at druid. */
 class Fly {
-	constructor(game, druid, x, y) {
-		Object.assign(this, { game, druid, x, y });
+	constructor(game, x, y) {
+		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.flyTimeTotal = 0.4;
-		this.flyTimeRemain = this.flyTimeTotal;
-		this.xchange = 0;
-		this.ychange = 0;
-		this.speed = 160;
-		this.range = 350;
+		this.range = { x: 400, y: 400 };
+		this.ACC = {x: 1000, y: 1000}
+		this.velocityMAX = { x: 3500, y: 3500 };
+		this.velocity = { x: 0, y: 0 };
+		this.left = false;
+		this.up = false;
+		this.accelerate = false;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -21,26 +20,42 @@ class Fly {
 	}
 
 	update() {
-		this.flyTimeRemain -= this.game.clockTick;
-		console.log
-		if (this.flyTimeRemain <= 0) {
-			var xdist = this.x - this.druid.x;
-			var ydist = this.y - this.druid.y;
-			var xmove = this.game.clockTick * this.speed;
-			var ymove = this.game.clockTick * this.speed;
-			if (Math.abs(xdist) < this.range && Math.abs(ydist) < this.range) {
-				if (xdist < 0) { this.xchange = xmove; }
-				if (xdist > 0) { this.xchange = 0 - xmove; }
-				if (ydist < 0) { this.ychange = ymove; }
-				if (ydist > 0) { this.ychange = 0 - ymove; }
-			} else {
-				this.xchange = 0;
-				this.ychange = 0;
-			}
-			this.flyTimeRemain = this.flyTimeTotal;
+		var xdist = this.x - this.game.druid.x;
+		var ydist = this.y - this.game.druid.y;
+		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
+			this.left = xdist > 0;
+			this.up = ydist > 0;
+			this.accelerate = true;
+		} else {
+			this.accelerate = false;
 		}
-		this.x += this.xchange;
-		this.y += this.ychange;
+		var velocityChangeX = this.ACC.x * this.game.clockTick;
+		var velocityChangeY = this.ACC.y * this.game.clockTick;
+		if (this.accelerate) {
+			if (this.left) {
+				this.velocity.x = Math.max(-1 * this.velocityMAX.x, this.velocity.x - velocityChangeX);
+			} else {
+				this.velocity.x = Math.min(this.velocityMAX.x, this.velocity.x + velocityChangeX);
+			}
+			if (this.up) {
+				this.velocity.y = Math.max(-1 * this.velocityMAX.y, this.velocity.y - velocityChangeY);
+			} else {
+				this.velocity.y = Math.min(this.velocityMAX.y, this.velocity.y + velocityChangeY);
+			}
+		} else {
+			if (this.velocity.x > 0) {
+				this.velocity.x = Math.max(0, this.velocity.x - velocityChangeX);
+			} else {
+				this.velocity.x = Math.min(0, this.velocity.x + velocityChangeX);
+			}
+			if (this.velocity.y > 0) {
+				this.velocity.y = Math.max(0, this.velocity.y - velocityChangeY);
+			} else {
+				this.velocity.y = Math.min(0, this.velocity.y + velocityChangeY);
+			}
+		}
+		this.x += this.velocity.x * this.game.clockTick;
+		this.y += this.velocity.y * this.game.clockTick;
 	}
 
 	draw() {
@@ -52,7 +67,7 @@ class Fly {
 	}
 }
 
-// Moves back and forth
+/** Moves back and forth. */
 class Beetle {
 	constructor(game, x, y) {
 		Object.assign(this, { game, x, y });
@@ -96,20 +111,20 @@ class Beetle {
 
 }
 
-// Hops towards the druid
+/** Hops towards the druid. */
 class Hopper {
-	constructor(game, druid, x, y) {
-		Object.assign(this, { game, druid, x, y });
+	constructor(game, x, y) {
+		Object.assign(this, { game, x, y });
 		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.xspeed = 400;
-		this.yspeed = 0;
-		this.yspeedStart = 500;
-		this.hop = false;
-		this.hoptick = 0.01;
-		this.hoptime = 0;
+		this.velocityMAX = { y: 5000 };
+		this.jumpForce = 700;
+		this.velocity = { x: 350, y: 0 };
+		this.ACC = { y: 2500 };
+		this.left = false;
+		this.range = { x: 300, y: 300 };
+		this.status = 0; // 0 is idle, 1 is noticed player, 2 is start jump, 3 is mid-jump.
 		this.landLag = 0.3;
-		this.airtime = 0;
-		this.range = 450;
+		this.landingTime = this.landLag;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -121,53 +136,49 @@ class Hopper {
 
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
-		this.landLag -= this.game.clockTick;
-		if (this.landLag >= 0 && this.hop == false) {
+		this.landingTime -= this.game.clockTick;
+		var xdist = this.x - this.game.druid.x;
+		var ydist = this.y - this.game.druid.y;
+		if (this.landingTime >= 0 && this.status === 2) {
 			return;
 		}
-		var xdist = this.x - this.druid.x;
-		var ydist = this.y - this.druid.y;
-		/* If the hopper is hopping then check if it is time to increment the
-		 * velocity, then move the hopper based on acceleration and gametime. 
-		 */
-		if (this.hop == true) {
-			this.hoptime += this.game.clockTick;
-			this.airtime += this.game.clockTick;
-			if (this.hoptime >= this.hoptick) {
-				this.yspeed += params.velocityACC * this.airtime;
-				this.yspeed = this.yspeed < params.velocityMin ? params.velocityMin : this.yspeed;
-				this.hoptime = 0;
-			}
-			this.x += this.xspeed * this.game.clockTick;
-			this.y -= this.yspeed * this.game.clockTick;
-		} else if (Math.abs(xdist) < this.range && Math.abs(ydist) < this.range) {
-			// If not hopping and the player is close enough
-			this.hop = true;
-			this.yspeed = this.yspeedStart;
-			this.hoptime = 0;
-			if (xdist >= 0) {
-				this.xspeed = Math.min(this.xspeed, -1 * this.xspeed);
-			} else {
-				this.xspeed = Math.max(this.xspeed, -1 * this.xspeed);
-			}
-			this.x += this.xspeed * this.game.clockTick;
-			this.y -= this.yspeed * this.game.clockTick;
-		}
-		if (this.y >= this.game.surfaceHeight - 64) {
-			this.y = this.game.surfaceHeight - 64;
-			this.hop = false;
-			this.landLag = 0.2;
-			this.airtime = 0;
-		}
-		if (this.y <= 0) {
-			this.y = 0;
-			this.yspeed = Math.min(this.yspeed, 25);
-		}
-		if (this.x <= 0) {
-			this.x = 0;
-		}
-		if (this.x >= this.game.surfaceWidth - 64) {
-			this.x = this.game.surfaceWidth - 64;
+		var velocityChangeY = this.ACC.y * this.game.clockTick;
+		switch (this.status) {
+			case 0:
+				if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
+					this.status = 1;
+					this.left = xdist > 0;
+				}
+				break;
+			case 1:
+				if (this.left) {
+					this.velocity.x = Math.min(-1 * this.velocity.x, this.velocity.x);
+				} else {
+					this.velocity.x = Math.max(this.velocity.x, -1 * this.velocity.x);
+				}
+				this.velocity.y = -1 * this.jumpForce;
+				this.status = 2;
+				break;
+			case 2:
+			case 3:
+				this.velocity.y = Math.min(this.velocityMAX.y, this.velocity.y + velocityChangeY);
+				this.status = 3;
+				this.x += this.velocity.x * this.game.clockTick;
+				this.y += this.velocity.y * this.game.clockTick;
+				if (this.y > this.game.surfaceHeight - 64) {
+					this.y = this.game.surfaceHeight - 64;
+				}
+				if (this.status === 3) {
+					if (this.y === this.game.surfaceHeight - 64) {
+						this.status = 0;
+					}
+					this.landingTime = this.landLag;
+				}
+				break;
+			default:
+				console.log("Illegal status = ");
+				console.log(this.status);
+
 		}
 	}
 

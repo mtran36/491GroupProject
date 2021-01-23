@@ -9,46 +9,56 @@ class Animator {
         this.totalTime = this.frameCount * this.frameDuration;
     };
 
-    drawFrame(tick, ctx, x, y, scale) {
-        this.elapsedTime += tick;
-
+    /**
+     * Draws the current frame of the animation to the screen with the designated 
+     * parameters. Calls to drawFrame occur once per tick, which may be more than once 
+     * per frame due to the way the engine scales animation speeds.
+     * @param {Number} tick Amount of time which has passed since the last tick.
+     * @param {CanvasImageSource} context Canvas to draw on.
+     * @param {Number} x The x-axis coordinate in the canvas at which to place the top
+     * left corner of the source image.
+     * @param {Number} y The y-axis coordinate in the canvas at which to place the top
+     * left corner of the source image.
+     * @param {Number} scale
+     */
+    drawFrame(tick, context, x, y, scale) {
+        // Check if animation is done
+        this.elapsedTime += tick; 
         if (this.isDone()) {
             if (this.loop) {
                 this.elapsedTime -= this.totalTime;
-            } else {
-                return;
-            }
+            } else return;
         }
-
+        // Prepare current frame
         let frame = this.currentFrame();
         if (this.reverse) frame = this.frameCount - frame - 1;
         if (this.flip) {
-            ctx.save();
-            ctx.scale(-1, 1);
-            x = 0 - x - width * scale;
-        }
-
-        ctx.drawImage(this.spritesheet,
+            context.save();
+            context.scale(-1, 1);
+            x = 0 - x - this.width * scale;
+        } 
+        // Draw current frame
+        context.drawImage(this.spritesheet,
             this.xStart + frame * (this.width + this.framePadding), this.yStart,
             this.width, this.height,
             x, y,
             this.width * scale,
-            this.height * scale);
-
+            this.height * scale); 
+        // Restore canvas context to previous settings.
         if (this.flip) {
-            ctx.restore();
+            context.restore();
         }
-
-        /* if (PARAMS.DEBUG) {
-            ctx.strokeStyle = 'Green';
-            ctx.strokeRect(x, y, this.width * scale, this.height * scale);
-        } */
     };
 
+    /** 
+     * Returns the frame step the animation is on. This may not be the same number
+     * as the frame being displayed if reverse is enabled.
+     */
     currentFrame() {
         return Math.floor(this.elapsedTime / this.frameDuration);
     };
 
+    /** Returns whether or not this animation has completed. */
     isDone() {
         return (this.elapsedTime >= this.totalTime);
     };

@@ -96,6 +96,7 @@ class Agent extends Entity {
         this.facing = 0;
         this.agentBB = this.makeDefaultBoundingCircle();
         this.lastAgentBB = this.agentBB;
+        this.loadAnimations();
     }
 
     /** Updates this entity's facing direction. */
@@ -117,6 +118,7 @@ class Agent extends Entity {
         this.pos.y += this.vel.y * tick;
         this.updateBB();
         this.checkCollisions();
+        this.updateBB();
         this.updateFacing();
     }
 

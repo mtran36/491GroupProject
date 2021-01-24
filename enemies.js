@@ -8,12 +8,10 @@ class Fly extends Agent {
 		super(game, x, y, "./Sprites/TestEnemy.png");
 		this.range = { x: 800, y: 800 };
 		this.ACC = {x: 500, y: 500}
-		this.velMax = { x: 200, y: 200 };
+		this.velMax = { x: 400, y: 400 };
 		this.left = false;
 		this.up = false;
 		this.accelerate = false;
-		this.animations = [];
-		this.loadAnimations();
 	}
 
 	loadAnimations() {
@@ -35,12 +33,12 @@ class Fly extends Agent {
 		var velChangeY = this.ACC.y * this.game.clockTick;
 		if (this.accelerate) {
 			if (this.left) {
-				this.vel.x = Math.max(-1 * this.velMax.x, this.vel.x - velChangeX);
+				this.vel.x = Math.max(-this.velMax.x, this.vel.x - velChangeX);
 			} else {
 				this.vel.x = Math.min(this.velMax.x, this.vel.x + velChangeX);
 			}
 			if (this.up) {
-				this.vel.y = Math.max(-1 * this.velMax.y, this.vel.y - velChangeY);
+				this.vel.y = Math.max(-this.velMax.y, this.vel.y - velChangeY);
 			} else {
 				this.vel.y = Math.min(this.velMax.y, this.vel.y + velChangeY);
 			}
@@ -68,25 +66,24 @@ class Fly extends Agent {
 				if (this.worldBB.collide(oth.worldBB)) {
 					if (oth instanceof Ground) {
 						if (this.worldBB.bottom >= oth.worldBB.top
-							&& this.worldBB.top <= oth.worldBB.top) {
-							this.pos.y = oth.worldBB.top - PARAMS.TILE_WIDTH;
-							this.vel.y = 0;
-							console.log(this.pos.y);
+							&& this.lastWorldBB.bottom < oth.worldBB.top) {
+							this.pos.y = oth.worldBB.top - PARAMS.TILE_WIDTH - 1;
+							this.vel.y = -this.vel.y;
 						}
 						if (this.worldBB.top <= oth.worldBB.bottom
-							&& this.worldBB.bottom >= oth.worldBB.bottom) {
-							this.pos.y = oth.worldBB.bottom;
-							this.vel.y = 0;
+							&& this.lastWorldBB.top > oth.worldBB.bottom) {
+							this.pos.y = oth.worldBB.bottom + 1;
+							this.vel.y = -this.vel.y;
 						}
 						if (this.worldBB.right >= oth.worldBB.left
-							&& this.worldBB.left <= oth.worldBB.left) {
-							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH;
-							this.vel.x = 0;
+							&& this.lastWorldBB.right < oth.worldBB.left) {
+							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+							this.vel.x = -this.vel.x;
 						}
 						if (this.worldBB.left <= oth.worldBB.right
-							&& this.worldBB.right >= oth.worldBB.right) {
-							this.pos.x = oth.worldBB.right;
-							this.vel.x = 0;
+							&& this.lastWorldBB.left > oth.worldBB.right) {
+							this.pos.x = oth.worldBB.right + 1;
+							this.vel.x = -this.vel.x;
 						}
 					}
 				}
@@ -143,7 +140,7 @@ class Beetle extends Agent{
 						}
 						if (this.worldBB.right > oth.worldBB.right) {
 							this.facing = 0;
-							this.vel.x = 0 - this.xspeed;
+							this.vel.x = -this.xspeed;
 						}
 					}
 				}
@@ -179,8 +176,8 @@ class Hopper extends Agent {
 		this.left = false;
 		this.range = { x: 300, y: 300 };
 		this.landLag = 0.3;
-		this.landingTime = this.landLag;
-		this.jumping = true;
+		this.landTime = this.landLag;
+		this.jumping = false;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -192,24 +189,22 @@ class Hopper extends Agent {
 
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
-		this.landingTime -= this.game.clockTick;
-		if (this.landingTime >= 0 && !this.jumping) {
-			return;
-		}
+		this.landTime -= this.game.clockTick;
 		var xdist = this.pos.x - this.game.druid.pos.x;
 		var ydist = this.pos.y - this.game.druid.pos.y;
 		if (Math.abs(xdist) < this.range.x
 			&& Math.abs(ydist) < this.range.y
-			&& !this.jumping) {
+			&& !this.jumping
+			&& this.landTime < 0) {
 			this.left = xdist > 0;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
 		if (this.jumping) {
 			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
-			this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
-			this.move(this.game.clockTick);
 		}
+		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
+		this.move(this.game.clockTick);
 	}
 
 	checkCollisions() {
@@ -219,11 +214,34 @@ class Hopper extends Agent {
 
 			} else {
 				if (this.worldBB.collide(oth.worldBB)) {
-					this.jumping = false;
-					this.landTime = this.landingLag;
-					this.vel.x = 0;
-					this.vel.y = 0;
-					this.pos.y = oth.worldBB.top - PARAMS.TILE_WIDTH;
+					if (oth instanceof Ground) {
+						if (this.worldBB.bottom >= oth.worldBB.top
+							&& this.lastWorldBB.bottom < oth.worldBB.top) {
+							this.pos.y = oth.worldBB.top - this.dim.y - 1;
+							if (this.jumping) {
+								this.landTime = this.landLag;
+							}
+							this.jumping = false;
+							this.vel.y = 0;
+							this.vel.x = 0;
+							this.status = 0;
+						}
+						if (this.worldBB.top <= oth.worldBB.bottom
+							&& this.lastWorldBB.top > oth.worldBB.bottom) {
+							this.pos.y = oth.worldBB.bottom + 1;
+							this.vel.y = 0;
+						}
+						if (this.worldBB.right >= oth.worldBB.left
+							&& this.lastWorldBB.right < oth.worldBB.left) {
+							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+							this.vel.x = -this.vel.x;
+						}
+						if (this.worldBB.left <= oth.worldBB.right
+							&& this.lastWorldBB.left > oth.worldBB.right) {
+							this.pos.x = oth.worldBB.right + 1;
+							this.vel.x = -this.vel.x;
+						}
+					}
 				}
 			}
 		}

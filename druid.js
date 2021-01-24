@@ -10,6 +10,7 @@ class Druid extends Agent {
 		this.animations = [];
 		this.loadAnimations();
 		this.isJumping = false;
+
 		this.loadAnimations();
 	}
 
@@ -17,15 +18,33 @@ class Druid extends Agent {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
-			if (that.vel.y > 0) {
-				if (entity.worldBB && that.worldBB.collide(entity.worldBB)) {
-					if (entity instanceof Ground) {
-						that.isJumping = false;
-						that.pos.y = entity.worldBB.top - that.dim.y;
-						that.vel.y = 0;
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+				&& !(entity instanceof Druid)) {
+				if (entity instanceof Ground) {
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top) { // falling dowm
+							that.pos.y = entity.worldBB.top - that.dim.y;
+							that.vel.y = 0;
+							if (that.isJumping) that.isJumping = false;
+							that.updateBB();
+						}
+					}
+					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom) { // jumping up
+							that.pos.y = entity.worldBB.bottom;
+							that.vel.y = 0;
+							that.isJumping = true;
+							that.updateBB();
+					}
+					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = 0;
+						that.updateBB();
+					}
+					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+						that.pos.x = entity.worldBB.left - that.dim.x;
+						that.vel.x = 0;
+						that.updateBB();
 					}
 				}
-			}
 		});
 	}
 
@@ -41,17 +60,17 @@ class Druid extends Agent {
 	update() {
 		const FALL_ACC = 1500;
 		const WALK_SPEED = 300;
-		const JUMP_VEL = 700;
+		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
 
-		if (!this.isJumping) { 
-			if (this.game.B) {
+		if (!this.isJumping && this.game.B) { 
 				this.vel.y = -JUMP_VEL;
 				this.isJumping = true;
-			}
 		} else {
 			this.vel.y += FALL_ACC * TICK;
+			this.isJumping = true;
 		}
+
 		if (this.game.right) { 
 			this.vel.x = WALK_SPEED;
 		} else if (this.game.left) {

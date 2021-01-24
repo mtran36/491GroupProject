@@ -145,6 +145,9 @@ class GameEngine {
                 this.entities.splice(i, 1);
             }
         }
+        for (var i = 0; i < entitiesCount; i++) {
+            this.entities[i].updateBB();
+        }
     };
 
     /** Main game loop. Defines the update/render order of the engine. */

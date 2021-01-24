@@ -118,7 +118,6 @@ class Agent extends Entity {
         this.pos.y += this.vel.y * tick;
         this.updateBB();
         this.checkCollisions();
-        this.updateBB();
         this.updateFacing();
     }
 

@@ -1,9 +1,13 @@
+class Enemy extends Agent {
+
+}
+
 /**
  * Enemy type: Fly
  * Movemenet pattern: Flies straight at player. Collides with all non-enemy objects.
  * 
  * */
-class Fly extends Agent {
+class Fly extends Enemy {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
 		this.range = { x: 800, y: 800 };
@@ -60,31 +64,29 @@ class Fly extends Agent {
 	checkCollisions() {
 		for (var i = this.game.entities.length - 1; i >= 0; --i) {
 			var oth = this.game.entities[i];
-			if (oth instanceof Agent) {
+			if (oth instanceof Agent && !(oth instanceof Enemy)) {
 
 			} else {
 				if (this.worldBB.collide(oth.worldBB)) {
-					if (oth instanceof Ground) {
-						if (this.worldBB.bottom >= oth.worldBB.top
-							&& this.lastWorldBB.bottom < oth.worldBB.top) {
-							this.pos.y = oth.worldBB.top - PARAMS.TILE_WIDTH - 1;
-							this.vel.y = -this.vel.y;
-						}
-						if (this.worldBB.top <= oth.worldBB.bottom
-							&& this.lastWorldBB.top > oth.worldBB.bottom) {
-							this.pos.y = oth.worldBB.bottom + 1;
-							this.vel.y = -this.vel.y;
-						}
-						if (this.worldBB.right >= oth.worldBB.left
-							&& this.lastWorldBB.right < oth.worldBB.left) {
-							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
-							this.vel.x = -this.vel.x;
-						}
-						if (this.worldBB.left <= oth.worldBB.right
-							&& this.lastWorldBB.left > oth.worldBB.right) {
-							this.pos.x = oth.worldBB.right + 1;
-							this.vel.x = -this.vel.x;
-						}
+					if (this.worldBB.bottom > oth.worldBB.top
+						&& this.lastWorldBB.bottom <= oth.worldBB.top) {
+						this.pos.y = oth.worldBB.top - PARAMS.TILE_WIDTH - 1;
+						this.vel.y = -this.vel.y;
+					}
+					if (this.worldBB.top < oth.worldBB.bottom
+						&& this.lastWorldBB.top >= oth.worldBB.bottom) {
+						this.pos.y = oth.worldBB.bottom + 1;
+						this.vel.y = -this.vel.y;
+					}
+					if (this.worldBB.right > oth.worldBB.left
+						&& this.lastWorldBB.right <= oth.worldBB.left) {
+						this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+						this.vel.x = -this.vel.x;
+					}
+					if (this.worldBB.left < oth.worldBB.right
+						&& this.lastWorldBB.left >= oth.worldBB.right) {
+						this.pos.x = oth.worldBB.right + 1;
+						this.vel.x = -this.vel.x;
 					}
 				}
 			}
@@ -106,7 +108,7 @@ class Fly extends Agent {
  * Movement pattern: Moves back and forth on a platform or the ground.
  * 
  * */
-class Beetle extends Agent{
+class Beetle extends Enemy{
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
 
@@ -129,7 +131,7 @@ class Beetle extends Agent{
 	checkCollisions() {
 		for (var i = this.game.entities.length - 1; i >= 0; --i) {
 			var oth = this.game.entities[i];
-			if (oth instanceof Agent) {
+			if (oth instanceof Agent && !(oth instanceof Enemy)) {
 
 			} else {
 				if (this.worldBB.collide(oth.worldBB)) {
@@ -141,6 +143,18 @@ class Beetle extends Agent{
 						if (this.worldBB.right > oth.worldBB.right) {
 							this.facing = 0;
 							this.vel.x = -this.xspeed;
+						}
+					}
+					if (oth instanceof Enemy) {
+						if (this.worldBB.right > oth.worldBB.left
+							&& this.lastWorldBB.right <= oth.worldBB.left) {
+							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+							this.vel.x = -this.vel.x;
+						}
+						if (this.worldBB.left < oth.worldBB.right
+							&& this.lastWorldBB.left >= oth.worldBB.right) {
+							this.pos.x = oth.worldBB.right + 1;
+							this.vel.x = -this.vel.x;
 						}
 					}
 				}
@@ -166,7 +180,7 @@ class Beetle extends Agent{
  * 
  * Has a bit of landing lag before it can hop again.
  * */
-class Hopper extends Agent {
+class Hopper extends Enemy {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
 		this.velMax = { y: 500 };
@@ -210,7 +224,7 @@ class Hopper extends Agent {
 	checkCollisions() {
 		for (var i = this.game.entities.length - 1; i >= 0; --i) {
 			var oth = this.game.entities[i];
-			if (oth instanceof Agent) {
+			if (oth instanceof Agent && !(oth instanceof Enemy)) {
 
 			} else {
 				if (this.worldBB.collide(oth.worldBB)) {
@@ -241,6 +255,9 @@ class Hopper extends Agent {
 							this.pos.x = oth.worldBB.right + 1;
 							this.vel.x = -this.vel.x;
 						}
+					}
+					if (oth instanceof Enemy) {
+
 					}
 				}
 			}

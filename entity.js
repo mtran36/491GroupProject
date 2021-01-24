@@ -118,6 +118,7 @@ class Agent extends Entity {
         this.pos.y += this.vel.y * tick;
         this.updateBB();
         this.checkCollisions();
+        this.worldBB = this.makeDefaultBoundingBox();
         this.updateFacing();
     }
 

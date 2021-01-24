@@ -67,24 +67,22 @@ class Fly extends Enemy {
 			if (oth instanceof Agent && !(oth instanceof Enemy)) {
 
 			} else {
+				var direction = collisionDirectionWorld(this, oth);
 				if (this.worldBB.collide(oth.worldBB)) {
-					if (this.worldBB.bottom > oth.worldBB.top
-						&& this.lastWorldBB.bottom <= oth.worldBB.top) {
-						this.pos.y = oth.worldBB.top - PARAMS.TILE_WIDTH - 1;
+					if (direction.down) {
+						this.pos.y = oth.worldBB.top - this.dim.y - 1;
 						this.vel.y = -this.vel.y;
 					}
-					if (this.worldBB.top < oth.worldBB.bottom
-						&& this.lastWorldBB.top >= oth.worldBB.bottom) {
+					if (direction.up) {
 						this.pos.y = oth.worldBB.bottom + 1;
 						this.vel.y = -this.vel.y;
 					}
-					if (this.worldBB.right > oth.worldBB.left
+					if (direction.right > oth.worldBB.left
 						&& this.lastWorldBB.right <= oth.worldBB.left) {
-						this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+						this.pos.x = oth.worldBB.left - this.dim.x - 1;
 						this.vel.x = -this.vel.x;
 					}
-					if (this.worldBB.left < oth.worldBB.right
-						&& this.lastWorldBB.left >= oth.worldBB.right) {
+					if (direction.left) {
 						this.pos.x = oth.worldBB.right + 1;
 						this.vel.x = -this.vel.x;
 					}
@@ -99,6 +97,8 @@ class Fly extends Enemy {
 		// Label for during testing. Remove in full game.
 		context.font = "48px serif";
 		context.fillText("F", this.pos.x + 16, this.pos.y + 48);
+		this.worldBB.display(context);
+		this.agentBB.display(context);
 	}
 }
 
@@ -148,7 +148,7 @@ class Beetle extends Enemy{
 					if (oth instanceof Enemy) {
 						if (this.worldBB.right > oth.worldBB.left
 							&& this.lastWorldBB.right <= oth.worldBB.left) {
-							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+							this.pos.x = oth.worldBB.left - this.dim.x - 1;
 							this.vel.x = -this.vel.x;
 						}
 						if (this.worldBB.left < oth.worldBB.right
@@ -228,9 +228,10 @@ class Hopper extends Enemy {
 
 			} else {
 				if (this.worldBB.collide(oth.worldBB)) {
+					var temp = this.lastWorldBB;
+					var direction = collisionDirectionWorld(this, oth);
 					if (oth instanceof Ground) {
-						if (this.worldBB.bottom >= oth.worldBB.top
-							&& this.lastWorldBB.bottom < oth.worldBB.top) {
+						if (direction.down) {
 							this.pos.y = oth.worldBB.top - this.dim.y - 1;
 							if (this.jumping) {
 								this.landTime = this.landLag;
@@ -240,24 +241,36 @@ class Hopper extends Enemy {
 							this.vel.x = 0;
 							this.status = 0;
 						}
-						if (this.worldBB.top <= oth.worldBB.bottom
-							&& this.lastWorldBB.top > oth.worldBB.bottom) {
+						if (direction.up) {
 							this.pos.y = oth.worldBB.bottom + 1;
 							this.vel.y = 0;
 						}
-						if (this.worldBB.right >= oth.worldBB.left
-							&& this.lastWorldBB.right < oth.worldBB.left) {
-							this.pos.x = oth.worldBB.left - PARAMS.TILE_WIDTH - 1;
+						if (direction.right) {
+							this.pos.x = oth.worldBB.left - this.dim.x - 1;
 							this.vel.x = -this.vel.x;
 						}
-						if (this.worldBB.left <= oth.worldBB.right
-							&& this.lastWorldBB.left > oth.worldBB.right) {
+						if (direction.left) {
 							this.pos.x = oth.worldBB.right + 1;
 							this.vel.x = -this.vel.x;
 						}
 					}
 					if (oth instanceof Enemy) {
-
+						if (direction.down) {
+							this.pos.y = oth.worldBB.top - this.dim.y - 1;
+							this.vel.y = -this.vel.y;
+						}
+						if (direction.up) {
+							this.pos.y = oth.worldBB.bottom + 1;
+							this.vel.y = -this.vel.y;
+						}
+						if (direction.right) {
+							this.pos.x = oth.worldBB.left - this.dim.x - 1;
+							this.vel.x = -this.vel.x;
+						}
+						if (direction.left) {
+							this.pos.x = oth.worldBB.right + 1;
+							this.vel.x = -this.vel.x;
+						}
 					}
 				}
 			}
@@ -273,4 +286,21 @@ class Hopper extends Enemy {
 		this.worldBB.display(context);
 		this.agentBB.display(context);
 	}
+}
+
+/**
+ * Takes in two entities and returns the direction of collision relative to the
+ * self as a tuple of values.
+ * i.e. if self is moving right and collides with other, then right will be true.
+ */
+function collisionDirectionWorld(self, oth) {
+	var down = self.worldBB.bottom >= oth.worldBB.top
+		&& self.lastWorldBB.bottom < oth.lastWorldBB.top;
+	var up = self.worldBB.top <= oth.worldBB.bottom
+		&& self.lastWorldBB.top > oth.lastWorldBB.bottom;
+	var right = self.worldBB.right >= oth.worldBB.left
+		&& self.lastWorldBB.right < oth.lastWorldBB.left;
+	var left = self.worldBB.left <= oth.worldBB.right
+		&& self.lastWorldBB.left > oth.lastWorldBB.right;
+	return { down, up, right, left };
 }

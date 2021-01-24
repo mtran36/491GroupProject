@@ -9,8 +9,7 @@ class Entity {
         this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
         this.dim = { x: PARAMS.TILE_WIDTH, y: PARAMS.TILE_WIDTH };
         this.pos = { x: x, y: y };
-        this.worldBB = new BoundingBox(
-            this.pos.x, this.pos.y, this.dim.x, this.dim.y);
+        this.worldBB = this.makeDefaultBoundingBox();
         this.lastWorldBB = this.worldBB;
         this.animations = [];
     }
@@ -93,7 +92,7 @@ class Agent extends Entity {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
         this.vel = { x: 0, y: 0 };
-        // Left = 1, Right = 0
+        // Left = 0, Right = 1
         this.facing = 0;
         this.agentBB = this.makeDefaultBoundingCircle();
         this.lastAgentBB = this.agentBB;

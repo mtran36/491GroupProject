@@ -34,7 +34,7 @@ class Druid extends Agent {
 		this.animations[0] = new Animator(
 			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, false);
 		this.animations[1] = new Animator(
-			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, false);
+			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, true);
 	}
 
 	/** @override */
@@ -65,17 +65,8 @@ class Druid extends Agent {
 	/** @override */
 	draw(context) {
 		// Display normally when facing left.
-		if (this.facing === 0) {
-			this.animations[this.facing].drawFrame(
-				this.game.clockTick, context, this.pos.x, this.pos.y, 1);
-		// Flip animation when facing right.
-		} else {
-			context.save();
-			context.scale(-1, 1);
-			this.animations[this.facing].drawFrame(
-				this.game.clockTick, context, -this.pos.x - this.dim.x, this.pos.y, 1);
-			context.restore();
-		}
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick, context, this.pos.x, this.pos.y, 1);
 		this.worldBB.display(context);
 		this.agentBB.display(context);
 	}

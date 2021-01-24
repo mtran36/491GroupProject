@@ -22,17 +22,14 @@ class Druid extends Agent {
 				&& !(entity instanceof Druid)) {
 				if (entity instanceof Ground) {
 					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top) { // falling dowm
-							that.pos.y = entity.worldBB.top - that.dim.y;
-							that.vel.y = 0;
-							if (that.isJumping) that.isJumping = false;
-							that.updateBB();
-						}
+						that.pos.y = entity.worldBB.top - that.dim.y;
+						that.vel.y = 0;
+						if (that.isJumping) that.isJumping = false;
 					}
 					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom) { // jumping up
-							that.pos.y = entity.worldBB.bottom;
-							that.vel.y = 0;
-							that.isJumping = true;
-							that.updateBB();
+						that.pos.y = entity.worldBB.bottom;
+						that.vel.y = 0;
+						that.isJumping = true;
 					}
 					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
 						that.pos.x = entity.worldBB.right;
@@ -45,6 +42,7 @@ class Druid extends Agent {
 						that.updateBB();
 					}
 				}
+			}
 		});
 	}
 

@@ -21,10 +21,11 @@ class SceneManager {
 			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
 		this.game.addEntity(new Ground(
 			this.game, PARAMS.TILE_WIDTH * 7, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 3));
+
 		this.game.addEntity(new Ground(
 			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2, 1));
 		this.game.addEntity(new Ground(this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 7,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 3, 1));
+			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
 		this.game.addEntity(new Ground(this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
 			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2, 1));
 

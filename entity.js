@@ -119,6 +119,7 @@ class Agent extends Entity {
         this.updateBB();
         this.checkCollisions();
         this.updateFacing();
+        this.updateBB();
     }
 
     /** Returns a default bounding circle for agents. */

@@ -17,12 +17,30 @@ class Druid extends Agent {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
-			if (that.vel.y > 0) {
-				if (entity.worldBB && that.worldBB.collide(entity.worldBB)) {
-					if (entity instanceof Ground) {
-						that.isJumping = false;
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+				&& !(entity instanceof Druid)) {
+				if (entity instanceof Ground) {
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+						&& (that.lastWorldBB.left) < entity.worldBB.right
+						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
 						that.vel.y = 0;
+						that.isJumping = false;
+					}
+					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
+						&& (that.lastWorldBB.left) != entity.worldBB.right
+						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+						that.pos.y = entity.worldBB.bottom;
+						that.vel.y = 0;
+						that.isJumping = true;
+					}
+					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = 0;
+					}
+					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+						that.pos.x = entity.worldBB.left - that.dim.x;
+						that.vel.x = 0;
 					}
 				}
 			}
@@ -41,17 +59,17 @@ class Druid extends Agent {
 	update() {
 		const FALL_ACC = 1500;
 		const WALK_SPEED = 300;
-		const JUMP_VEL = 700;
+		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
 
-		if (!this.isJumping) { 
-			if (this.game.B) {
+		if (!this.isJumping && this.game.B) { 
 				this.vel.y = -JUMP_VEL;
 				this.isJumping = true;
-			}
 		} else {
 			this.vel.y += FALL_ACC * TICK;
+			this.isJumping = true;
 		}
+
 		if (this.game.right) { 
 			this.vel.x = WALK_SPEED;
 		} else if (this.game.left) {
@@ -59,6 +77,7 @@ class Druid extends Agent {
 		} else {
 			this.vel.x = 0;
 		}
+		console.log("Isjumping:" + this.isJumping);
 		this.move(TICK);
 	}
 

@@ -1,5 +1,8 @@
 class Enemy extends Agent {
-
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/TestEnemy.png");
+		this.damage = 1;
+	}
 }
 
 /**

@@ -12,7 +12,8 @@ class SceneManager {
 			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 16));
 		this.game.addEntity(new Ground(
 			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
-
+		this.game.addEntity(new Ground(
+			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 4, 3));
 		this.game.addEntity(new Fly(
 			this.game, randomInt(800), randomInt(600)));
 		this.game.addEntity(new Fly(

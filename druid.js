@@ -10,7 +10,6 @@ class Druid extends Agent {
 		this.animations = [];
 		this.loadAnimations();
 		this.isJumping = false;
-
 		this.loadAnimations();
 	}
 
@@ -21,12 +20,16 @@ class Druid extends Agent {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& !(entity instanceof Druid)) {
 				if (entity instanceof Ground) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top) { // falling dowm
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+						&& (that.lastWorldBB.left) < entity.worldBB.right
+						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
 						that.vel.y = 0;
-						if (that.isJumping) that.isJumping = false;
+						that.isJumping = false;
 					}
-					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom) { // jumping up
+					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
+						&& (that.lastWorldBB.left) != entity.worldBB.right
+						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = 0;
 						that.isJumping = true;
@@ -34,12 +37,10 @@ class Druid extends Agent {
 					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = 0;
-						that.updateBB();
 					}
 					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = 0;
-						that.updateBB();
 					}
 				}
 			}
@@ -66,7 +67,6 @@ class Druid extends Agent {
 				this.isJumping = true;
 		} else {
 			this.vel.y += FALL_ACC * TICK;
-			this.isJumping = true;
 		}
 
 		if (this.game.right) { 
@@ -76,6 +76,7 @@ class Druid extends Agent {
 		} else {
 			this.vel.x = 0;
 		}
+		console.log("Isjumping:" + this.isJumping);
 		this.move(TICK);
 	}
 

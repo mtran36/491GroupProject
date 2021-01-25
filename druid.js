@@ -67,6 +67,7 @@ class Druid extends Agent {
 				this.isJumping = true;
 		} else {
 			this.vel.y += FALL_ACC * TICK;
+			this.isJumping = true;
 		}
 
 		if (this.game.right) { 

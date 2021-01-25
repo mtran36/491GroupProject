@@ -64,9 +64,9 @@ class SceneManager {
 		this.game.addEntity(new Fly(
 			this.game, randomInt(800), randomInt(600)));
 		this.game.addEntity(new Beetle(
-			this.game, 200, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 + 1));
+			this.game, 200, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2));
 		this.game.addEntity(new Hopper(
-			this.game, 700, this.game.surfaceHeight - PARAMS.TILE_WIDTH * 2 - 1));
+			this.game, 700, this.game.surfaceHeight - PARAMS.TILE_WIDTH * 2));
 
 		this.game.addEntity(new Druid(
 			this.game,

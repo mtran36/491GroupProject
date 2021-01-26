@@ -1,11 +1,36 @@
+/**
+ * Houses all of the enemy classes.
+ * 
+ * */
+
+/**
+ * Wrapper class for all enemies that consolidates some common code and attributes.
+ * Also allows for easier detection of enemies colliding with enemies.
+ * */
 class Enemy extends Agent {
+
+	/**
+	 * Calls the Agent constructor and sets default values for attack, defense, and health.
+	 * @param {any} game The game engine
+	 * @param {any} x starting x position on the canvas
+	 * @param {any} y starting y position on the canvas
+	 */
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
+		//These are default values that may be overriden in specific enemy classes.
 		this.attack = 1;
 		this.defense = 0;
 		this.health = 2;
+		this.range = { x: 400, y: 400 };
+		this.ACC = { x: 1000, y: 1500 };
+		this.velMax = { x: 400, y: 400 };
 	}
 
+	/**
+	 * Causes the enemy to take the specified amount of damage.
+	 * The enemy removes itself from the worl after its health reaches 0.
+	 * @param {any} damage damage to health as an integer
+	 */
 	takeDamage(damage) {
 		this.health -= damage;
 		if (this.health <= 0) {
@@ -16,14 +41,23 @@ class Enemy extends Agent {
 
 /**
  * Enemy type: Fly
- * Movemenet pattern: Flies straight at player. Collides with all non-enemy objects.
+ * Movemenet pattern: Flies straight at player. Collides with ground and other enemies.
  * 
  * */
 class Fly extends Enemy {
+	/**
+	* Calls the Agent constructor and sets default values for attack, defense, and health.
+	* @param {any} game The game engine
+	* @param {any} x starting x position on the canvas
+	* @param {any} y starting y position on the canvas
+	*/
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.range = { x: 800, y: 800 };
-		this.ACC = {x: 700, y: 700}
+		//Override of default values
+		this.range = { x: 600, y: 600 };
+		this.ACC = { x: 700, y: 700 };
+		this.health = 1;
+		//End override
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
 		this.up = false;
@@ -35,6 +69,9 @@ class Fly extends Enemy {
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
 	}
 
+	/**
+	 * Updates position in gameWorld.
+	 * */
 	update() {
 		var xdist = this.pos.x - this.game.druid.pos.x;
 		var ydist = this.pos.y - this.game.druid.pos.y;
@@ -74,6 +111,10 @@ class Fly extends Enemy {
 	}
 
 	/** @override */
+	/**
+	 * Checks for when this entity collides with another entity in the game world.
+	 * Updates position and variables accordingly.
+	 * */
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
@@ -125,10 +166,8 @@ class Fly extends Enemy {
 class Beetle extends Enemy{
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.ACC = { y: 1500 };
-		this.velMax = { y: 400 };
+		//Constant horizontal speed.
 		this.vel.x = -200;
-		this.animations = [];
 		this.loadAnimations();
 	}
 
@@ -180,13 +219,15 @@ class Beetle extends Enemy{
 				}
 			}
 		});
-		if (farLeft > this.pos.x && that.facing === 0 && this.vel.y === 0) {
-			this.facing = 1;
+		//If the beetles leftmost position is not on ground and it is moving in the left
+		//direction, then it will start moving right.
+		if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
 			this.pos.x = farLeft;
 		}
-		if (farRight < this.pos.x + this.dim.x && that.facing === 1 && this.vel.y === 0) {
-			this.facing = 0;
+		//If the beetle's rightmost position is not on ground and it is moving in the right
+		//direction, then it will start moving left.
+		if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
 			this.pos.x = farRight - this.dim.x;
 		}
@@ -213,16 +254,17 @@ class Beetle extends Enemy{
 class Hopper extends Enemy {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
+		//Overriden defaults
+		this.ACC = { y: 2000 };
+		//End Override
 		this.velMax = { y: 550 };
 		this.jumpForce = -800;
 		this.xspeed = 300;
-		this.ACC = { y: 2000 };
 		this.left = false;
 		this.range = { x: 300, y: 300 };
 		this.landLag = 0.3;
 		this.landTime = this.landLag;
 		this.jumping = false;
-		this.animations = [];
 		this.loadAnimations();
 	}
 

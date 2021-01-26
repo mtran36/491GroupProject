@@ -1,8 +1,9 @@
 var GAME_ENGINE = new GameEngine();
 var ASSET_MANAGER = new AssetManager();
 
-ASSET_MANAGER.queueDownload("./Sprites/TestEnemy.png");
-ASSET_MANAGER.queueDownload("./Sprites/TestPlayer.png");
+ASSET_MANAGER.queueDownload("./Sprites/TestFly.png");
+ASSET_MANAGER.queueDownload("./Sprites/TestBeetle.png");
+ASSET_MANAGER.queueDownload("./Sprites/TestHopper.png");
 ASSET_MANAGER.queueDownload("./Sprites/druid.png");
 ASSET_MANAGER.queueDownload("./Sprites/ground.png");
 

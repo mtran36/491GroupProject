@@ -77,7 +77,6 @@ class Druid extends Agent {
 		} else {
 			this.vel.x = 0;
 		}
-		console.log("Isjumping:" + this.isJumping);
 		this.move(TICK);
 	}
 

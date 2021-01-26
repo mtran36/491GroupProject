@@ -15,8 +15,8 @@ class Enemy extends Agent {
 	 * @param {any} x starting x position on the canvas
 	 * @param {any} y starting y position on the canvas
 	 */
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
+	constructor(game, x, y, spritesheet) {
+		super(game, x, y, spritesheet);
 		//These are default values that may be overriden in specific enemy classes.
 		this.attack = 1;
 		this.defense = 0;
@@ -37,6 +37,26 @@ class Enemy extends Agent {
 			this.removeFromWorld = true;
 		}
 	}
+
+	/**
+	 * Returns a tuple of boolean values that tells what direction or directions
+	 * this object has collided with entity.
+	 * Values are stored in up, down, left, and right properties of the tuple.
+	 * @param {any} othWorldBB
+	 */
+	worldCollisionDirection(entity) {
+		var down = this.vel.y > 0 && this.lastWorldBB.bottom <= entity.worldBB.top
+			&& (this.lastWorldBB.left) < entity.worldBB.right
+			&& (this.lastWorldBB.right) > entity.worldBB.left;
+		var up = this.vel.y < 0 && (this.lastWorldBB.top) >= entity.worldBB.bottom
+			&& (this.lastWorldBB.left) != entity.worldBB.right
+			&& (this.lastWorldBB.right) != entity.worldBB.left;
+		var left = this.vel.x < 0
+			&& (this.lastWorldBB.left) >= entity.worldBB.right;
+		var right = this.vel.x > 0
+			&& (this.lastWorldBB.right) <= entity.worldBB.left;
+		return { up, down, left, right };
+	}
 }
 
 /**
@@ -52,8 +72,10 @@ class Fly extends Enemy {
 	* @param {any} y starting y position on the canvas
 	*/
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
+		super(game, x, y, "./Sprites/TestFly.png");
 		//Override of default values
+		this.dim.x = 32;
+		this.dim.y = 32;
 		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
 		this.health = 1;
@@ -65,8 +87,20 @@ class Fly extends Enemy {
 	}
 
 	loadAnimations() {
-		this.animations[0] = new Animator(
+		this.animations[1] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+	}
+
+	/**
+	 * Override
+	 * */
+	updateBB() {
+		super.updateBB();
+		this.agentBB.radius = this.agentBB.radius - 3;
+		this.worldBB = new BoundingBox(
+			this.pos.x + 2, this.pos.y + 4, this.dim.x - 5, this.dim.y - 6);
 	}
 
 	/**
@@ -120,24 +154,21 @@ class Fly extends Enemy {
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& !(that === entity)) {
+				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
 						that.vel.y = -that.vel.y;
 					}
-					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
-						&& (that.lastWorldBB.left) != entity.worldBB.right
-						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+					if (direction.up) { // jumping up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = -that.vel.y;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (direction.left) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+					if (direction.right) { // going right
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = -that.vel.x;
 					}
@@ -147,11 +178,8 @@ class Fly extends Enemy {
 	}
 
 	draw(context) {
-		this.animations[0].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		// Label for during testing. Remove in full game.
-		context.font = "48px serif";
-		context.fillText("F", this.pos.x + 16, this.pos.y + 48);
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick, context, this.pos.x, this.pos.y, 1);
 		this.worldBB.display(context);
 		this.agentBB.display(context);
 	}
@@ -165,15 +193,17 @@ class Fly extends Enemy {
  * */
 class Beetle extends Enemy{
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
+		super(game, x, y, "./Sprites/TestBeetle.png");
 		//Constant horizontal speed.
 		this.vel.x = -200;
 		this.loadAnimations();
 	}
 
 	loadAnimations() {
-		this.animations[0] = new Animator(
+		this.animations[1] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
 	update() {
@@ -189,24 +219,21 @@ class Beetle extends Enemy{
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& !(that === entity)) {
+				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
 						that.vel.y = 0;
 					}
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.dim.y;
+					if (direction.up) { // moving up
+						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = 0;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (direction.left) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+					if (direction.right) { // going right
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = -that.vel.x;
 					}
@@ -220,13 +247,13 @@ class Beetle extends Enemy{
 			}
 		});
 		//If the beetles leftmost position is not on ground and it is moving in the left
-		//direction, then it will start moving right.
+		//direction and it is not moving vertically, then it will start moving right.
 		if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
 			this.pos.x = farLeft;
 		}
 		//If the beetle's rightmost position is not on ground and it is moving in the right
-		//direction, then it will start moving left.
+		//direction and it is not moving vertically, then it will start moving left.
 		if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
 			this.pos.x = farRight - this.dim.x;
@@ -234,15 +261,19 @@ class Beetle extends Enemy{
 	}
 
 	draw(context) {
-		this.animations[0].drawFrame(
+		this.animations[this.facing].drawFrame(
 			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		// Test Label. Remove after getting proper sprites.
-		context.font = '48px serif';
-		context.fillText("B", this.pos.x + 16, this.pos.y + 48);
 		this.worldBB.display(context);
 		this.agentBB.display(context);
 	}
 
+}
+
+class FlyBeetle extends Beetle {
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/TestBeetle.png)");
+
+	}
 }
 
 /**
@@ -253,7 +284,7 @@ class Beetle extends Enemy{
  * */
 class Hopper extends Enemy {
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
+		super(game, x, y, "./Sprites/TestHopper.png");
 		//Overriden defaults
 		this.ACC = { y: 2000 };
 		//End Override
@@ -269,8 +300,10 @@ class Hopper extends Enemy {
 	}
 
 	loadAnimations() {
-		this.animations[0] = new Animator(
+		this.animations[1] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
 	update() {
@@ -299,10 +332,9 @@ class Hopper extends Enemy {
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& !(that === entity)) {
+				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
 						that.vel.y = 0;
 						that.vel.x = 0;
@@ -310,17 +342,15 @@ class Hopper extends Enemy {
 							that.landTime = that.landLag;
 						that.jumping = false;
 					}
-					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
-						&& (that.lastWorldBB.left) != entity.worldBB.right
-						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+					if (direction.up) { // jumping up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = 0;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (direction.left) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+					if (direction.right) { // going right
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = -that.vel.x;
 					}
@@ -330,11 +360,8 @@ class Hopper extends Enemy {
 	}
 
 	draw(context) {
-		this.animations[0].drawFrame(
+		this.animations[this.facing].drawFrame(
 			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		// Test Label. Remove after getting proper sprites.
-		context.font = '48px serif';
-		context.fillText("H", this.pos.x + 16, this.pos.y + 48);
 		this.worldBB.display(context);
 		this.agentBB.display(context);
 	}

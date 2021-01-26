@@ -1,7 +1,16 @@
 class Enemy extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.damage = 1;
+		this.attack = 1;
+		this.defense = 0;
+		this.health = 2;
+	}
+
+	takeDamage(damage) {
+		this.health -= damage;
+		if (this.health <= 0) {
+			this.removeFromWorld = true;
+		}
 	}
 }
 
@@ -13,10 +22,8 @@ class Enemy extends Agent {
 class Fly extends Enemy {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.groundCheck = new BoundingBox(
-			this.x + this.dim.x - 1, this.y + this.dim.y - 1, 1, 1);
 		this.range = { x: 800, y: 800 };
-		this.ACC = {x: 500, y: 500}
+		this.ACC = {x: 700, y: 700}
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
 		this.up = false;
@@ -118,9 +125,9 @@ class Fly extends Enemy {
 class Beetle extends Enemy{
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
-
 		this.ACC = { y: 1500 };
-		this.vel.x = 200
+		this.velMax = { y: 400 };
+		this.vel.x = -200;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -131,13 +138,15 @@ class Beetle extends Enemy{
 	}
 
 	update() {
-		this.vel.y = this.game.clockTick * this.ACC.y;
+		this.vel.y = Math.min(this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
 	}
 
 	/** @override */
 	checkCollisions() {
 		let that = this;
+		var farLeft = PARAMS.CANVAS_WIDTH;
+		var farRight = -1;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& !(that === entity)) {
@@ -147,7 +156,8 @@ class Beetle extends Enemy{
 						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
 						that.vel.y = 0;
-					} if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+					}
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
 						&& (that.lastWorldBB.left) < entity.worldBB.right
 						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
@@ -161,9 +171,25 @@ class Beetle extends Enemy{
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = -that.vel.x;
 					}
+					if (entity instanceof Ground) {
+						farLeft = entity.worldBB.left < farLeft
+							? entity.worldBB.left : farLeft;
+						farRight = entity.worldBB.right > farRight
+							? entity.worldBB.right : farRight;
+					}
 				}
 			}
 		});
+		if (farLeft > this.pos.x && that.facing === 0 && this.vel.y === 0) {
+			this.facing = 1;
+			this.vel.x = -this.vel.x;
+			this.pos.x = farLeft;
+		}
+		if (farRight < this.pos.x + this.dim.x && that.facing === 1 && this.vel.y === 0) {
+			this.facing = 0;
+			this.vel.x = -this.vel.x;
+			this.pos.x = farRight - this.dim.x;
+		}
 	}
 
 	draw(context) {
@@ -187,8 +213,8 @@ class Beetle extends Enemy{
 class Hopper extends Enemy {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.velMax = { y: 500 };
-		this.jumpForce = -750;
+		this.velMax = { y: 550 };
+		this.jumpForce = -800;
 		this.xspeed = 300;
 		this.ACC = { y: 2000 };
 		this.left = false;

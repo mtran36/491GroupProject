@@ -101,6 +101,11 @@ class Fly extends Enemy {
 						that.vel.x = -that.vel.x;
 					}
 				}
+				// Author: tommy
+				// For range attack testing
+				if (entity instanceof RangeAttack) {
+					that.removeFromWorld = true;
+                }
 			}
 		});
 	}
@@ -177,6 +182,11 @@ class Beetle extends Enemy{
 						farRight = entity.worldBB.right > farRight
 							? entity.worldBB.right : farRight;
 					}
+				}
+				// Author: tommy
+				// For range attack testing
+				if (entity instanceof RangeAttack) {
+					that.removeFromWorld = true;
 				}
 			}
 		});
@@ -282,6 +292,11 @@ class Hopper extends Enemy {
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = -that.vel.x;
 					}
+				}
+				// Author: tommy
+				// For range attack testing
+				if (entity instanceof RangeAttack) {
+					that.removeFromWorld = true;
 				}
 			}
 		});

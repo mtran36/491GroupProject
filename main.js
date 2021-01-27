@@ -5,6 +5,7 @@ ASSET_MANAGER.queueDownload("./Sprites/TestEnemy.png");
 ASSET_MANAGER.queueDownload("./Sprites/TestPlayer.png");
 ASSET_MANAGER.queueDownload("./Sprites/druid.png");
 ASSET_MANAGER.queueDownload("./Sprites/ground.png");
+ASSET_MANAGER.queueDownload("./Sprites/ball.png");
 
 ASSET_MANAGER.downloadAll(function () {
 	var canvas = document.getElementById('gameWorld');

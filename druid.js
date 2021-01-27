@@ -116,6 +116,7 @@ class RangeAttack extends Agent {
         }
 		this.animations = new Animator(this.spritesheet, 0, 16, 32, 32, 8, 0.05, 0, false, true, false);;
 		this.removeFromWorld = false;
+		this.attack = 1;
 	}
 
 	/** @override */

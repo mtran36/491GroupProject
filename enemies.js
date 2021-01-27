@@ -175,8 +175,9 @@ class Fly extends Enemy {
 				}
 				// Author: tommy
 				// For range attack testing
+				// Walter: I changed it to use the takeDamage method
 				if (entity instanceof RangeAttack) {
-					that.removeFromWorld = true;
+					this.takeDamage(entity.attack);
                 }
 			}
 		});
@@ -251,8 +252,9 @@ class Beetle extends Enemy{
 				}
 				// Author: tommy
 				// For range attack testing
+				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					that.removeFromWorld = true;
+					this.takeDamage(entity.attack);
 				}
 			}
 		});
@@ -367,8 +369,9 @@ class Hopper extends Enemy {
 				}
 				// Author: tommy
 				// For range attack testing
+				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					that.removeFromWorld = true;
+					this.takeDamage(entity.attack);
 				}
 			}
 		});

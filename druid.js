@@ -10,15 +10,32 @@ class Druid extends Agent {
 		this.animations = [];
 		this.loadAnimations();
 		this.isJumping = false;
+		this.health = 10;
+		this.invincTime = 0;
+		this.flashing = false;
 		this.rangeAttackCooldown = 0;
+	}
+
+	takeDamage(damage) {
+		this.health -= damage;
+		if (this.health <= 0) {
+			this.removeFromWorld = true;
+		}
+		this.flashing = true;
 	}
 
 	/** @override */
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)) {
+				if (entity instanceof Enemy && that.invincTime <= 0) {
+					that.takeDamage(entity.attack);
+					that.invincTime = 1;
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(entity instanceof Druid)) {
+				&& that !== entity) {
 				if (entity instanceof Ground) {
 					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
 						&& (that.lastWorldBB.left) < entity.worldBB.right
@@ -66,6 +83,13 @@ class Druid extends Agent {
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
 
+		if (this.invincTime > 0) {
+			this.invincTime -= this.game.clockTick;
+			this.flashing = !this.flashing;
+		} else {
+			this.flashing = false;
+		}
+
 		if (!this.isJumping && this.game.B) { 
 				this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
@@ -100,11 +124,12 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
+		if (this.flashing) return;
 		// Display normally when facing left.
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 1);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 1);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 }
 
@@ -118,9 +143,13 @@ class RangeAttack extends Agent {
 		} else {
 			this.vel.x = 400;
         }
-		this.animations = new Animator(this.spritesheet, 0, 16, 32, 32, 8, 0.05, 0, false, true, false);;
 		this.removeFromWorld = false;
 		this.attack = 1;
+		this.loadAnimations();
+	}
+
+	loadAnimations() {
+		this.animations[0] = new Animator(this.spritesheet, 0, 16, 32, 32, 8, 0.05, 0, false, true, false);
 	}
 
 	/** @override */
@@ -145,8 +174,8 @@ class RangeAttack extends Agent {
 
 	/** @override */
 	draw(context) {
-		this.animations.drawFrame(this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+		this.animations[0].drawFrame(this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 2);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
     }
 }

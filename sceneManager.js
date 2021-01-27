@@ -2,6 +2,7 @@ class SceneManager {
 	constructor(game) {
 		this.game = game;
 		this.game.camera = this;
+		this.pos = { x: 0, y: 0 };
 
 		this.sprites = new Array(2);
 
@@ -34,6 +35,7 @@ class SceneManager {
 		//}
 
 		// ground
+
 		for (var i = 0; i < 4; i++) {
 			this.game.addEntity(new Ground(
 				this.game, 0 + i * 4 * PARAMS.TILE_WIDTH, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 4));
@@ -98,13 +100,22 @@ class SceneManager {
 			this.game, 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2));
 
 		// mc
-		this.game.addEntity(new Druid(
+		this.game.druid = new Druid(
 			this.game,
 			PARAMS.CANVAS_WIDTH - 700,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5));
+			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5)
+		this.game.addEntity(this.game.druid);
+		this.game.addEntity(this);
 	}
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
-	};
+		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
+		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+
+	}
+
+	draw() {
+
+	}
 }

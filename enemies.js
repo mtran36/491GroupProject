@@ -159,7 +159,7 @@ class Fly extends Enemy {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
@@ -191,9 +191,9 @@ class Fly extends Enemy {
 
 	draw(context) {
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 1);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 1);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 }
 
@@ -230,9 +230,8 @@ class Beetle extends Enemy{
 		var farRight = -1;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
-				console.log(that.lastWorldBB.bottom, entity.worldBB.top);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
@@ -281,9 +280,9 @@ class Beetle extends Enemy{
 
 	draw(context) {
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 2);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 
 }
@@ -350,7 +349,7 @@ class Hopper extends Enemy {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
@@ -386,8 +385,8 @@ class Hopper extends Enemy {
 
 	draw(context) {
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 2);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 }

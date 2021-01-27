@@ -45,16 +45,22 @@ class Enemy extends Agent {
 	 * @param {any} othWorldBB
 	 */
 	worldCollisionDirection(entity) {
-		var down = this.vel.y > 0 && this.lastWorldBB.bottom <= entity.worldBB.top
-			&& (this.lastWorldBB.left) <= entity.worldBB.right
-			&& (this.lastWorldBB.right) >= entity.worldBB.left;
-		var up = this.vel.y < 0 && (this.lastWorldBB.top) >= entity.worldBB.bottom
+		var down = this.vel.y > 0
+			&& this.lastWorldBB.bottom <= entity.worldBB.top
+			&& (this.lastWorldBB.left) < entity.worldBB.right
+			&& (this.lastWorldBB.right) > entity.worldBB.left;
+		var up = this.vel.y < 0
+			&& (this.lastWorldBB.top) >= entity.worldBB.bottom
 			&& (this.lastWorldBB.left) != entity.worldBB.right
 			&& (this.lastWorldBB.right) != entity.worldBB.left;
 		var left = this.vel.x < 0
-			&& (this.lastWorldBB.left) >= entity.worldBB.right;
+			&& (this.lastWorldBB.left) >= entity.worldBB.right
+			&& (this.lastWorldBB.top) != entity.worldBB.bottom
+			&& (this.lastWorldBB.bottom) != entity.worldBB.top;
 		var right = this.vel.x > 0
-			&& (this.lastWorldBB.right) <= entity.worldBB.left;
+			&& (this.lastWorldBB.right) <= entity.worldBB.left
+			&& (this.lastWorldBB.top) < entity.worldBB.bottom
+			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
 		return { up, down, left, right };
 	}
 }
@@ -226,6 +232,7 @@ class Beetle extends Enemy{
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& !(that === entity)) {
 				var direction = that.worldCollisionDirection(entity);
+				console.log(that.lastWorldBB.bottom, entity.worldBB.top);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;

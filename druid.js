@@ -34,11 +34,15 @@ class Druid extends Agent {
 						that.vel.y = 0;
 						that.isJumping = true;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right
+						&& that.lastWorldBB.top != entity.worldBB.bottom
+						&& that.lastWorldBB.bottom != entity.worldBB.top) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = 0;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left
+						&& that.lastWorldBB.top < entity.worldBB.bottom
+						&& that.lastWorldBB.bottom > entity.worldBB.top) { // going right
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = 0;
 					}

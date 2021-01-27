@@ -16,6 +16,7 @@ class GameEngine {
         this.up = false;
         this.down = false;
         this.B = false;
+        this.A = false;
     };
 
     /**
@@ -83,6 +84,10 @@ class GameEngine {
                 case "KeyK":
                     that.B = true;
                     break;
+                case "KeyX":
+                case "KeyJ":
+                    that.A = true;
+                    break;
             }
         });
         this.context.canvas.addEventListener("keyup", function (e) {
@@ -106,6 +111,10 @@ class GameEngine {
                 case "KeyZ":
                 case "KeyK":
                     that.B = false;
+                    break;
+                case "KeyX":
+                case "KeyJ":
+                    that.A = false;
                     break;
             }
         });

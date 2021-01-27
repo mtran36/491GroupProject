@@ -1,17 +1,33 @@
-/** Flies straight at druid. */
-class Fly {
+class Enemy extends Agent {
 	constructor(game, x, y) {
-		Object.assign(this, { game, x, y });
-		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.range = { x: 400, y: 400 };
-		this.ACC = {x: 1000, y: 1000}
-		this.velocityMAX = { x: 3500, y: 3500 };
-		this.velocity = { x: 0, y: 0 };
+		super(game, x, y, "./Sprites/TestEnemy.png");
+		this.attack = 1;
+		this.defense = 0;
+		this.health = 2;
+	}
+
+	takeDamage(damage) {
+		this.health -= damage;
+		if (this.health <= 0) {
+			this.removeFromWorld = true;
+		}
+	}
+}
+
+/**
+ * Enemy type: Fly
+ * Movemenet pattern: Flies straight at player. Collides with all non-enemy objects.
+ * 
+ * */
+class Fly extends Enemy {
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/TestEnemy.png");
+		this.range = { x: 800, y: 800 };
+		this.ACC = {x: 700, y: 700}
+		this.velMax = { x: 400, y: 400 };
 		this.left = false;
 		this.up = false;
 		this.accelerate = false;
-		this.animations = [];
-		this.loadAnimations();
 	}
 
 	loadAnimations() {
@@ -20,8 +36,8 @@ class Fly {
 	}
 
 	update() {
-		var xdist = this.x - this.game.druid.x;
-		var ydist = this.y - this.game.druid.y;
+		var xdist = this.pos.x - this.game.druid.pos.x;
+		var ydist = this.pos.y - this.game.druid.pos.y;
 		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
 			this.left = xdist > 0;
 			this.up = ydist > 0;
@@ -29,53 +45,89 @@ class Fly {
 		} else {
 			this.accelerate = false;
 		}
-		var velocityChangeX = this.ACC.x * this.game.clockTick;
-		var velocityChangeY = this.ACC.y * this.game.clockTick;
+		var velChangeX = this.ACC.x * this.game.clockTick;
+		var velChangeY = this.ACC.y * this.game.clockTick;
 		if (this.accelerate) {
 			if (this.left) {
-				this.velocity.x = Math.max(-1 * this.velocityMAX.x, this.velocity.x - velocityChangeX);
+				this.vel.x = Math.max(-this.velMax.x, this.vel.x - velChangeX);
 			} else {
-				this.velocity.x = Math.min(this.velocityMAX.x, this.velocity.x + velocityChangeX);
+				this.vel.x = Math.min(this.velMax.x, this.vel.x + velChangeX);
 			}
 			if (this.up) {
-				this.velocity.y = Math.max(-1 * this.velocityMAX.y, this.velocity.y - velocityChangeY);
+				this.vel.y = Math.max(-this.velMax.y, this.vel.y - velChangeY);
 			} else {
-				this.velocity.y = Math.min(this.velocityMAX.y, this.velocity.y + velocityChangeY);
+				this.vel.y = Math.min(this.velMax.y, this.vel.y + velChangeY);
 			}
 		} else {
-			if (this.velocity.x > 0) {
-				this.velocity.x = Math.max(0, this.velocity.x - velocityChangeX);
+			if (this.vel.x > 0) {
+				this.vel.x = Math.max(0, this.vel.x - velChangeX);
 			} else {
-				this.velocity.x = Math.min(0, this.velocity.x + velocityChangeX);
+				this.vel.x = Math.min(0, this.vel.x + velChangeX);
 			}
-			if (this.velocity.y > 0) {
-				this.velocity.y = Math.max(0, this.velocity.y - velocityChangeY);
+			if (this.vel.y > 0) {
+				this.vel.y = Math.max(0, this.vel.y - velChangeY);
 			} else {
-				this.velocity.y = Math.min(0, this.velocity.y + velocityChangeY);
+				this.vel.y = Math.min(0, this.vel.y + velChangeY);
 			}
 		}
-		this.x += this.velocity.x * this.game.clockTick;
-		this.y += this.velocity.y * this.game.clockTick;
+		this.move(this.game.clockTick);
 	}
 
-	draw() {
+	/** @override */
+	checkCollisions() {
+		let that = this;
+		this.game.entities.forEach(function (entity) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+				&& !(that === entity)) {
+				if (entity instanceof Ground || entity instanceof Enemy) {
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+						&& (that.lastWorldBB.left) < entity.worldBB.right
+						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.dim.y;
+						that.vel.y = -that.vel.y;
+					}
+					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
+						&& (that.lastWorldBB.left) != entity.worldBB.right
+						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+						that.pos.y = entity.worldBB.bottom;
+						that.vel.y = -that.vel.y;
+					}
+					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = -that.vel.x;
+					}
+					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+						that.pos.x = entity.worldBB.left - that.dim.x;
+						that.vel.x = -that.vel.x;
+					}
+				}
+			}
+		});
+	}
+
+	draw(context) {
 		this.animations[0].drawFrame(
-			this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
 		// Label for during testing. Remove in full game.
-		this.game.ctx.font = "48px serif";
-		this.game.ctx.fillText("F", this.x + 16, this.y + 48);
+		context.font = "48px serif";
+		context.fillText("F", this.pos.x + 16, this.pos.y + 48);
+		this.worldBB.display(context);
+		this.agentBB.display(context);
 	}
 }
 
-/** Moves back and forth. */
-class Beetle {
+/**
+ * 
+ * Enemy type: Beetle
+ * Movement pattern: Moves back and forth on a platform or the ground.
+ * 
+ * */
+class Beetle extends Enemy{
 	constructor(game, x, y) {
-		Object.assign(this, { game, x, y });
-		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-
-		this.faceRight = true;
-		this.speed = 100;
-
+		super(game, x, y, "./Sprites/TestEnemy.png");
+		this.ACC = { y: 1500 };
+		this.velMax = { y: 400 };
+		this.vel.x = -200;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -86,45 +138,90 @@ class Beetle {
 	}
 
 	update() {
-		var xmove = this.game.clockTick * this.speed;
-		if (this.faceRight) {
-			this.x += xmove;
-		} else {
-			this.x -= xmove;
+		this.vel.y = Math.min(this.game.clockTick * this.ACC.y, this.velMax.y);
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	checkCollisions() {
+		let that = this;
+		var farLeft = PARAMS.CANVAS_WIDTH;
+		var farRight = -1;
+		this.game.entities.forEach(function (entity) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+				&& !(that === entity)) {
+				if (entity instanceof Ground || entity instanceof Enemy) {
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+						&& (that.lastWorldBB.left) < entity.worldBB.right
+						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.dim.y;
+						that.vel.y = 0;
+					}
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+						&& (that.lastWorldBB.left) < entity.worldBB.right
+						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.dim.y;
+						that.vel.y = 0;
+					}
+					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = -that.vel.x;
+					}
+					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+						that.pos.x = entity.worldBB.left - that.dim.x;
+						that.vel.x = -that.vel.x;
+					}
+					if (entity instanceof Ground) {
+						farLeft = entity.worldBB.left < farLeft
+							? entity.worldBB.left : farLeft;
+						farRight = entity.worldBB.right > farRight
+							? entity.worldBB.right : farRight;
+					}
+				}
+			}
+		});
+		if (farLeft > this.pos.x && that.facing === 0 && this.vel.y === 0) {
+			this.facing = 1;
+			this.vel.x = -this.vel.x;
+			this.pos.x = farLeft;
 		}
-		if (this.x >= this.game.surfaceWidth - 64) {
-			this.x = this.game.surfaceWidth - 64;
-			this.faceRight = false;
-		} else if (this.x <= 0) {
-			this.x = 0;
-			this.faceRight = true;
+		if (farRight < this.pos.x + this.dim.x && that.facing === 1 && this.vel.y === 0) {
+			this.facing = 0;
+			this.vel.x = -this.vel.x;
+			this.pos.x = farRight - this.dim.x;
 		}
 	}
 
-	draw() {
+	draw(context) {
 		this.animations[0].drawFrame(
-			this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
 		// Test Label. Remove after getting proper sprites.
-		this.game.font = '48px serif';
-		this.game.ctx.fillText("B", this.x + 16, this.y + 48);
+		context.font = '48px serif';
+		context.fillText("B", this.pos.x + 16, this.pos.y + 48);
+		this.worldBB.display(context);
+		this.agentBB.display(context);
 	}
 
 }
 
-/** Hops towards the druid. */
-class Hopper {
+/**
+ * Enemy type: Hopper
+ * Movement pattern: Hops towards the player in an arc if the player is within range.
+ * 
+ * Has a bit of landing lag before it can hop again.
+ * */
+class Hopper extends Enemy {
 	constructor(game, x, y) {
-		Object.assign(this, { game, x, y });
-		this.spritesheet = ASSET_MANAGER.getAsset("./Sprites/TestEnemy.png");
-		this.velocityMAX = { y: 5000 };
-		this.jumpForce = 700;
-		this.velocity = { x: 350, y: 0 };
-		this.ACC = { y: 2500 };
+		super(game, x, y, "./Sprites/TestEnemy.png");
+		this.velMax = { y: 550 };
+		this.jumpForce = -800;
+		this.xspeed = 300;
+		this.ACC = { y: 2000 };
 		this.left = false;
 		this.range = { x: 300, y: 300 };
-		this.status = 0; // 0 is idle, 1 is noticed player, 2 is start jump, 3 is mid-jump.
 		this.landLag = 0.3;
-		this.landingTime = this.landLag;
+		this.landTime = this.landLag;
+		this.jumping = false;
 		this.animations = [];
 		this.loadAnimations();
 	}
@@ -136,56 +233,67 @@ class Hopper {
 
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
-		this.landingTime -= this.game.clockTick;
-		var xdist = this.x - this.game.druid.x;
-		var ydist = this.y - this.game.druid.y;
-		if (this.landingTime >= 0 && this.status === 2) {
-			return;
+		this.landTime -= this.game.clockTick;
+		var xdist = this.pos.x - this.game.druid.pos.x;
+		var ydist = this.pos.y - this.game.druid.pos.y;
+		if (Math.abs(xdist) < this.range.x
+			&& Math.abs(ydist) < this.range.y
+			&& !this.jumping
+			&& this.landTime < 0) {
+			this.left = xdist > 0;
+			this.vel.y = this.jumpForce;
+			this.jumping = true;
 		}
-		var velocityChangeY = this.ACC.y * this.game.clockTick;
-		switch (this.status) {
-			case 0:
-				if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
-					this.status = 1;
-					this.left = xdist > 0;
-				}
-				break;
-			case 1:
-				if (this.left) {
-					this.velocity.x = Math.min(-1 * this.velocity.x, this.velocity.x);
-				} else {
-					this.velocity.x = Math.max(this.velocity.x, -1 * this.velocity.x);
-				}
-				this.velocity.y = -1 * this.jumpForce;
-				this.status = 2;
-				break;
-			case 2:
-			case 3:
-				this.velocity.y = Math.min(this.velocityMAX.y, this.velocity.y + velocityChangeY);
-				this.status = 3;
-				this.x += this.velocity.x * this.game.clockTick;
-				this.y += this.velocity.y * this.game.clockTick;
-				if (this.y > this.game.surfaceHeight - 64) {
-					this.y = this.game.surfaceHeight - 64;
-				}
-				if (this.status === 3) {
-					if (this.y === this.game.surfaceHeight - 64) {
-						this.status = 0;
-					}
-					this.landingTime = this.landLag;
-				}
-				break;
-			default:
-				console.log("Illegal status = ");
-				console.log(this.status);
-
+		if (this.jumping) {
+			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
 		}
+		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
+		this.move(this.game.clockTick);
 	}
 
-	draw() {
-		this.animations[0].drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y, 2);
+	/** @override */
+	checkCollisions() {
+		let that = this;
+		this.game.entities.forEach(function (entity) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+				&& !(that === entity)) {
+				if (entity instanceof Ground || entity instanceof Enemy) {
+					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
+						&& (that.lastWorldBB.left) < entity.worldBB.right
+						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.dim.y;
+						that.vel.y = 0;
+						that.vel.x = 0;
+						if (that.jumping)
+							that.landTime = that.landLag;
+						that.jumping = false;
+					}
+					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
+						&& (that.lastWorldBB.left) != entity.worldBB.right
+						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+						that.pos.y = entity.worldBB.bottom;
+						that.vel.y = 0;
+					}
+					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = -that.vel.x;
+					}
+					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
+						that.pos.x = entity.worldBB.left - that.dim.x;
+						that.vel.x = -that.vel.x;
+					}
+				}
+			}
+		});
+	}
+
+	draw(context) {
+		this.animations[0].drawFrame(
+			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
 		// Test Label. Remove after getting proper sprites.
-		this.game.font = '48px serif';
-		this.game.ctx.fillText("H", this.x + 16, this.y + 48);
+		context.font = '48px serif';
+		context.fillText("H", this.pos.x + 16, this.pos.y + 48);
+		this.worldBB.display(context);
+		this.agentBB.display(context);
 	}
 }

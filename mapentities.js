@@ -8,9 +8,9 @@ class Ground extends Entity {
 
 	/** @override */
 	updateBB(context) {
-		//this.lastWorldBB = this.worldBB;
 		this.worldBB = new BoundingBox(
 			this.pos.x, this.pos.y, this.dim.x * PARAMS.TILE_WIDTH, this.dim.y);
+		this.lastWorldBB = this.worldBB;
 		this.drawWorldBB(context);
     }
 

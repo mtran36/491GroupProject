@@ -34,8 +34,10 @@ class SceneManager {
 		//}
 
 		// ground
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 16));
+		for (var i = 0; i < 4; i++) {
+			this.game.addEntity(new Ground(
+				this.game, 0 + i * 4 * PARAMS.TILE_WIDTH, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 4));
+		}
 		this.game.addEntity(new Ground(this.game, 0,
 			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 , 1));
 //		this.game.addEntity(new Ground(this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,

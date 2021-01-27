@@ -46,8 +46,8 @@ class Enemy extends Agent {
 	 */
 	worldCollisionDirection(entity) {
 		var down = this.vel.y > 0 && this.lastWorldBB.bottom <= entity.worldBB.top
-			&& (this.lastWorldBB.left) < entity.worldBB.right
-			&& (this.lastWorldBB.right) > entity.worldBB.left;
+			&& (this.lastWorldBB.left) <= entity.worldBB.right
+			&& (this.lastWorldBB.right) >= entity.worldBB.left;
 		var up = this.vel.y < 0 && (this.lastWorldBB.top) >= entity.worldBB.bottom
 			&& (this.lastWorldBB.left) != entity.worldBB.right
 			&& (this.lastWorldBB.right) != entity.worldBB.left;
@@ -177,7 +177,7 @@ class Fly extends Enemy {
 				// For range attack testing
 				// Walter: I changed it to use the takeDamage method
 				if (entity instanceof RangeAttack) {
-					this.takeDamage(entity.attack);
+					that.takeDamage(entity.attack);
                 }
 			}
 		});
@@ -254,7 +254,7 @@ class Beetle extends Enemy{
 				// For range attack testing
 				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					this.takeDamage(entity.attack);
+					that.takeDamage(entity.attack);
 				}
 			}
 		});
@@ -371,7 +371,7 @@ class Hopper extends Enemy {
 				// For range attack testing
 				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					this.takeDamage(entity.attack);
+					that.takeDamage(entity.attack);
 				}
 			}
 		});

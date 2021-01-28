@@ -187,16 +187,16 @@ class BoundingBox {
 
     /**
      * Displays the bounding box for testing purposes.
-     * @param {CanvasImageSource} context Canvas to draw on.
+     * @param {CanvasImageSource} game.context Canvas to draw on.
      */
-    display(context) {
+    display(game) {
         if (PARAMS.DEBUG) {
-            context.save();
-            context.strokeStyle = 'red';
-            context.lineWidth = PARAMS.BB_LINE_WIDTH;
-            context.strokeRect(
-                this.x, this.y, this.width, this.height);
-            context.restore();
+            game.context.save();
+            game.context.strokeStyle = 'red';
+            game.context.lineWidth = PARAMS.BB_LINE_WIDTH;
+            game.context.strokeRect(
+                this.x - game.camera.pos.x, this.y - game.camera.pos.y, this.width, this.height);
+            game.context.restore();
         }
     }
 }
@@ -220,17 +220,17 @@ class BoundingCircle {
 
     /**
      * Displays the bounding cicle for testing purposes.
-     * @param {CanvasImageSource} context Canvas to draw on.
+     * @param {CanvasImageSource} game.context Canvas to draw on.
      */
-    display(context) {
+    display(game) {
         if (PARAMS.DEBUG) {
-            context.save();
-            context.strokeStyle = 'green';
-            context.lineWidth = PARAMS.BB_LINE_WIDTH;
-            context.beginPath();
-            context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            context.stroke();
-            context.restore();
+            game.context.save();
+            game.context.strokeStyle = 'green';
+            game.context.lineWidth = PARAMS.BB_LINE_WIDTH;
+            game.context.beginPath();
+            game.context.arc(this.x - game.camera.pos.x, this.y - game.camera.pos.y, this.radius, 0, 2 * Math.PI);
+            game.context.stroke();
+            game.context.restore();
         }
     }
 }

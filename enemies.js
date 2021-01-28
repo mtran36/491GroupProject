@@ -23,7 +23,7 @@ class Enemy extends Agent {
 		this.health = 2;
 		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
-		this.velMax = { x: 400, y: 400 };
+		this.velMax = { x: 400, y: 700 };
 	}
 
 	/**
@@ -158,8 +158,17 @@ class Fly extends Enemy {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				// Author: tommy
+				// For range attack testing
+				// Walter: Changed to use takeDamage method;
+				if (entity instanceof RangeAttack) {
+//					that.takeDamage(entity.attack);
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
@@ -179,21 +188,15 @@ class Fly extends Enemy {
 						that.vel.x = -that.vel.x;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				// Walter: I changed it to use the takeDamage method
-				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
-                }
 			}
 		});
 	}
 
 	draw(context) {
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 1);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 1);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 }
 
@@ -219,7 +222,7 @@ class Beetle extends Enemy{
 	}
 
 	update() {
-		this.vel.y = Math.min(this.game.clockTick * this.ACC.y, this.velMax.y);
+		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
 	}
 
@@ -229,10 +232,18 @@ class Beetle extends Enemy{
 		var farLeft = PARAMS.CANVAS_WIDTH;
 		var farRight = -1;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				// Author: tommy
+				// For range attack testing
+				// Walter: Changed to use takeDamage method;
+				if (entity instanceof RangeAttack) {
+//					that.takeDamage(entity.attack);
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
-				console.log(that.lastWorldBB.bottom, entity.worldBB.top);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.dim.y;
@@ -257,12 +268,6 @@ class Beetle extends Enemy{
 							? entity.worldBB.right : farRight;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				// Walter: Changed to use takeDamage method;
-				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
-				}
 			}
 		});
 		//If the beetles leftmost position is not on ground and it is moving in the left
@@ -281,9 +286,9 @@ class Beetle extends Enemy{
 
 	draw(context) {
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 2);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 
 }
@@ -349,8 +354,17 @@ class Hopper extends Enemy {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				// Author: tommy
+				// For range attack testing
+				// Walter: Changed to use takeDamage method;
+				if (entity instanceof RangeAttack) {
+//					that.takeDamage(entity.attack);
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
 					if (direction.down) { // falling dowm
@@ -374,20 +388,14 @@ class Hopper extends Enemy {
 						that.vel.x = -that.vel.x;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				// Walter: Changed to use takeDamage method;
-				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
-				}
 			}
 		});
 	}
 
 	draw(context) {
 		this.animations[this.facing].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+			this.game.clockTick, context, this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y, 2);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
 	}
 }

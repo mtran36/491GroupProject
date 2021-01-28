@@ -20,72 +20,72 @@ class SceneManager {
 
 		/* Switch to this once collision detection is handled */
 
-		//for (var i = 0; i < 200; i++) {
-		//	for (var j = 0; j < 35; j++) {
-		//		var sprite = this.sprites[this.map[j][i]];
-		//		//var currentLevel = this.currentLevel;
-		//		if (sprite) {
-		//			if (sprite == 1) {
-		//				this.game.addEntity(new Ground(
-		//					this.game, i * 64, j * 20.7, 1));
-		//			}
-		//		}
-		//	}
-		//}
+		for (var i = 0; i < this.map[0].length; i++) {
+			for (var j = 0; j < this.map.length; j++) {
+				var sprite = this.sprites[this.map[j][i]];
+				//var currentLevel = this.currentLevel;
+				if (sprite) {
+					if (sprite == 1) {
+						this.game.addEntity(new Ground(
+							this.game, i * 64, j * 64, 1));
+					}
+				}
+			}
+		}
 
 		// ground
-		for (var i = 0; i < 4; i++) {
-			this.game.addEntity(new Ground(
-				this.game, 0 + i * 4 * PARAMS.TILE_WIDTH, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 4));
-		}
-		this.game.addEntity(new Ground(this.game, 0,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 , 1));
+//		for (var i = 0; i < 4; i++) {
+//			this.game.addEntity(new Ground(
+//				this.game, 0 + i * 4 * PARAMS.TILE_WIDTH, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 4));
+//		}
+//		this.game.addEntity(new Ground(this.game, 0,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 , 1));
 //		this.game.addEntity(new Ground(this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
 //			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2, 1));
 
-		// left platform
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 2));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 1));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9, 1));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 10, 1));
+//		// left platform
+//		this.game.addEntity(new Ground(
+//			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
+//		this.game.addEntity(new Ground(
+//			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 2));
+//		this.game.addEntity(new Ground(
+//			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 10, 1));
 
-		// right platform
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 3,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 2,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 2));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 10, 1));
+//		// right platform
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 3,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 2,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 2));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
+//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 10, 1));
 
-		// mid platform
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 5));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 8, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 10, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
+//		// mid platform
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 5));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.TILE_WIDTH * 8, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
+//		this.game.addEntity(new Ground(
+//			this.game, PARAMS.TILE_WIDTH * 10, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
 
 		// enemies
 		this.game.addEntity(new Fly(

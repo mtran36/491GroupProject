@@ -143,8 +143,8 @@ class RangeAttack extends Agent {
 		} else {
 			this.vel.x = 400;
         }
-		this.removeFromWorld = false;
 		this.attack = 1;
+		this.hit = false
 		this.loadAnimations();
 	}
 
@@ -154,19 +154,29 @@ class RangeAttack extends Agent {
 
 	/** @override */
 	update() {
-		const TICK = this.game.clockTick;
-		this.move(TICK);
+		if (this.hit) {
+			this.removeFromWorld = true;
+		}
+		this.move(this.game.clockTick);
 	}
 
 	/** @override */
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				if (entity instanceof Enemy) {
+					that.hit = true;
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(entity instanceof RangeAttack) && !(entity instanceof Druid)) {
-				if ((that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right)
-					|| (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left)) { // touching a entity on side way
-					that.removeFromWorld = true;
+				&& that !== entity) {
+				if (entity instanceof Ground) {
+					if ((that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right)
+						|| (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left)) { // touching a entity on side way
+						that.removeFromWorld = true;
+					}
 				}
 			}
 		});

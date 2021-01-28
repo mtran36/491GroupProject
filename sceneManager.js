@@ -19,24 +19,24 @@ class SceneManager {
 
 	loadTestLevel() {
 
-		/* Switch to this once collision detection is handled */
+	/* Switch to this once collision detection is handled */
 
-		//for (var i = 0; i < 200; i++) {
-		//	for (var j = 0; j < 35; j++) {
-		//		var sprite = this.sprites[this.map[j][i]];
-		//		//var currentLevel = this.currentLevel;
-		//		if (sprite) {
-		//			if (sprite == 1) {
-		//				this.game.addEntity(new Ground(
-		//					this.game, i * 64, j * 20.7, 1));
-		//			}
-		//		}
-		//	}
-		//}
+		for (var i = 0; i < this.map[0].length; i++) {
+			for (var j = 0; j < this.map.length; j++) {
+				var sprite = this.sprites[this.map[j][i]];
+				//var currentLevel = this.currentLevel;
+				if (sprite) {
+					if (sprite == 1) {
+						this.game.addEntity(new Ground(
+							this.game, i * 64, j * 64, 1));
+					}
+				}
+			}
+		}
 
 		// ground
 
-		for (var i = 0; i < 4; i++) {
+/*		for (var i = 0; i < 4; i++) {
 			this.game.addEntity(new Ground(
 				this.game, 0 + i * 4 * PARAMS.TILE_WIDTH, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 4));
 		}
@@ -87,7 +87,7 @@ class SceneManager {
 		this.game.addEntity(new Ground(
 			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
 		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 10, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
+			this.game, PARAMS.TILE_WIDTH * 10, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));*/
 
 		// enemies
 		this.game.addEntity(new Fly(
@@ -95,9 +95,9 @@ class SceneManager {
 		this.game.addEntity(new Fly(
 			this.game, randomInt(800), randomInt(600)));
 		this.game.addEntity(new Beetle(
-			this.game, 200, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2));
+			this.game, 200, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 - 10));
 		this.game.addEntity(new Hopper(
-			this.game, 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2));
+			this.game, 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 - 10));
 
 		// mc
 		this.game.druid = new Druid(

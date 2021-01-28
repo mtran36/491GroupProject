@@ -23,7 +23,7 @@ class Enemy extends Agent {
 		this.health = 2;
 		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
-		this.velMax = { x: 400, y: 400 };
+		this.velMax = { x: 400, y: 700 };
 	}
 
 	/**
@@ -158,6 +158,15 @@ class Fly extends Enemy {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				// Author: tommy
+				// For range attack testing
+				// Walter: Changed to use takeDamage method;
+				if (entity instanceof RangeAttack) {
+					that.takeDamage(entity.attack);
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
@@ -179,12 +188,6 @@ class Fly extends Enemy {
 						that.vel.x = -that.vel.x;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				// Walter: I changed it to use the takeDamage method
-				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
-                }
 			}
 		});
 	}
@@ -219,7 +222,7 @@ class Beetle extends Enemy{
 	}
 
 	update() {
-		this.vel.y = Math.min(this.game.clockTick * this.ACC.y, this.velMax.y);
+		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
 	}
 
@@ -229,6 +232,15 @@ class Beetle extends Enemy{
 		var farLeft = PARAMS.CANVAS_WIDTH;
 		var farRight = -1;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				// Author: tommy
+				// For range attack testing
+				// Walter: Changed to use takeDamage method;
+				if (entity instanceof RangeAttack) {
+					that.takeDamage(entity.attack);
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
@@ -255,12 +267,6 @@ class Beetle extends Enemy{
 						farRight = entity.worldBB.right > farRight
 							? entity.worldBB.right : farRight;
 					}
-				}
-				// Author: tommy
-				// For range attack testing
-				// Walter: Changed to use takeDamage method;
-				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
 				}
 			}
 		});
@@ -348,6 +354,15 @@ class Hopper extends Enemy {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
+			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
+				&& that !== entity) {
+				// Author: tommy
+				// For range attack testing
+				// Walter: Changed to use takeDamage method;
+				if (entity instanceof RangeAttack) {
+					that.takeDamage(entity.attack);
+				}
+			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
@@ -372,12 +387,6 @@ class Hopper extends Enemy {
 						that.pos.x = entity.worldBB.left - that.dim.x;
 						that.vel.x = -that.vel.x;
 					}
-				}
-				// Author: tommy
-				// For range attack testing
-				// Walter: Changed to use takeDamage method;
-				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
 				}
 			}
 		});

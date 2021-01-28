@@ -164,7 +164,7 @@ class Fly extends Enemy {
 				// For range attack testing
 				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
+//					that.takeDamage(entity.attack);
 				}
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
@@ -238,7 +238,7 @@ class Beetle extends Enemy{
 				// For range attack testing
 				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
+//					that.takeDamage(entity.attack);
 				}
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
@@ -360,7 +360,7 @@ class Hopper extends Enemy {
 				// For range attack testing
 				// Walter: Changed to use takeDamage method;
 				if (entity instanceof RangeAttack) {
-					that.takeDamage(entity.attack);
+//					that.takeDamage(entity.attack);
 				}
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)

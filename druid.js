@@ -154,9 +154,6 @@ class RangeAttack extends Agent {
 
 	/** @override */
 	update() {
-		if (this.hit) {
-			this.removeFromWorld = true;
-		}
 		this.move(this.game.clockTick);
 	}
 
@@ -167,7 +164,8 @@ class RangeAttack extends Agent {
 			if (entity.agentBB && that.agentBB.collide(entity.agentBB)
 				&& that !== entity) {
 				if (entity instanceof Enemy) {
-					that.hit = true;
+					entity.takeDamage(that.attack);
+					that.removeFromWorld = true;
 				}
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)

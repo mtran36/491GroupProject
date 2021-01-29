@@ -5,9 +5,6 @@ class Druid extends Agent {
 		this.setDimensions(97, 157);
 		this.game.druid = this;
 
-		this.facing = 0;	// 0 is left 1 is right
-		this.velocity = { x: 0, y: 0 };
-		this.animations = [];
 		this.loadAnimations();
 		this.isJumping = false;
 		this.health = 10;
@@ -17,11 +14,13 @@ class Druid extends Agent {
 	}
 
 	takeDamage(damage) {
-		this.health -= damage;
-		if (this.health <= 0) {
-			this.removeFromWorld = true;
+		if (!PARAMS.DEBUG) {
+			this.health -= damage;
+			if (this.health <= 0) {
+				this.removeFromWorld = true;
+			}
+			this.flashing = true;
 		}
-		this.flashing = true;
 	}
 
 	/** @override */

@@ -15,6 +15,7 @@ class GameEngine {
         this.right = false;
         this.up = false;
         this.down = false;
+        this.C = false;
         this.B = false;
         this.A = false;
     };
@@ -80,6 +81,10 @@ class GameEngine {
                 case "KeyS":
                     that.down = true;
                     break;
+                case "KeyC":
+                case "KeyL":
+                    that.C = true;
+                    break;
                 case "KeyZ":
                 case "KeyK":
                     that.B = true;
@@ -107,6 +112,10 @@ class GameEngine {
                 case "ArrowDown":
                 case "KeyS":
                     that.down = false;
+                    break;
+                case "KeyC":
+                case "KeyL":
+                    that.C = false;
                     break;
                 case "KeyZ":
                 case "KeyK":

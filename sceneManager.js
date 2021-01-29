@@ -89,7 +89,8 @@ class SceneManager {
 		this.game.addEntity(new Ground(
 			this.game, PARAMS.TILE_WIDTH * 10, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));*/
 
-		// enemies
+		// enemies 
+		
 		this.game.addEntity(new Fly(
 			this.game, randomInt(800), randomInt(600)));
 		this.game.addEntity(new Fly(
@@ -98,21 +99,21 @@ class SceneManager {
 			this.game, 200, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 - 10));
 		this.game.addEntity(new Hopper(
 			this.game, 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 - 10));
-
+		
 		// mc
 		this.game.druid = new Druid(
 			this.game,
 			PARAMS.CANVAS_WIDTH - 700,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5)
+			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9)
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(this);
 	}
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
+		
 		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
 		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
-
 	}
 
 	draw() {

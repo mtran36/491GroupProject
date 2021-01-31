@@ -58,6 +58,20 @@ class SceneManager {
             }
         }
 
+		if (level.keys) {
+			for (var i = 0; i < level.keys.length; i++) {
+				let key = level.keys[i];
+				this.game.addEntity(new Key(this.game, key.x * PARAMS.TILE_WIDTH, key.y * PARAMS.TILE_WIDTH));
+			}
+        }
+
+		if (level.doors) {
+			for (var i = 0; i < level.doors.length; i++) {
+				let door = level.doors[i];
+				this.game.addEntity(new Door(this.game, door.x * PARAMS.TILE_WIDTH, door.y * PARAMS.TILE_WIDTH));
+			}
+		}
+
 		this.game.druid = new Druid(
 			this.game, x, y)
 		this.game.addEntity(this.game.druid);

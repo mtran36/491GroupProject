@@ -133,7 +133,7 @@ class Fly extends Enemy {
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy) {
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
@@ -196,7 +196,7 @@ class Beetle extends Enemy{
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy) {
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;
@@ -302,7 +302,7 @@ class Hopper extends Enemy {
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				let direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy) {
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;

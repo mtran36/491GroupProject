@@ -39,7 +39,7 @@ class Druid extends Agent {
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
 				&& that !== entity) {
-				if (entity instanceof Ground) {
+				if (entity instanceof Ground || entity instanceof Door) {
 					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
 						&& (that.lastWorldBB.left) < entity.worldBB.right
 						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
@@ -66,6 +66,14 @@ class Druid extends Agent {
 						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = 0;
 					}
+				}
+				// Temporary collision detection for key and door
+				if (entity instanceof Key) {
+					that.hasKey = true;
+					entity.removeFromWorld = true;
+				}
+				if (entity instanceof Door) {
+					if (that.hasKey == true) entity.removeFromWorld = true;
 				}
 			}
 		});

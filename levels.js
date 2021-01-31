@@ -25,5 +25,9 @@ var levelOne = {
 
 	hopper: [{ x: 700, y: 2 }],
 
-	potions: [{x: 1, y: 1}] //Temporary
+	potions: [{ x: 1, y: 1 }],  //Temporary
+
+	keys: [{ x: 10, y: 4 }],	//Temporary
+
+	doors: [{ x: 13, y: 8 }]		//Temporary
 };

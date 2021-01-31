@@ -13,7 +13,7 @@ class Enemy extends Agent {
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
 		this.prizeRate = prizeRate ? prizeRate : 0.1;
-		this.prize = prize ? prize : "POTION";
+		this.prize = prize ? prize : "Potion";
 	}
 
 	/**
@@ -34,7 +34,7 @@ class Enemy extends Agent {
 	 * chance based on this.prizeRate.
 	 * e.g. a prize rate of 0.1 yields a 10% chance of spawning a prize.
 	 * Currently only spawns potions.
-	 * */
+	 */
 	spawnPrize() {
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
 			if (this.prize === "Potion") {

@@ -5,7 +5,7 @@ class SceneManager {
 		this.pos = { x: 0, y: 0 };
 
 
-		this.loadLevel(levelOne, PARAMS.CANVAS_WIDTH - 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9);
+		this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
 	};
 
 	loadLevel(level, x, y) {

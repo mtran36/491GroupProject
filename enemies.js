@@ -161,7 +161,7 @@ class Fly extends Enemy {
  * Movement pattern: Moves back and forth on a platform or the ground.
  */
 class Beetle extends Enemy{
-	constructor(game, x, y) {
+	constructor(game, x, y, prize) {
 		super(game, x, y, "./Sprites/TestBeetle.png");
 		this.setDimensions(2, 32, 32);
 		this.vel.x = -200;
@@ -180,6 +180,12 @@ class Beetle extends Enemy{
 	update() {
 		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
+		if (this.removeFromWorld) {
+			switch (prize) {
+				case 'Potion':
+					this.game.addEntity(new Potions(this.game, this.x, this.y));
+            }
+        }
 	}
 
 	/** @override */

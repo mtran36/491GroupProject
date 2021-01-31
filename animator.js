@@ -13,15 +13,17 @@ class Animator {
      * Draws the current frame of the animation to the screen with the designated 
      * parameters. Calls to drawFrame occur once per tick, which may be more than once 
      * per frame due to the way the engine scales animation speeds.
-     * @param {Number} tick Amount of time which has passed since the last tick.
+     * @param {number} tick Amount of time which has passed since the last tick.
      * @param {CanvasImageSource} context Canvas to draw on.
-     * @param {Number} x The x-axis coordinate in the canvas at which to place the top
+     * @param {number} x The x-axis coordinate in the canvas at which to place the top
      * left corner of the source image.
-     * @param {Number} y The y-axis coordinate in the canvas at which to place the top
+     * @param {number} y The y-axis coordinate in the canvas at which to place the top
      * left corner of the source image.
-     * @param {Number} scale
+     * @param {number} scale
      */
-    drawFrame(tick, context, x, y, scale) {
+    drawFrame(tick, context, x, y, scale, camera) {
+        x -= camera.pos.x;
+        y -= camera.pos.y;
         // Check if animation is done
         this.elapsedTime += tick; 
         if (this.isDone()) {

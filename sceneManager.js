@@ -2,79 +2,75 @@ class SceneManager {
 	constructor(game) {
 		this.game = game;
 		this.game.camera = this;
-		this.loadTestLevel();
-	}
+		this.pos = { x: 0, y: 0 };
 
-	loadTestLevel() {
 
-		// ground
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH, 16));
-		this.game.addEntity(new Ground(this.game, 0,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2 , 1));
-//		this.game.addEntity(new Ground(this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-//			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2, 1));
+		this.loadLevel(levelOne, PARAMS.CANVAS_WIDTH - 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9);
+	};
 
-		// left platform
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 2));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 1));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9, 1));
-		this.game.addEntity(new Ground(
-			this.game, 0, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 10, 1));
+	loadLevel(level, x, y) {
+		this.game.entities = [];
+		this.x = 0;
 
-		// right platform
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 3,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5, 3));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH * 2,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 2));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 10, 1));
+		if (level.grounds) {
+			for (var i = 0; i < level.grounds.length; i++) {
+				let ground = level.grounds[i];
+				this.game.addEntity(new Ground(this.game,
+					(PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH) * ground.x,
+					PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * ground.y,
+					ground.size));
+			}
+		}
+		if (level.middle) {
+			for (var i = 0; i < level.middle.length; i++) {
+				let middle = level.middle[i];
+				this.game.addEntity(new Ground(this.game,
+					(PARAMS.TILE_WIDTH) * middle.x,
+					PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * middle.y,
+					middle.size));
+			}
+		}
+		if (level.flies) {
+			for (var i = 0; i < level.flies.length; i++) {
+				let flies = level.flies[i];
+				this.game.addEntity(new Fly(this.game,
+					randomInt(800) * flies.x, randomInt(600) * flies.y));
+			}
+		}
+		if (level.beetles) {
+			for (var i = 0; i < level.beetles.length; i++) {
+				let beetles = level.beetles[i];
+				this.game.addEntity(new Beetle(this.game,
+					beetles.x, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * beetles.y - 10));
+			}
+		}
+		if (level.hopper) {
+			for (var i = 0; i < level.hopper.length; i++) {
+				let hopper = level.hopper[i];
+				this.game.addEntity(new Hopper(this.game,
+					hopper.x, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * hopper.y - 10));
+			}
+		}
+		if (level.potions) {
+			for (var i = 0; i < level.potions.length; i++) {
+				let potion = level.potions[i];
+				this.game.addEntity(new Potions(this.game, potion.x, potion.y));
+            }
+        }
 
-		// mid platform
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 7, 5));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 8, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 8, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 6, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
-		this.game.addEntity(new Ground(
-			this.game, PARAMS.TILE_WIDTH * 10, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 6, 1));
-
-		this.game.addEntity(new Fly(
-			this.game, randomInt(800), randomInt(600)));
-		this.game.addEntity(new Fly(
-			this.game, randomInt(800), randomInt(600)));
-		this.game.addEntity(new Beetle(
-			this.game, 200, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2));
-		this.game.addEntity(new Hopper(
-			this.game, 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 2));
-
-		this.game.addEntity(new Druid(
-			this.game,
-			PARAMS.CANVAS_WIDTH - 700,
-			PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 5));
-	}
+		this.game.druid = new Druid(
+			this.game, x, y)
+		this.game.addEntity(this.game.druid);
+	};
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
+		
+		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
+		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+	};
+
+	draw() {
+
 	};
 }

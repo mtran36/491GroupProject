@@ -1,40 +1,94 @@
+/**
+ * Superclass for all enemies that consolidates some common code and attributes. Also 
+ * allows for easier detection of enemies colliding with enemies.
+ */
 class Enemy extends Agent {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
+	constructor(game, x, y, spritesheet) {
+		super(game, x, y, spritesheet);
+		// Default values that may be overriden in specific enemy classes.
 		this.attack = 1;
 		this.defense = 0;
 		this.health = 2;
+		this.range = { x: 400, y: 400 };
+		this.ACC = { x: 1000, y: 1500 };
+		this.velMax = { x: 400, y: 700 };
 	}
 
+	/**
+	 * Causes the enemy to take the specified amount of damage. The enemy removes itself 
+	 * from the world after its health reaches 0.
+	 * @param {number} damage Damage to health as an integer
+	 */
 	takeDamage(damage) {
 		this.health -= damage;
 		if (this.health <= 0) {
 			this.removeFromWorld = true;
 		}
 	}
+
+	/**
+	 * Returns a tuple of boolean values that tells what direction or directions this object
+	 * has collided with entity. Values are stored in up, down, left, and right properties 
+	 * of the tuple.
+	 * @param {BoundingBox} othWorldBB
+	 */
+	worldCollisionDirection(entity) {
+		var down = this.vel.y > 0
+			&& this.lastWorldBB.bottom <= entity.worldBB.top
+			&& (this.lastWorldBB.left) < entity.worldBB.right
+			&& (this.lastWorldBB.right) > entity.worldBB.left;
+		var up = this.vel.y < 0
+			&& (this.lastWorldBB.top) >= entity.worldBB.bottom
+			&& (this.lastWorldBB.left) != entity.worldBB.right
+			&& (this.lastWorldBB.right) != entity.worldBB.left;
+		var left = this.vel.x < 0
+			&& (this.lastWorldBB.left) >= entity.worldBB.right
+			&& (this.lastWorldBB.top) != entity.worldBB.bottom
+			&& (this.lastWorldBB.bottom) != entity.worldBB.top;
+		var right = this.vel.x > 0
+			&& (this.lastWorldBB.right) <= entity.worldBB.left
+			&& (this.lastWorldBB.top) < entity.worldBB.bottom
+			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
+		return { up, down, left, right };
+	}
 }
 
 /**
  * Enemy type: Fly
- * Movemenet pattern: Flies straight at player. Collides with all non-enemy objects.
- * 
- * */
+ * Movement pattern: Flies straight at player. Collides with ground and other enemies.
+ */
 class Fly extends Enemy {
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.range = { x: 800, y: 800 };
-		this.ACC = {x: 700, y: 700}
+		super(game, x, y, "./Sprites/TestFly.png");
+		this.setDimensions(1, 32, 32);
+		// Override default values
+		this.range = { x: 600, y: 600 };
+		this.ACC = { x: 700, y: 700 };
+		this.health = 1;
+		// End override
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
 		this.up = false;
 		this.accelerate = false;
 	}
 
+	/** @override */
 	loadAnimations() {
-		this.animations[0] = new Animator(
+		this.animations[1] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
+	/** @override */
+	updateBB() {
+		super.updateBB();
+		this.agentBB.radius = this.agentBB.radius - 3;
+		this.worldBB = new BoundingBox(
+			this.pos.x + 2, this.pos.y + 4, this.dim.x - 5, this.dim.y - 6);
+	}
+
+	/** @override */
 	update() {
 		var xdist = this.pos.x - this.game.druid.pos.x;
 		var ydist = this.pos.y - this.game.druid.pos.y;
@@ -77,74 +131,61 @@ class Fly extends Enemy {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
+				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.dim.y;
+					if (direction.down) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
 					}
-					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
-						&& (that.lastWorldBB.left) != entity.worldBB.right
-						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+					if (direction.up) { // jumping up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = -that.vel.y;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (direction.left) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
-						that.pos.x = entity.worldBB.left - that.dim.x;
+					if (direction.right) { // going right
+						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				if (entity instanceof RangeAttack) {
-					that.removeFromWorld = true;
-                }
 			}
 		});
-	}
-
-	draw(context) {
-		this.animations[0].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		// Label for during testing. Remove in full game.
-		context.font = "48px serif";
-		context.fillText("F", this.pos.x + 16, this.pos.y + 48);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
 	}
 }
 
 /**
- * 
  * Enemy type: Beetle
  * Movement pattern: Moves back and forth on a platform or the ground.
- * 
- * */
+ */
 class Beetle extends Enemy{
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
-		this.ACC = { y: 1500 };
-		this.velMax = { y: 400 };
+	constructor(game, x, y, prize) {
+		super(game, x, y, "./Sprites/TestBeetle.png");
+		this.setDimensions(2, 32, 32);
 		this.vel.x = -200;
-		this.animations = [];
 		this.loadAnimations();
 	}
 
+	/** @override */
 	loadAnimations() {
-		this.animations[0] = new Animator(
+		this.animations[1] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
+	/** @override */
 	update() {
-		this.vel.y = Math.min(this.game.clockTick * this.ACC.y, this.velMax.y);
+		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
+		if (this.removeFromWorld) {
+			switch (prize) {
+				case 'Potion':
+					this.game.addEntity(new Potions(this.game, this.x, this.y));
+            }
+        }
 	}
 
 	/** @override */
@@ -153,27 +194,23 @@ class Beetle extends Enemy{
 		var farLeft = PARAMS.CANVAS_WIDTH;
 		var farRight = -1;
 		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
+				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.dim.y;
+					if (direction.down) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;
 					}
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.dim.y;
+					if (direction.up) { // moving up
+						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = 0;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (direction.left) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
-						that.pos.x = entity.worldBB.left - that.dim.x;
+					if (direction.right) { // going right
+						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
 					}
 					if (entity instanceof Ground) {
@@ -183,69 +220,67 @@ class Beetle extends Enemy{
 							? entity.worldBB.right : farRight;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				if (entity instanceof RangeAttack) {
-					that.removeFromWorld = true;
-				}
 			}
 		});
-		if (farLeft > this.pos.x && that.facing === 0 && this.vel.y === 0) {
-			this.facing = 1;
+		// If the beetles leftmost position is not on ground and it is moving in the left
+		// direction and it is not moving vertically, then it will start moving right.
+		if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
 			this.pos.x = farLeft;
 		}
-		if (farRight < this.pos.x + this.dim.x && that.facing === 1 && this.vel.y === 0) {
-			this.facing = 0;
+		// If the beetle's rightmost position is not on ground and it is moving in the right
+		// direction and it is not moving vertically, then it will start moving left.
+		if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
 			this.pos.x = farRight - this.dim.x;
 		}
 	}
+}
 
-	draw(context) {
-		this.animations[0].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		// Test Label. Remove after getting proper sprites.
-		context.font = '48px serif';
-		context.fillText("B", this.pos.x + 16, this.pos.y + 48);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
+class FlyBeetle extends Beetle {
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/TestBeetle.png)");
+
 	}
-
 }
 
 /**
  * Enemy type: Hopper
- * Movement pattern: Hops towards the player in an arc if the player is within range.
- * 
- * Has a bit of landing lag before it can hop again.
- * */
+ * Movement pattern: Hops towards the player in an arc if the player is within range. Has
+ * a bit of landing lag before it can hop again.
+ */
 class Hopper extends Enemy {
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestEnemy.png");
+		super(game, x, y, "./Sprites/TestHopper.png");
+		this.setDimensions(2, 32, 32);
+		// Override default values
+		this.ACC = { y: 2000 };
+		// End Override
 		this.velMax = { y: 550 };
 		this.jumpForce = -800;
 		this.xspeed = 300;
-		this.ACC = { y: 2000 };
 		this.left = false;
 		this.range = { x: 300, y: 300 };
 		this.landLag = 0.3;
 		this.landTime = this.landLag;
 		this.jumping = false;
-		this.animations = [];
 		this.loadAnimations();
 	}
 
+	/** @override */
 	loadAnimations() {
-		this.animations[0] = new Animator(
+		this.animations[1] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
+	/** @override */
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
-		var xdist = this.pos.x - this.game.druid.pos.x;
-		var ydist = this.pos.y - this.game.druid.pos.y;
+		let xdist = this.pos.x - this.game.druid.pos.x;
+		let ydist = this.pos.y - this.game.druid.pos.y;
 		if (Math.abs(xdist) < this.range.x
 			&& Math.abs(ydist) < this.range.y
 			&& !this.jumping
@@ -265,50 +300,31 @@ class Hopper extends Enemy {
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& !(that === entity)) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
+				let direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy) {
-					if (that.vel.y > 0 && that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.dim.y;
+					if (direction.down) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;
 						that.vel.x = 0;
 						if (that.jumping)
 							that.landTime = that.landLag;
 						that.jumping = false;
 					}
-					if (that.vel.y < 0 && (that.lastWorldBB.top) >= entity.worldBB.bottom
-						&& (that.lastWorldBB.left) != entity.worldBB.right
-						&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
+					if (direction.up) { // jumping up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = 0;
 					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right) { // going left
+					if (direction.left) { // going left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left) { // going right
-						that.pos.x = entity.worldBB.left - that.dim.x;
+					if (direction.right) { // going right
+						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
 					}
 				}
-				// Author: tommy
-				// For range attack testing
-				if (entity instanceof RangeAttack) {
-					that.removeFromWorld = true;
-				}
 			}
 		});
-	}
-
-	draw(context) {
-		this.animations[0].drawFrame(
-			this.game.clockTick, context, this.pos.x, this.pos.y, 2);
-		// Test Label. Remove after getting proper sprites.
-		context.font = '48px serif';
-		context.fillText("H", this.pos.x + 16, this.pos.y + 48);
-		this.worldBB.display(context);
-		this.agentBB.display(context);
 	}
 }

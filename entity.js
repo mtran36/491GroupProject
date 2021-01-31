@@ -7,42 +7,32 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
-        this.dim = { x: PARAMS.TILE_WIDTH, y: PARAMS.TILE_WIDTH };
         this.pos = { x: x, y: y };
+        this.setDimensions(1, PARAMS.TILE_WIDTH);
         this.worldBB = this.makeDefaultBoundingBox();
         this.lastWorldBB = this.worldBB;
         this.animations = [];
     }
 
     /** 
-     * Sets the dimensions of the sprite. If only width is included, makes the dimensions
-     * square shaped with width length sides. 
+     * Sets the base dimensions (in pixels) of the image for each frame.
+     * @param {number} scale Value to scale the sprite by when displaying on canavs.
+     * @param {number} width Width of the sprite on its spritesheet in pixels.
+     * @param {number} height Height of the sprite on its spritesheet in pixels.
      */
-    setDimensions(width, height) {
-        if (height) {
-            this.dim = { x: width, y: height };
-        } else {
-            this.dim = { x: width, y: width };
+    setDimensions(scale, width, height) {
+        if (!height) {
+            height = width;
         }
+        this.scale = scale;
+        this.dim = { x: width, y: height };
+        this.scaleDim = { x: width * this.scale, y: height * this.scale };
     }
 
     /** Updates the bounding box to the current position of the entity. */
     updateBB() {
         this.lastWorldBB = this.worldBB;
-        this.worldBB = new BoundingBox(
-            this.pos.x, this.pos.y, this.dim.x, this.dim.y);
-    }
-
-    /** Draws the entity's bounding box used for collisions with entities. */
-    drawWorldBB(context) {
-        if (PARAMS.DEBUG) { 
-            context.save();
-            context.strokeStyle = 'red';
-            context.lineWidth = PARAMS.BB_LINE_WIDTH;
-            context.strokeRect(
-                this.pos.x, this.pos.y, this.dim.x, this.dim.y);
-            context.restore();
-        }
+        this.worldBB = this.makeDefaultBoundingBox();
     }
 
     /**
@@ -50,15 +40,18 @@ class Entity {
      * @param {CanvasImageSource} context Canvas to draw on.
      */
     draw(context) {
-        context.drawImage(this.spritesheet, 0, 0, this.dim.x, this.dim.y,
-            this.pos.x * this.dim.x, this.pos.y * this.dim.y,
-            this.dim.x, this.dim.y);
-        this.drawWorldBB(context);
+        context.drawImage(
+            this.spritesheet, 0, 0,   // Draw from top left of source
+            this.dim.x, this.dim.y,   // Source image width & height
+            this.pos.x * this.dim.x,  // Canvas drawing position x
+            this.pos.y * this.dim.y,  // Canvas drawing position y
+            this.scaleDim.x,          // Canvas drawing width
+            this.scaleDim.y);         // Canvas drawing height
     }
 
     /** Returns a default bounding box for entities. */
     makeDefaultBoundingBox() {
-        return new BoundingBox(this.pos.x, this.pos.y, this.dim.x, this.dim.y);
+        return new BoundingBox(this.pos.x, this.pos.y, this.scaleDim.x, this.scaleDim.y);
     }
 
     /**
@@ -92,8 +85,8 @@ class Agent extends Entity {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
         this.vel = { x: 0, y: 0 };
-        // Left = 0, Right = 1
-        this.facing = 0;
+        
+        this.facing = 0; // Left = 0, Right = 1
         this.agentBB = this.makeDefaultBoundingCircle();
         this.lastAgentBB = this.agentBB;
         this.loadAnimations();
@@ -126,14 +119,24 @@ class Agent extends Entity {
     /** Returns a default bounding circle for agents. */
     makeDefaultBoundingCircle() {
         return new BoundingCircle(
-            this.pos.x + this.dim.x / 2,
-            this.pos.y + this.dim.y / 2,
-            Math.min(this.dim.x, this.dim.y) / 2);
+            this.pos.x + this.scaleDim.x / 2,
+            this.pos.y + this.scaleDim.y / 2,
+            Math.min(this.scaleDim.x, this.scaleDim.y) / 2);
+    }
+
+    /** @override */
+    draw(context) {
+        this.animations[this.facing].drawFrame(
+            this.game.clockTick, context,
+            this.pos.x, this.pos.y,
+            this.scale, this.game.camera);
+        this.worldBB.display(this.game);
+        this.agentBB.display(this.game);
     }
 
     /** 
-     * Location to check if the agent is colliding with anything. This method should be
-     * overriden by the implementing agent.
+     * Checks for when this entity collides with another entity in the game world.
+	 * Updates position and variables accordingly.
      */
     checkCollisions() {
         console.log(
@@ -187,16 +190,18 @@ class BoundingBox {
 
     /**
      * Displays the bounding box for testing purposes.
-     * @param {CanvasImageSource} context Canvas to draw on.
+     * @param {CanvasImageSource} game.context Canvas to draw on.
      */
-    display(context) {
+    display(game) {
         if (PARAMS.DEBUG) {
-            context.save();
-            context.strokeStyle = 'red';
-            context.lineWidth = PARAMS.BB_LINE_WIDTH;
-            context.strokeRect(
-                this.x, this.y, this.width, this.height);
-            context.restore();
+            game.context.save();
+            game.context.strokeStyle = 'red';
+            game.context.lineWidth = PARAMS.BB_LINE_WIDTH;
+            game.context.strokeRect(
+                this.x - game.camera.pos.x,
+                this.y - game.camera.pos.y,
+                this.width, this.height);
+            game.context.restore();
         }
     }
 }
@@ -220,17 +225,20 @@ class BoundingCircle {
 
     /**
      * Displays the bounding cicle for testing purposes.
-     * @param {CanvasImageSource} context Canvas to draw on.
+     * @param {CanvasImageSource} game.context Canvas to draw on.
      */
-    display(context) {
+    display(game) {
         if (PARAMS.DEBUG) {
-            context.save();
-            context.strokeStyle = 'green';
-            context.lineWidth = PARAMS.BB_LINE_WIDTH;
-            context.beginPath();
-            context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            context.stroke();
-            context.restore();
+            game.context.save();
+            game.context.strokeStyle = 'green';
+            game.context.lineWidth = PARAMS.BB_LINE_WIDTH;
+            game.context.beginPath();
+            game.context.arc(
+                this.x - game.camera.pos.x,
+                this.y - game.camera.pos.y,
+                this.radius, 0, 2 * Math.PI);
+            game.context.stroke();
+            game.context.restore();
         }
     }
 }

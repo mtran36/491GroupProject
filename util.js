@@ -33,5 +33,6 @@ var PARAMS = {
     CANVAS_WIDTH: 1024,
     CANVAS_HEIGHT: 768,
     BB_LINE_WIDTH: 5,
+    BLOCKWIDTH: 64,
     DEBUG: false
 };

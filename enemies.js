@@ -22,6 +22,9 @@ class Enemy extends Agent {
 	takeDamage(damage) {
 		this.health -= damage;
 		if (this.health <= 0) {
+			if (Math.random() < 0.5) {
+				this.game.addEntity(new Potions(this.game, this.agentBB.x, this.agentBB.y));
+			}
 			this.removeFromWorld = true;
 		}
 	}

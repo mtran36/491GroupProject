@@ -6,7 +6,7 @@ class SceneManager {
 
 
 		this.loadLevel(levelOne, PARAMS.CANVAS_WIDTH - 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9);
-	}
+	};
 
 	loadLevel(level, x, y) {
 		this.game.entities = [];
@@ -51,20 +51,26 @@ class SceneManager {
 					hopper.x, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * hopper.y - 10));
 			}
 		}
+		if (level.potions) {
+			for (var i = 0; i < level.potions.length; i++) {
+				let potion = level.potions[i];
+				this.game.addEntity(new Potions(this.game, potion.x, potion.y));
+            }
+        }
 
 		this.game.druid = new Druid(
 			this.game, x, y)
 		this.game.addEntity(this.game.druid);
-	}
+	};
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
 		
 		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
 		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
-	}
+	};
 
 	draw() {
 
-	}
+	};
 }

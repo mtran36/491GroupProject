@@ -21,7 +21,9 @@ var levelOne = {
 
 	flies: [{ x: 1, y: 1 }, { x: 1, y: 1 }],
 
-	beetles: [{ x: 200, y: 2 }],
+	beetles: [{ x: 200, y: 2, prize: "Potion" }],
 
-	hopper: [{ x: 700, y: 2}]
+	hopper: [{ x: 700, y: 2 }],
+
+	potions: [{x: 1, y: 1}] //Temporary
 };

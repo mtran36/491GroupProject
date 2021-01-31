@@ -4,10 +4,12 @@ class Druid extends Agent {
 		super(game, x, y, "./Sprites/druid.png");
 		this.setDimensions(1, 97, 157);
 		this.game.druid = this;
+		this.maxHealth = 400;
 
 		this.loadAnimations();
 		this.isJumping = false;
-		this.health = 10;
+		this.health = 100;
+		this.damage = 0;
 		this.invincTime = 0;
 		this.flashing = false;
 		this.rangeAttackCooldown = 0;
@@ -150,6 +152,24 @@ class Druid extends Agent {
 	/** @override */
 	draw(context) {
 		if (this.flashing) return;
+
+		context.fillStyle = "Red";
+		context.fillRect(30, 30, this.health, 30);
+		context.fillStyle = "White";
+		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
+		context.beginPath();
+		context.strokeStyle = "Black";
+		context.rect(30, 30, this.maxHealth, 30)
+		context.stroke();
+
+		context.fillStyle = "black";
+		context.font = "16px Verdana";
+		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
+		context.fillStyle = "grey";
+		context.font = "16px Verdana";
+		context.fillText("LVL", 360, 25);
+		context.fillText("Name Here if want", 30, 25);
+
 		super.draw(context);
 	}
 }

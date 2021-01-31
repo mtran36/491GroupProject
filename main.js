@@ -8,6 +8,7 @@ ASSET_MANAGER.queueDownload("./Sprites/druid.png");
 ASSET_MANAGER.queueDownload("./Sprites/ground.png");
 ASSET_MANAGER.queueDownload("./Sprites/ball.png");
 ASSET_MANAGER.queueDownload("./Sprites/sword.png");
+ASSET_MANAGER.queueDownload("./Sprites/testpotion.png");
 
 ASSET_MANAGER.downloadAll(function () {
 	var canvas = document.getElementById('gameWorld');

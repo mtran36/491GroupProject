@@ -159,7 +159,6 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-		if (this.flashing) return;
 
 		context.fillStyle = "Red";
 		context.fillRect(30, 30, this.health, 30);
@@ -177,6 +176,8 @@ class Druid extends Agent {
 		context.font = "16px Verdana";
 		context.fillText("LVL", 360, 25);
 		context.fillText("Name Here if want", 30, 25);
+
+		if (this.flashing) return;
 
 		super.draw(context);
 	}

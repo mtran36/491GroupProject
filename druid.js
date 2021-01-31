@@ -189,6 +189,18 @@ class SwordAttack extends Agent {
 		this.duration = 0.5;
 		this.attack = 1;
 		this.damagedEnemies = [];
+		// Walter: copied repositioning from update to fix incorrect draw on first draw cycle.
+		const DRUID = this.game.druid;
+		if (DRUID.facing === 0) { // facing left
+			this.pos.x = DRUID.pos.x - this.scaleDim.x
+				+ (this.duration * 75) + (this.scaleDim.x / 5);
+			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
+		} else { // facing right
+			this.pos.x = DRUID.pos.x + DRUID.scaleDim.x
+				- (this.duration * 75) - (this.scaleDim.x / 5);
+			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
+		}
+		this.updateBB();
 	}
 
 	/** @override */

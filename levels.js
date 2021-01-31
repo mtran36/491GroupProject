@@ -19,11 +19,11 @@ var levelOne = {
 		{ x: 6, y: 6, size: 1 }, { x: 10, y: 6, size: 1 },
 		{ x: 13, y: 5, size: 3 }, { x: 14, y: 6, size: 2 }],
 
-	flies: [{ x: 1, y: 1 }, { x: 1, y: 1 }],
+	flies: [{ x: 5, y: 10 }, { x: 5.5, y: 10 }, { x: 11, y: 4, prize: "Key", prizeRate: 1 }],
 
-	beetles: [{ x: 200, y: 2, prize: "Potion" }],
+	beetles: [{ x: 11, y: 10, prize: "Potion" , prizeRate: 1}],
 
-	hopper: [{ x: 700, y: 2 }],
+	hopper: [{ x: 1, y: 10 , prizeRate: 0.5}],
 
 	potions: [{ x: 1, y: 1 }],  //Temporary
 

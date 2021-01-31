@@ -26,6 +26,7 @@ class Ground extends Entity {
 class Key extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/key.png");
+		this.update = function () { };
 
 	};
 

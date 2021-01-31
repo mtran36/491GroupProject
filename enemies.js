@@ -37,11 +37,13 @@ class Enemy extends Agent {
 	 */
 	spawnPrize() {
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
-			if (this.prize === "Potion") {
-				this.game.addEntity(new Potions(this.game, this.agentBB.x, this.agentBB.y));
-			}
-			if (this.prize === "Key") {
-				this.game.addEntity(new Key(this.game, this.agentBB.x, this.agentBB.y));
+			switch (this.prize) {
+				case "Potion":
+					this.game.addEntity(new Potions(this.game, this.agentBB.x, this.agentBB.y));
+					break;
+				case "Key":
+					this.game.addEntity(new Key(this.game, this.agentBB.x, this.agentBB.y));
+					break;
 			}
 		}
 	}

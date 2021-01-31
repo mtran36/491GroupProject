@@ -18,6 +18,8 @@ class GameEngine {
         this.C = false;
         this.B = false;
         this.A = false;
+        this.pause = false;
+        this.pausePressed = false;
     };
 
     /**
@@ -93,6 +95,12 @@ class GameEngine {
                 case "KeyJ":
                     that.A = true;
                     break;
+                case "KeyP":
+                    if (!that.pausePressed) {
+                        that.pause = !that.pause;
+                        that.pausePressed = true;
+                    }
+                    break;
             }
         });
         this.context.canvas.addEventListener("keyup", function (e) {
@@ -124,6 +132,9 @@ class GameEngine {
                 case "KeyX":
                 case "KeyJ":
                     that.A = false;
+                    break;
+                case "KeyP":
+                    that.pausePressed = false;
                     break;
             }
         });
@@ -167,6 +178,7 @@ class GameEngine {
 
     /** Main game loop. Defines the update/render order of the engine. */
     loop() {
+        if (this.pause) return;
         this.clockTick = this.timer.tick();
         this.update();
         this.draw();

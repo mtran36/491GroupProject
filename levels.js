@@ -29,5 +29,7 @@ var levelOne = {
 
 	keys: [{ x: 10, y: 4 }],	//Temporary
 
-	doors: [{ x: 13, y: 8 }]		//Temporary
+	doors: [{ x: 13, y: 8 }],		//Temporary
+
+	powerups: [{x: 10, y: 1}]
 };

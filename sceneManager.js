@@ -72,6 +72,13 @@ class SceneManager {
 			}
 		}
 
+		if (level.powerups) {
+			for (var i = 0; i < level.powerups.length; i++) {
+				let powerup = level.powerups[i];
+				this.game.addEntity(new RangedPowerUp(this.game, powerup.x * PARAMS.TILE_WIDTH, powerup.y * PARAMS.TILE_WIDTH));
+			}
+		}
+
 		this.game.druid = new Druid(
 			this.game, x, y)
 		this.game.addEntity(this.game.druid);

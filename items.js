@@ -8,12 +8,18 @@ class Items extends Agent {
 class Potions extends Items {
     constructor(game, x, y) {
         super(game, x, y, "./Sprites/testpotion.png");
+        this.setDimensions(1, 32, 32);
     }
 
     /** @override */
     loadAnimations() {
         this.animations[0] = new Animator(
             this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+    }
+
+    /** @override */
+    update() {
+
     }
 
     /** @override */

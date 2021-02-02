@@ -3,7 +3,7 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet) {
+	constructor(game, x, y, spritesheet, prize, prizeRate) {
 		super(game, x, y, spritesheet);
 		// Default values that may be overriden in specific enemy classes.
 		this.attack = 1;
@@ -12,6 +12,8 @@ class Enemy extends Agent {
 		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
+		this.prizeRate = prizeRate ? prizeRate : 0.1;
+		this.prize = prize ? prize : "Potion";
 	}
 
 	/**
@@ -22,7 +24,27 @@ class Enemy extends Agent {
 	takeDamage(damage) {
 		this.health -= damage;
 		if (this.health <= 0) {
+			this.spawnPrize();
 			this.removeFromWorld = true;
+		}
+	}
+
+	/**
+	 * Spawns a prize at this Enemy location if PARAMS.DEBUG is true or on a random
+	 * chance based on this.prizeRate.
+	 * e.g. a prize rate of 0.1 yields a 10% chance of spawning a prize.
+	 * Currently only spawns potions.
+	 */
+	spawnPrize() {
+		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
+			switch (this.prize) {
+				case "Potion":
+					this.game.addEntity(new Potions(this.game, this.agentBB.x, this.agentBB.y));
+					break;
+				case "Key":
+					this.game.addEntity(new Key(this.game, this.agentBB.x, this.agentBB.y));
+					break;
+			}
 		}
 	}
 
@@ -58,8 +80,8 @@ class Enemy extends Agent {
  * Movement pattern: Flies straight at player. Collides with ground and other enemies.
  */
 class Fly extends Enemy {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestFly.png");
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/TestFly.png", prize, prizeRate);
 		this.setDimensions(1, 32, 32);
 		// Override default values
 		this.range = { x: 600, y: 600 };
@@ -133,7 +155,7 @@ class Fly extends Enemy {
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy) {
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
@@ -161,8 +183,8 @@ class Fly extends Enemy {
  * Movement pattern: Moves back and forth on a platform or the ground.
  */
 class Beetle extends Enemy{
-	constructor(game, x, y, prize) {
-		super(game, x, y, "./Sprites/TestBeetle.png");
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/TestBeetle.png", prize, prizeRate);
 		this.setDimensions(2, 32, 32);
 		this.vel.x = -200;
 		this.loadAnimations();
@@ -196,7 +218,7 @@ class Beetle extends Enemy{
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy) {
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;
@@ -250,8 +272,8 @@ class FlyBeetle extends Beetle {
  * a bit of landing lag before it can hop again.
  */
 class Hopper extends Enemy {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestHopper.png");
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/TestHopper.png", prize, prizeRate);
 		this.setDimensions(2, 32, 32);
 		// Override default values
 		this.ACC = { y: 2000 };
@@ -302,7 +324,7 @@ class Hopper extends Enemy {
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				let direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy) {
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 					if (direction.down) { // falling dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;

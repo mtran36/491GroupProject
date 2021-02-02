@@ -27,6 +27,7 @@ class Entity {
         this.scale = scale;
         this.dim = { x: width, y: height };
         this.scaleDim = { x: width * this.scale, y: height * this.scale };
+        this.updateBB();
     }
 
     /** Updates the bounding box to the current position of the entity. */

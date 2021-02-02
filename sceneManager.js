@@ -5,7 +5,7 @@ class SceneManager {
 		this.pos = { x: 0, y: 0 };
 
 
-		this.loadLevel(levelOne, PARAMS.CANVAS_WIDTH - 700, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * 9);
+		this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
 	};
 
 	loadLevel(level, x, y) {
@@ -32,23 +32,23 @@ class SceneManager {
 		}
 		if (level.flies) {
 			for (var i = 0; i < level.flies.length; i++) {
-				let flies = level.flies[i];
+				let fly = level.flies[i];
 				this.game.addEntity(new Fly(this.game,
-					randomInt(800) * flies.x, randomInt(600) * flies.y));
+					fly.x * PARAMS.TILE_WIDTH, fly.y * PARAMS.TILE_WIDTH, fly.prize, fly.prizeRate));
 			}
 		}
 		if (level.beetles) {
 			for (var i = 0; i < level.beetles.length; i++) {
-				let beetles = level.beetles[i];
+				let beetle = level.beetles[i];
 				this.game.addEntity(new Beetle(this.game,
-					beetles.x, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * beetles.y - 10));
+					beetle.x * PARAMS.TILE_WIDTH, beetle.y * PARAMS.TILE_WIDTH, beetle.prize, beetle.prizeRate));
 			}
 		}
 		if (level.hopper) {
 			for (var i = 0; i < level.hopper.length; i++) {
 				let hopper = level.hopper[i];
 				this.game.addEntity(new Hopper(this.game,
-					hopper.x, PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * hopper.y - 10));
+					hopper.x * PARAMS.TILE_WIDTH, hopper.y * PARAMS.TILE_WIDTH, hopper.prize, hopper.prizeRate));
 			}
 		}
 		if (level.potions) {
@@ -57,6 +57,20 @@ class SceneManager {
 				this.game.addEntity(new Potions(this.game, potion.x, potion.y));
             }
         }
+
+		if (level.keys) {
+			for (var i = 0; i < level.keys.length; i++) {
+				let key = level.keys[i];
+				this.game.addEntity(new Key(this.game, key.x * PARAMS.TILE_WIDTH, key.y * PARAMS.TILE_WIDTH));
+			}
+        }
+
+		if (level.doors) {
+			for (var i = 0; i < level.doors.length; i++) {
+				let door = level.doors[i];
+				this.game.addEntity(new Door(this.game, door.x * PARAMS.TILE_WIDTH, door.y * PARAMS.TILE_WIDTH));
+			}
+		}
 
 		this.game.druid = new Druid(
 			this.game, x, y)

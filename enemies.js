@@ -8,7 +8,7 @@ class Enemy extends Agent {
 		// Default values that may be overriden in specific enemy classes.
 		this.attack = 1;
 		this.defense = 0;
-		this.health = 2;
+		this.health = 3;
 		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
@@ -26,6 +26,26 @@ class Enemy extends Agent {
 		if (this.health <= 0) {
 			this.spawnPrize();
 			this.removeFromWorld = true;
+		}
+	}
+
+
+	/**
+	 * Takes in an attack that has a knockback force value defined. The angle of the
+	 * collision is determined and then the force is used as a force vector with that angle
+	 * to detemine the x and y components of the force vectore. The x and y components of
+	 * the force vector are then applied to the enemies x and y velocities respectively.
+	 * @param {Agent} attack
+	 */
+	knockback(attack) {
+		// If the collision is directly vertical, then the entire force applies to the
+		// y velocity.
+		if (this.agentBB.x - attack.agentBB.x === 0) {
+			this.vel.y = attack.force;
+		} else {
+			let angle = Math.atan2((this.agentBB.y - attack.agentBB.y), (this.agentBB.x - attack.agentBB.x));
+			this.vel.y = attack.force * Math.sin(angle);
+			this.vel.x = attack.force * Math.cos(angle);
 		}
 	}
 
@@ -86,7 +106,7 @@ class Fly extends Enemy {
 		// Override default values
 		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
-		this.health = 1;
+//		this.health = 1;
 		// End override
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
@@ -186,6 +206,7 @@ class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/TestBeetle.png", prize, prizeRate);
 		this.setDimensions(2, 32, 32);
+		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
 	}
@@ -200,6 +221,13 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
+		if (this.vel.x > this.velMax.x) {
+			this.vel.x -= this.ACC.x * this.game.clockTick;
+			Math.max(this.velMax.x, this.vel.x);
+		} else if (this.vel.x < -this.velMax.x) {
+			this.vel.x += this.ACC.x * this.game.clockTick;
+			Math.min(-this.velMax.x, this.vel.x);
+		}
 		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
 		if (this.removeFromWorld) {
@@ -297,6 +325,13 @@ class Hopper extends Enemy {
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
+
+	/** @override */
+	knockback(attack) {
+		super.knockback(attack);
+		this.left = this.vel.x < 0 ? true : false;
+	}
+
 	/** @override */
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
@@ -311,7 +346,7 @@ class Hopper extends Enemy {
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
-		if (this.jumping) {
+		if (this.jumping && this.knockbackTime === 0) {
 			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
 		}
 		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
@@ -332,6 +367,7 @@ class Hopper extends Enemy {
 						if (that.jumping)
 							that.landTime = that.landLag;
 						that.jumping = false;
+						that.knockbackTime = 0;
 					}
 					if (direction.up) { // jumping up
 						that.pos.y = entity.worldBB.bottom;

@@ -5,6 +5,7 @@ class SwordAttack extends Agent {
 		this.duration = 0.5;
 		this.attack = 1;
 		this.damagedEnemies = [];
+		this.force = 600;
 		// Walter: copied repositioning from update to fix incorrect draw on first draw cycle.
 		const DRUID = this.game.druid;
 		if (DRUID.facing === 0) { // facing left
@@ -57,6 +58,7 @@ class SwordAttack extends Agent {
 			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
 				if (entity instanceof Enemy && !that.damagedEnemies.includes(entity)) {
 					entity.takeDamage(that.attack);
+					entity.knockback(that);
 					that.damagedEnemies.push(entity);
 				}
 			}

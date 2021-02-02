@@ -6,7 +6,7 @@ class Enemy extends Agent {
 	constructor(game, x, y, spritesheet, prize, prizeRate) {
 		super(game, x, y, spritesheet);
 		// Default values that may be overriden in specific enemy classes.
-		this.attack = 1;
+		this.attack = 5;
 		this.defense = 0;
 		this.health = 3;
 		this.range = { x: 400, y: 400 };
@@ -106,6 +106,7 @@ class Fly extends Enemy {
 		// Override default values
 		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
+		this.attack = 3;
 //		this.health = 1;
 		// End override
 		this.velMax = { x: 400, y: 400 };
@@ -221,21 +222,21 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
-		if (this.vel.x > this.velMax.x) {
-			this.vel.x -= this.ACC.x * this.game.clockTick;
-			Math.max(this.velMax.x, this.vel.x);
-		} else if (this.vel.x < -this.velMax.x) {
-			this.vel.x += this.ACC.x * this.game.clockTick;
-			Math.min(-this.velMax.x, this.vel.x);
+		if (this.facing === 0) {
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(this.vel.x - this.ACC.x * this.game.clockTick, -this.velMax.x);
+			} else {
+				this.vel.x = Math.min(this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
+			}
+		} else {
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
+			}
 		}
 		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
-		if (this.removeFromWorld) {
-			switch (prize) {
-				case 'Potion':
-					this.game.addEntity(new Potions(this.game, this.x, this.y));
-            }
-        }
 	}
 
 	/** @override */
@@ -305,6 +306,7 @@ class Hopper extends Enemy {
 		this.setDimensions(2, 32, 32);
 		// Override default values
 		this.ACC = { y: 2000 };
+		this.attack = 7;
 		// End Override
 		this.velMax = { y: 550 };
 		this.jumpForce = -800;

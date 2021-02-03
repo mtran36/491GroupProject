@@ -70,12 +70,12 @@ class Druid extends Agent {
 						// top corners to entity's bottom corners
 						if (that.vel.x > 0 && that.lastWorldBB.top < entity.worldBB.bottom
 							&& that.lastWorldBB.right > entity.worldBB.left) {
-							that.pos.y = entity.worldBB.bottom;
-							that.vel.y = 0;
+							that.pos.x = entity.worldBB.left - that.scaleDim.x;
+							that.vel.x = 0;
 						} else if (that.vel.x < 0 && that.lastWorldBB.top < entity.worldBB.bottom
 							&& that.lastWorldBB.left < entity.worldBB.right) {
-							that.pos.y = entity.worldBB.bottom;
-							that.vel.y = 0;
+							that.pos.x = entity.worldBB.right;
+							that.vel.x = 0;
 						}
 					}
 					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right

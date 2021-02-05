@@ -124,14 +124,6 @@ class Fly extends Enemy {
 	}
 
 	/** @override */
-	updateBB() {
-		super.updateBB();
-		this.agentBB.radius = this.agentBB.radius - 3;
-		this.worldBB = new BoundingBox(
-			this.pos.x + 2, this.pos.y + 4, this.dim.x - 5, this.dim.y - 6);
-	}
-
-	/** @override */
 	update() {
 		var xdist = this.pos.x - this.game.druid.pos.x;
 		var ydist = this.pos.y - this.game.druid.pos.y;
@@ -177,25 +169,71 @@ class Fly extends Enemy {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
+					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
 					}
-					if (direction.up) { // jumping up
+					if (direction.up) { // moving up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = -that.vel.y;
 					}
-					if (direction.left) { // going left
+					if (direction.left) { // moving left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (direction.right) { // going right
+					if (direction.right) { //  right
 						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
 					}
 				}
 			}
 		});
+	}
+}
+
+/**
+ * Enemy type: Ranged Attack Fly
+ * Movement pattern: Flies straight at player. Collides with enemies and solid map entities.
+ * Firing pattern: 
+ */
+class RangedFly extends Fly {
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, prize, prizeRate);
+		this.setDimensions(2, 32, 32);
+		this.range = { x: 900, y: 900 };
+		this.ACC = { x: 500, y: 500 };
+		this.flyTime = 2.5;
+		this.currFlyTime = 0;
+		this.canShoot = false;
+	}
+
+	update() {
+		if (this.canShoot) {
+			if (this.vel.x > 0) {
+				this.vel.x = Math.max(0, this.vel.x - this.ACC.x * this.game.clockTick);
+			} else {
+				this.vel.x = Math.min(0, this.vel.x + this.ACC.x * this.game.clockTick);
+			}
+			if (this.vel.y > 0) {
+				this.vel.y = Math.max(0, this.vel.y - this.ACC.y * this.game.clockTick);
+			} else {
+				this.vel.y = Math.min(0, this.vel.y + this.ACC.y * this.game.clockTick);
+			}
+			if (this.vel.x === 0 && this.vel.y === 0) {
+				this.game.addEntity(new EnemyRangedAttack(this.game, this.agentBB.x, this.agentBB.y,
+					this.agentBB.x - this.game.druid.agentBB.x, this.agentBB.y - this.game.druid.agentBB.y));
+				this.canShoot = false;;
+			}
+			this.move(this.game.clockTick);
+		} else {
+			super.update();
+			if (this.accelerate && this.currFlyTime > this.flyTime) {
+				this.canShoot = true;
+				this.currFlyTime = 0;
+			} else {
+				this.currFlyTime += this.game.clockTick;
+			}
+		}
 	}
 }
 

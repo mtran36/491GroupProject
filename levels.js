@@ -21,9 +21,11 @@ var levelOne = {
 
 	flies: [{ x: 5, y: 10 }, { x: 5.5, y: 10 }, { x: 11, y: 4, prize: "Key", prizeRate: 1 }],
 
+	rangedFlies: [{x:5, y:7, prizeRate: 0.75}],
+
 	beetles: [{ x: 11, y: 10, prize: "Potion", prizeRate: 1 }],
 
-	flybeetles: [{x: 2, y: 5, prizeRate: 1}],
+	flyBeetles: [{x: 2, y: 5, prizeRate: 1}],
 
 	hopper: [{ x: 1, y: 10 , prizeRate: 0.5}],
 

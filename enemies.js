@@ -289,10 +289,56 @@ class Beetle extends Enemy{
 }
 
 class FlyBeetle extends Beetle {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestBeetle.png)");
-
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/TestBeetle.png)", prize, prizeRate);
 	}
+
+	/** @override */
+	update() {
+		if (this.vel.x > this.velMax.x) {
+			this.vel.x -= this.ACC.x * this.game.clockTick;
+			this.vel.x = Math.max(this.velMax.x, this.vel.x);
+		} else if (this.vel.x < -this.velMax.x) {
+			this.vel.x += this.ACC.x * this.game.clockTick;
+			this.vel.x = Math.min(-this.velMax.x, this.vel.x);
+		}
+		if (this.vel.y > 0) {
+			this.vel.y -= this.ACC.y * this.game.clockTick;
+			this.vel.y = Math.max(0, this.vel.y);
+		} else if (this.vel.y < 0) {
+			this.vel.y += this.ACC.y * this.game.clockTick;
+			Math.min(0, this.vel.y);
+		}
+		this.move(this.game.clockTick);
+	}
+
+	checkCollisions() {
+		let that = this;
+		this.game.entities.forEach(function (entity) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
+				var direction = that.worldCollisionDirection(entity);
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+					if (direction.down) { // falling dowm
+						that.pos.y = entity.worldBB.top - that.scaleDim.y;
+						that.vel.y = -that.vel.y;
+					}
+					if (direction.up) { // moving up
+						that.pos.y = entity.worldBB.bottom;
+						that.vel.y = -that.vel.y;
+					}
+					if (direction.left) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = -that.vel.x;
+					}
+					if (direction.right) { // going right
+						that.pos.x = entity.worldBB.left - that.scaleDim.x;
+						that.vel.x = -that.vel.x;
+					}
+				}
+			}
+		});
+	}
+
 }
 
 /**

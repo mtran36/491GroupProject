@@ -43,6 +43,12 @@ class SceneManager {
 				this.game.addEntity(new Beetle(this.game,
 					beetle.x * PARAMS.TILE_WIDTH, beetle.y * PARAMS.TILE_WIDTH, beetle.prize, beetle.prizeRate));
 			}
+		} if (level.flybeetles) {
+			for (var i = 0; i < level.flybeetles.length; i++) {
+				let flybeetle = level.flybeetles[i];
+				this.game.addEntity(new FlyBeetle(this.game,
+					flybeetle.x * PARAMS.TILE_WIDTH, flybeetle.y * PARAMS.TILE_WIDTH, flybeetle.prize, flybeetle.prizeRate));
+			}
 		}
 		if (level.hopper) {
 			for (var i = 0; i < level.hopper.length; i++) {

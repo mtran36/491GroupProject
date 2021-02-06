@@ -6,9 +6,9 @@ class Enemy extends Agent {
 	constructor(game, x, y, spritesheet, prize, prizeRate) {
 		super(game, x, y, spritesheet);
 		// Default values that may be overriden in specific enemy classes.
-		this.attack = 1;
+		this.attack = 5;
 		this.defense = 0;
-		this.health = 2;
+		this.health = 3;
 		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
@@ -26,6 +26,26 @@ class Enemy extends Agent {
 		if (this.health <= 0) {
 			this.spawnPrize();
 			this.removeFromWorld = true;
+		}
+	}
+
+
+	/**
+	 * Takes in an attack that has a knockback force value defined. The angle of the
+	 * collision is determined and then the force is used as a force vector with that angle
+	 * to detemine the x and y components of the force vectore. The x and y components of
+	 * the force vector are then applied to the enemies x and y velocities respectively.
+	 * @param {Agent} attack
+	 */
+	knockback(attack) {
+		// If the collision is directly vertical, then the entire force applies to the
+		// y velocity.
+		if (this.agentBB.x - attack.agentBB.x === 0) {
+			this.vel.y = attack.force;
+		} else {
+			let angle = Math.atan2((this.agentBB.y - attack.agentBB.y), (this.agentBB.x - attack.agentBB.x));
+			this.vel.y = attack.force * Math.sin(angle);
+			this.vel.x = attack.force * Math.cos(angle);
 		}
 	}
 
@@ -65,12 +85,32 @@ class Enemy extends Agent {
 			&& (this.lastWorldBB.right) != entity.worldBB.left;
 		var left = this.vel.x < 0
 			&& (this.lastWorldBB.left) >= entity.worldBB.right
-			&& (this.lastWorldBB.top) != entity.worldBB.bottom
-			&& (this.lastWorldBB.bottom) != entity.worldBB.top;
+			&& (this.lastWorldBB.top) < entity.worldBB.bottom
+			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
 		var right = this.vel.x > 0
 			&& (this.lastWorldBB.right) <= entity.worldBB.left
 			&& (this.lastWorldBB.top) < entity.worldBB.bottom
 			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
+		if (down) {
+			// bottom corners to entity's top corners collision
+			if (this.lastWorldBB.bottom > entity.worldBB.top) {
+				if (this.vel.x > 0 && this.lastWorldBB.right > entity.worldBB.left) {
+					right = true;
+				} else if (this.vel.x < 0 && this.lastWorldBB.left < entity.worldBB.right) {
+					left = true;
+				}
+			}
+		}
+		if (up) {
+			// top corners to entity's bottom corners
+			if (this.vel.x > 0 && this.lastWorldBB.top < entity.worldBB.bottom
+				&& this.lastWorldBB.right > entity.worldBB.left) {
+				right = true;
+			} else if (this.vel.x < 0 && this.lastWorldBB.top < entity.worldBB.bottom
+				&& this.lastWorldBB.left < entity.worldBB.right) {
+				left = true;
+			}
+		}
 		return { up, down, left, right };
 	}
 }
@@ -86,7 +126,8 @@ class Fly extends Enemy {
 		// Override default values
 		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
-		this.health = 1;
+		this.attack = 3;
+//		this.health = 1;
 		// End override
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
@@ -100,14 +141,6 @@ class Fly extends Enemy {
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
 		this.animations[0] = new Animator(
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
-	}
-
-	/** @override */
-	updateBB() {
-		super.updateBB();
-		this.agentBB.radius = this.agentBB.radius - 3;
-		this.worldBB = new BoundingBox(
-			this.pos.x + 2, this.pos.y + 4, this.dim.x - 5, this.dim.y - 6);
 	}
 
 	/** @override */
@@ -156,25 +189,71 @@ class Fly extends Enemy {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
+					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
 					}
-					if (direction.up) { // jumping up
+					if (direction.up) { // moving up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = -that.vel.y;
 					}
-					if (direction.left) { // going left
+					if (direction.left) { // moving left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
 					}
-					if (direction.right) { // going right
+					if (direction.right) { //  right
 						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
 					}
 				}
 			}
 		});
+	}
+}
+
+/**
+ * Enemy type: Ranged Attack Fly
+ * Movement pattern: Flies straight at player. Collides with enemies and solid map entities.
+ * Firing pattern: 
+ */
+class RangedFly extends Fly {
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, prize, prizeRate);
+		this.setDimensions(2, 32, 32);
+		this.range = { x: 900, y: 900 };
+		this.ACC = { x: 500, y: 500 };
+		this.flyTime = 2.5;
+		this.currFlyTime = 0;
+		this.canShoot = false;
+	}
+
+	update() {
+		if (this.canShoot) {
+			if (this.vel.x > 0) {
+				this.vel.x = Math.max(0, this.vel.x - this.ACC.x * this.game.clockTick);
+			} else {
+				this.vel.x = Math.min(0, this.vel.x + this.ACC.x * this.game.clockTick);
+			}
+			if (this.vel.y > 0) {
+				this.vel.y = Math.max(0, this.vel.y - this.ACC.y * this.game.clockTick);
+			} else {
+				this.vel.y = Math.min(0, this.vel.y + this.ACC.y * this.game.clockTick);
+			}
+			if (this.vel.x === 0 && this.vel.y === 0) {
+				this.game.addEntity(new EnemyRangedAttack(this.game, this.agentBB.x, this.agentBB.y,
+					this.agentBB.x - this.game.druid.agentBB.x, this.agentBB.y - this.game.druid.agentBB.y));
+				this.canShoot = false;;
+			}
+			this.move(this.game.clockTick);
+		} else {
+			super.update();
+			if (this.accelerate && this.currFlyTime > this.flyTime) {
+				this.canShoot = true;
+				this.currFlyTime = 0;
+			} else {
+				this.currFlyTime += this.game.clockTick;
+			}
+		}
 	}
 }
 
@@ -186,6 +265,7 @@ class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/TestBeetle.png", prize, prizeRate);
 		this.setDimensions(2, 32, 32);
+		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
 	}
@@ -200,14 +280,21 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
+		if (this.facing === 0) {
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(this.vel.x - this.ACC.x * this.game.clockTick, -this.velMax.x);
+			} else {
+				this.vel.x = Math.min(this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
+			}
+		} else {
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
+			}
+		}
 		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
-		if (this.removeFromWorld) {
-			switch (prize) {
-				case 'Potion':
-					this.game.addEntity(new Potions(this.game, this.x, this.y));
-            }
-        }
 	}
 
 	/** @override */
@@ -219,7 +306,7 @@ class Beetle extends Enemy{
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
+					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;
 					}
@@ -260,10 +347,57 @@ class Beetle extends Enemy{
 }
 
 class FlyBeetle extends Beetle {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestBeetle.png)");
-
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/TestBeetle.png)", prize, prizeRate);
 	}
+
+	/** @override */
+	update() {
+		if (this.vel.x > this.velMax.x) {
+			this.vel.x -= this.ACC.x * this.game.clockTick;
+			this.vel.x = Math.max(this.velMax.x, this.vel.x);
+		} else if (this.vel.x < -this.velMax.x) {
+			this.vel.x += this.ACC.x * this.game.clockTick;
+			this.vel.x = Math.min(-this.velMax.x, this.vel.x);
+		}
+		if (this.vel.y > 0) {
+			this.vel.y -= this.ACC.y * this.game.clockTick;
+			this.vel.y = Math.max(0, this.vel.y);
+		} else if (this.vel.y < 0) {
+			this.vel.y += this.ACC.y * this.game.clockTick;
+			Math.min(0, this.vel.y);
+		}
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	checkCollisions() {
+		let that = this;
+		this.game.entities.forEach(function (entity) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
+				var direction = that.worldCollisionDirection(entity);
+				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+					if (direction.down) { // moving dowm
+						that.pos.y = entity.worldBB.top - that.scaleDim.y;
+						that.vel.y = -that.vel.y;
+					}
+					if (direction.up) { // moving up
+						that.pos.y = entity.worldBB.bottom;
+						that.vel.y = -that.vel.y;
+					}
+					if (direction.left) { // going left
+						that.pos.x = entity.worldBB.right;
+						that.vel.x = -that.vel.x;
+					}
+					if (direction.right) { // going right
+						that.pos.x = entity.worldBB.left - that.scaleDim.x;
+						that.vel.x = -that.vel.x;
+					}
+				}
+			}
+		});
+	}
+
 }
 
 /**
@@ -277,6 +411,7 @@ class Hopper extends Enemy {
 		this.setDimensions(2, 32, 32);
 		// Override default values
 		this.ACC = { y: 2000 };
+		this.attack = 7;
 		// End Override
 		this.velMax = { y: 550 };
 		this.jumpForce = -800;
@@ -297,6 +432,13 @@ class Hopper extends Enemy {
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
+
+	/** @override */
+	knockback(attack) {
+		super.knockback(attack);
+		this.left = this.vel.x < 0 ? true : false;
+	}
+
 	/** @override */
 	update() {
 		// Keeps hopper grounded for a brief moment before it can jump again.
@@ -311,7 +453,7 @@ class Hopper extends Enemy {
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
-		if (this.jumping) {
+		if (this.jumping && this.knockbackTime === 0) {
 			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
 		}
 		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
@@ -332,6 +474,7 @@ class Hopper extends Enemy {
 						if (that.jumping)
 							that.landTime = that.landLag;
 						that.jumping = false;
+						that.knockbackTime = 0;
 					}
 					if (direction.up) { // jumping up
 						that.pos.y = entity.worldBB.bottom;

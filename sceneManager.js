@@ -37,11 +37,24 @@ class SceneManager {
 					fly.x * PARAMS.TILE_WIDTH, fly.y * PARAMS.TILE_WIDTH, fly.prize, fly.prizeRate));
 			}
 		}
+		if (level.rangedFlies) {
+			for (var i = 0; i < level.rangedFlies.length; i++) {
+				let rangedFly = level.rangedFlies[i];
+				this.game.addEntity(new RangedFly(this.game,
+					rangedFly.x * PARAMS.TILE_WIDTH, rangedFly.y * PARAMS.TILE_WIDTH, rangedFly.prize, rangedFly.prizeRate));
+			}
+		}
 		if (level.beetles) {
 			for (var i = 0; i < level.beetles.length; i++) {
 				let beetle = level.beetles[i];
 				this.game.addEntity(new Beetle(this.game,
 					beetle.x * PARAMS.TILE_WIDTH, beetle.y * PARAMS.TILE_WIDTH, beetle.prize, beetle.prizeRate));
+			}
+		} if (level.flyBeetles) {
+			for (var i = 0; i < level.flyBeetles.length; i++) {
+				let flyBeetle = level.flyBeetles[i];
+				this.game.addEntity(new FlyBeetle(this.game,
+					flyBeetle.x * PARAMS.TILE_WIDTH, flyBeetle.y * PARAMS.TILE_WIDTH, flyBeetle.prize, flyBeetle.prizeRate));
 			}
 		}
 		if (level.hopper) {
@@ -69,6 +82,13 @@ class SceneManager {
 			for (var i = 0; i < level.doors.length; i++) {
 				let door = level.doors[i];
 				this.game.addEntity(new Door(this.game, door.x * PARAMS.TILE_WIDTH, door.y * PARAMS.TILE_WIDTH));
+			}
+		}
+
+		if (level.powerups) {
+			for (var i = 0; i < level.powerups.length; i++) {
+				let powerup = level.powerups[i];
+				this.game.addEntity(new RangedPowerUp(this.game, powerup.x * PARAMS.TILE_WIDTH, powerup.y * PARAMS.TILE_WIDTH));
 			}
 		}
 

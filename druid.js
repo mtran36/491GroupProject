@@ -25,8 +25,9 @@ class Druid extends Agent {
 			if (this.health <= 0) {
 				this.removeFromWorld = true;
 			}
-			this.flashing = true;
 		}
+		this.invincTime = 1;
+		this.flashing = true;
 	}
 
 	meleeAttack(DRUID) {
@@ -50,7 +51,6 @@ class Druid extends Agent {
 			if (entity.agentBB && that.agentBB.collide(entity.agentBB)) {
 				if (entity instanceof Enemy && that.invincTime <= 0) {
 					that.takeDamage(entity.attack);
-					that.invincTime = 1;
 				}
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB)

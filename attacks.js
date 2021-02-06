@@ -56,10 +56,12 @@ class SwordAttack extends Agent {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
 			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
-				if (entity instanceof Enemy && !that.damagedEnemies.includes(entity)) {
-					entity.takeDamage(that.attack);
+				if (entity instanceof Enemy) {
+					if (!that.damagedEnemies.includes(entity)) {
+						entity.takeDamage(that.attack);
+						that.damagedEnemies.push(entity);
+					}
 					entity.knockback(that);
-					that.damagedEnemies.push(entity);
 				}
 			}
 		});
@@ -127,7 +129,7 @@ class RangeAttack extends Agent {
 }
 
 /**
- * Basic attacks for ranged enemies. Flies at a fixed angle specified during construction;
+ * Basic attacks for ranged enemies. Flies at a fixed angle specified during construction.
  */
 class EnemyRangedAttack extends Agent {
 	constructor(game, x, y, xdist, ydist) {

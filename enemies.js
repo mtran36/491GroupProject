@@ -85,8 +85,8 @@ class Enemy extends Agent {
 			&& (this.lastWorldBB.right) != entity.worldBB.left;
 		var left = this.vel.x < 0
 			&& (this.lastWorldBB.left) >= entity.worldBB.right
-			&& (this.lastWorldBB.top) != entity.worldBB.bottom
-			&& (this.lastWorldBB.bottom) != entity.worldBB.top;
+			&& (this.lastWorldBB.top) < entity.worldBB.bottom
+			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
 		var right = this.vel.x > 0
 			&& (this.lastWorldBB.right) <= entity.worldBB.left
 			&& (this.lastWorldBB.top) < entity.worldBB.bottom

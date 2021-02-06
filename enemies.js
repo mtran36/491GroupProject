@@ -91,6 +91,26 @@ class Enemy extends Agent {
 			&& (this.lastWorldBB.right) <= entity.worldBB.left
 			&& (this.lastWorldBB.top) < entity.worldBB.bottom
 			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
+		if (down) {
+			// bottom corners to entity's top corners collision
+			if (this.lastWorldBB.bottom > entity.worldBB.top) {
+				if (this.vel.x > 0 && this.lastWorldBB.right > entity.worldBB.left) {
+					right = true;
+				} else if (this.vel.x < 0 && this.lastWorldBB.left < entity.worldBB.right) {
+					left = true;
+				}
+			}
+		}
+		if (up) {
+			// top corners to entity's bottom corners
+			if (this.vel.x > 0 && this.lastWorldBB.top < entity.worldBB.bottom
+				&& this.lastWorldBB.right > entity.worldBB.left) {
+				right = true;
+			} else if (this.vel.x < 0 && this.lastWorldBB.top < entity.worldBB.bottom
+				&& this.lastWorldBB.left < entity.worldBB.right) {
+				left = true;
+			}
+		}
 		return { up, down, left, right };
 	}
 }
@@ -286,7 +306,7 @@ class Beetle extends Enemy{
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
+					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = 0;
 					}
@@ -350,13 +370,14 @@ class FlyBeetle extends Beetle {
 		this.move(this.game.clockTick);
 	}
 
+	/** @override */
 	checkCollisions() {
 		let that = this;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
 				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
+					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
 					}

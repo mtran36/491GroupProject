@@ -7,7 +7,7 @@ class Block extends Entity {
 	/**
 	 * Automatically sets the size of the tile to be equal to the tile width parameter 
 	 * (you don't have to scale the block to the correct size). Use instead of setDimensions
-	 * for blocks.
+	 * for block constructors.
 	 * @param {number} width Number of tiles this block will cover horizontally from the origin.
 	 * @param {number} height Number of tiles this block will cover vertically from the origin.
 	 * @param {number} sideLen Length of one side of the block's graphic in pixels.

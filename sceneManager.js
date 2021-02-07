@@ -4,7 +4,6 @@ class SceneManager {
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
 
-
 		this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
 	};
 
@@ -79,9 +78,9 @@ class SceneManager {
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
-		
-		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
-		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+
+		this.pos.x = Math.floor(this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2);
+		this.pos.y = Math.floor(this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2);
 	};
 
 	draw() {

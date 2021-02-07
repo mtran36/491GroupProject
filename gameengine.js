@@ -178,7 +178,7 @@ class GameEngine {
 
     /** Main game loop. Defines the update/render order of the engine. */
     loop() {
-        if (this.pause) return;
+        if (this.pause || !document.hasFocus()) return;
         this.clockTick = this.timer.tick();
         this.update();
         this.draw();

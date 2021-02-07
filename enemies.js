@@ -241,7 +241,7 @@ class RangedFly extends Fly {
 			}
 			if (this.vel.x === 0 && this.vel.y === 0) {
 				this.game.addEntity(new EnemyRangedAttack(this.game, this.agentBB.x, this.agentBB.y,
-					this.agentBB.x - this.game.druid.agentBB.x, this.agentBB.y - this.game.druid.agentBB.y));
+					this.game.druid.agentBB.x - this.agentBB.x, this.game.druid.agentBB.y - this.agentBB.y));
 				this.canShoot = false;;
 			}
 			this.move(this.game.clockTick);
@@ -351,7 +351,7 @@ class Beetle extends Enemy{
 
 class FlyBeetle extends Beetle {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestBeetle.png)", prize, prizeRate);
+		super(game, x, y, prize, prizeRate);
 	}
 
 	/** @override */

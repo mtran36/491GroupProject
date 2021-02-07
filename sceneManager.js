@@ -12,6 +12,15 @@ class SceneManager {
 		this.game.entities = [];
 		this.x = 0;
 
+		// Author: tommy
+		// backgroung testing
+		// 4 layers, lowest layer doesn't have speed, layer speed increases as layer inceases, speed different for this set is 50
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 0));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 50));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 100));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 150));
+
+
 		if (level.grounds) {
 			for (var i = 0; i < level.grounds.length; i++) {
 				let ground = level.grounds[i];

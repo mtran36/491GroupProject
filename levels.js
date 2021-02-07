@@ -1,8 +1,8 @@
 var levelOne = {
 	grounds: [
 		// Ground
-		{ x: 0, y: 1, size: 16 },
-		{ x: 0, y: 2, size: 1 }, { x: 1, y: 2, size: 1 },
+		{ x: 0, y: 1, size: 100 },
+		{ x: 0, y: 2, size: 1 },
 
 		// Left Platform
 		{ x: 0, y: 5, size: 3 }, { x: 0, y: 6, size: 2 },

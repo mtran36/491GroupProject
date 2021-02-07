@@ -12,6 +12,10 @@ ASSET_MANAGER.queueDownload("./Sprites/testpotion.png");
 ASSET_MANAGER.queueDownload("./Sprites/door.png");
 ASSET_MANAGER.queueDownload("./Sprites/key.png");
 ASSET_MANAGER.queueDownload("./Sprites/TestEnemyAttack.png");
+ASSET_MANAGER.queueDownload("./Sprites/layer1.png");
+ASSET_MANAGER.queueDownload("./Sprites/layer2.png");
+ASSET_MANAGER.queueDownload("./Sprites/layer3.png");
+ASSET_MANAGER.queueDownload("./Sprites/layer4.png");
 
 ASSET_MANAGER.downloadAll(function () {
 	var canvas = document.getElementById('gameWorld');

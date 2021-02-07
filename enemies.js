@@ -331,17 +331,20 @@ class Beetle extends Enemy{
 				}
 			}
 		});
-		// If the beetles leftmost position is not on ground and it is moving in the left
-		// direction and it is not moving vertically, then it will start moving right.
-		if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.pos.x = farLeft;
-		}
-		// If the beetle's rightmost position is not on ground and it is moving in the right
-		// direction and it is not moving vertically, then it will start moving left.
-		if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.pos.x = farRight - this.dim.x;
+		//Only perform ground check if moving at normal velocity or below.
+		if (Math.abs(that.vel.x) <= that.velMax.x) {
+			// If the beetles leftmost position is not on ground and it is moving in the left
+			// direction and it is not moving vertically, then it will start moving right.
+			if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
+				this.vel.x = -this.vel.x;
+				this.pos.x = farLeft;
+			}
+			// If the beetle's rightmost position is not on ground and it is moving in the right
+			// direction and it is not moving vertically, then it will start moving left.
+			if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
+				this.vel.x = -this.vel.x;
+				this.pos.x = farRight - this.dim.x;
+			}
 		}
 	}
 }

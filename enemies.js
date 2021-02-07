@@ -9,11 +9,12 @@ class Enemy extends Agent {
 		this.attack = 5;
 		this.defense = 0;
 		this.health = 3;
-		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
 		this.prizeRate = prizeRate ? prizeRate : 0.1;
 		this.prize = prize ? prize : "Potion";
+		this.sightRange = 400;
+		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
 	}
 
 	/**
@@ -113,6 +114,11 @@ class Enemy extends Agent {
 		}
 		return { up, down, left, right };
 	}
+
+	canSee(DRUID) {
+		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
+		return this.sight.collide(DRUID.agentBB);
+	}
 }
 
 /**
@@ -124,10 +130,10 @@ class Fly extends Enemy {
 		super(game, x, y, "./Sprites/TestFly.png", prize, prizeRate);
 		this.setDimensions(1, 32, 32);
 		// Override default values
-		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
 		this.attack = 3;
-//		this.health = 1;
+		this.sightRange = 500;
+		this.health = 1;
 		// End override
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
@@ -145,12 +151,11 @@ class Fly extends Enemy {
 
 	/** @override */
 	update() {
-		var xdist = this.pos.x - this.game.druid.pos.x;
-		var ydist = this.pos.y - this.game.druid.pos.y;
-		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
-			this.left = xdist > 0;
-			this.up = ydist > 0;
+		const DRUID = this.game.druid;
+		if (this.canSee(DRUID)) {
 			this.accelerate = true;
+			this.left = this.sight.x > DRUID.agentBB.x;
+			this.up = this.sight.y > DRUID.agentBB.y;
 		} else {
 			this.accelerate = false;
 		}
@@ -220,8 +225,9 @@ class RangedFly extends Fly {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
 		this.setDimensions(2, 32, 32);
-		this.range = { x: 900, y: 900 };
+		this.sightRange = 900;
 		this.ACC = { x: 500, y: 500 };
+		this.health = 3;
 		this.flyTime = 2.5;
 		this.currFlyTime = 0;
 		this.canShoot = false;
@@ -420,7 +426,6 @@ class Hopper extends Enemy {
 		this.jumpForce = -800;
 		this.xspeed = 300;
 		this.left = false;
-		this.range = { x: 300, y: 300 };
 		this.landLag = 0.3;
 		this.landTime = this.landLag;
 		this.jumping = false;
@@ -444,15 +449,13 @@ class Hopper extends Enemy {
 
 	/** @override */
 	update() {
+		const DRUID = this.game.druid;
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
-		let xdist = this.pos.x - this.game.druid.pos.x;
-		let ydist = this.pos.y - this.game.druid.pos.y;
-		if (Math.abs(xdist) < this.range.x
-			&& Math.abs(ydist) < this.range.y
+		if (this.canSee(DRUID)
 			&& !this.jumping
 			&& this.landTime < 0) {
-			this.left = xdist > 0;
+			this.left = this.agentBB.x > DRUID.agentBB.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}

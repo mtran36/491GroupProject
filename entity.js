@@ -7,10 +7,19 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
-        this.pos = { x: x, y: y };
-        this.setDimensions(1, PARAMS.TILE_WIDTH);
-        this.worldBB = this.makeDefaultBoundingBox();
-        this.lastWorldBB = this.worldBB;
+        this.scale = 1;
+        this.pos = {
+            x: x,
+            y: y
+        };
+        this.dim = {
+            x: PARAMS.TILE_WIDTH,
+            y: PARAMS.TILE_WIDTH
+        };
+        this.scaleDim = {
+            x: this.dim.x * this.scale,
+            y: this.dim.y * this.scale
+        };
         this.animations = [];
     }
 
@@ -25,12 +34,20 @@ class Entity {
             height = width;
         }
         this.scale = scale;
-        this.dim = { x: width, y: height };
-        this.scaleDim = { x: width * this.scale, y: height * this.scale };
+        this.dim = {
+            x: width,
+            y: height
+        };
+        this.scaleDim = {
+            x: width * this.scale,
+            y: height * this.scale
+        };
         this.updateBB();
     }
 
-    /** Updates the bounding box to the current position of the entity. */
+    /** 
+     * Updates the bounding box to the current position of the entity. 
+     */
     updateBB() {
         this.lastWorldBB = this.worldBB;
         this.worldBB = this.makeDefaultBoundingBox();
@@ -50,7 +67,9 @@ class Entity {
             this.scaleDim.y);         // Canvas drawing height
     }
 
-    /** Returns a default bounding box for entities. */
+    /** 
+     * Returns a default bounding box for entities. 
+     */
     makeDefaultBoundingBox() {
         return new BoundingBox(this.pos.x, this.pos.y, this.scaleDim.x, this.scaleDim.y);
     }
@@ -93,7 +112,9 @@ class Agent extends Entity {
         this.loadAnimations();
     }
 
-    /** Updates this entity's facing direction. */
+    /** 
+     * Updates this entity's facing direction. 
+     */
     updateFacing() {
         if (this.vel.x < 0) {
             this.facing = 0;
@@ -117,7 +138,9 @@ class Agent extends Entity {
         this.updateBB();
     }
 
-    /** Returns a default bounding circle for agents. */
+    /** 
+     * Returns a default bounding circle for agents. 
+     */
     makeDefaultBoundingCircle() {
         return new BoundingCircle(
             this.pos.x + this.scaleDim.x / 2,
@@ -167,7 +190,9 @@ class Agent extends Entity {
     }
 }
 
-/** Checks collisions with entities. */ 
+/** 
+ * Checks collisions with entities. 
+ */ 
 class BoundingBox {
     constructor(x, y, width, height) {
         Object.assign(this, { x, y, width, height });
@@ -207,7 +232,9 @@ class BoundingBox {
     }
 }
 
-/** Checks collisions between agents. */
+/** 
+ * Checks collisions between agents. 
+ */
 class BoundingCircle {
     constructor(x, y, radius) {
         Object.assign(this, { x, y, radius });

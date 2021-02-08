@@ -20,7 +20,6 @@ ASSET_MANAGER.queueDownload("./Sprites/layer4.png");
 ASSET_MANAGER.downloadAll(function () {
 	var canvas = document.getElementById('gameWorld');
 	canvas.focus();
-	var context = canvas.getContext('2d');
 
 	GAME_ENGINE.init(context);
 	new SceneManager(GAME_ENGINE);

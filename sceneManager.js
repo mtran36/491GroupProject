@@ -111,6 +111,8 @@ class SceneManager {
 		
 		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
 		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+		this.pos.x = Math.floor(this.pos.x);
+		this.pos.y = Math.floor(this.pos.y);
 	};
 
 	draw() {

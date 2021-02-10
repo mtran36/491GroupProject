@@ -85,10 +85,6 @@ class AssetManager {
                     if (that.isDone()) callback();
                 });
                 audio.setAttribute('src', path);
-                // Remove audio from playing if the audio has ended.
-                audio.addEventListener('ended', function () {
-                    AUDIO_PLAYER.playing.splice(audio, 1);
-                });
                 audioArr.push(audio);
             }
             this.audioCache[path] = audioArr;

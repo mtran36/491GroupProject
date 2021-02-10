@@ -76,4 +76,14 @@ class AudioPlayer {
         this.pauseAudio();
         this.playing = [];
     }
+
+    update() {
+        this.playing.forEach((audio) => {
+            if (audio.ended) {
+                this.playing.splice(this.playing.findIndex((a) => {
+                    return a === audio;
+                }), 1);
+            }
+        });
+    }
 }

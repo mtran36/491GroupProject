@@ -176,6 +176,7 @@ class GameEngine {
                 this.entities.splice(i, 1);
             }
         }
+        AUDIO_PLAYER.update();
     };
 
     /** Main game loop. Defines the update/render order of the engine. */

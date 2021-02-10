@@ -15,6 +15,7 @@ ASSET_MANAGER.queueDownload("./Sprites/key.png");
 ASSET_MANAGER.downloadAll(function () {
 	var canvas = document.getElementById('gameWorld');
 	var context = canvas.getContext('2d');
+	context.imageSmoothingEnabled = false;
 
 	GAME_ENGINE.init(context);
 	new SceneManager(GAME_ENGINE);

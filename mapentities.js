@@ -32,13 +32,13 @@ class Block extends Entity {
 
 	/** @override */
 	draw(context) {
-		let row, col;
-		for (row = 0; row < this.size.width; row++) {
-			for (col = 0; col < this.size.height; col++) {
+		let col, row;
+		for (col = 0; col < this.size.width; col++) {
+			for (row = 0; row < this.size.height; row++) {
 				context.drawImage(
 					this.spritesheet, 0, 0, this.dim.x, this.dim.y,
-					this.pos.x + row * this.scaleDim.x - this.game.camera.pos.x,
-					this.pos.y + col * this.scaleDim.y - this.game.camera.pos.y,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
 					this.scaleDim.y, this.scaleDim.y);
 			}
 		}
@@ -49,8 +49,119 @@ class Block extends Entity {
 class Ground extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");
-		this.setSize(width, height, 128);
+		this.setSize(width, height, 32);
+		this.look = { x: 0, y: 0 };
 	};
+
+	/** @override */
+	draw(context) {
+		let col, row;
+		for (col = 0; col < this.size.width; col++) {
+			for (row = 0; row < this.size.height; row++) {
+				this.pickLook(row, col);
+				context.drawImage(
+					this.spritesheet,
+					this.look.x * this.dim.x, this.look.y * this.dim.y,
+					this.dim.x, this.dim.y,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
+					this.scaleDim.y, this.scaleDim.y);
+			}
+		}
+		this.worldBB.display(this.game);
+	}
+
+	/**
+	 * Given the placement within the block group, picks the correct look for the ground
+	 * block. Magic numbers in this method are related to the spritesheet, do not alter
+	 * the positions of blocks already in the sheet.
+	 * @param {number} row Vertical position of this block section.
+	 * @param {number} col Horizontal position of this block sction.
+	 */
+	pickLook(row, col) {
+		switch (row) {
+			// Pick sprite column
+			case 0:
+				if (this.size.height === 1) {
+					this.look.y = 8;
+				} else {
+					this.look.y = 0;
+				}
+				switch (col) {
+					case 0:
+						this.look.x = 0;
+						break;
+					case this.size.width - 1:
+						this.look.x = 5;
+						break;
+					case 1:
+						if (this.size.width === 3) {
+							this.look.x = 6;
+						} else {
+							this.look.x = 1;
+						}
+						break;
+					case this.size.width - 2:
+						this.look.x = 4;
+						break;
+					default:
+						if (col % 2 === 0) {
+							this.look.x = 2;
+						} else {
+							this.look.x = 3;
+						}
+				}
+				break;
+			// Otherwise pick sprite row
+			case this.size.height - 2:
+				if (this.size.height === 3) {
+					this.look.y = 6;
+				} else {
+					this.look.y = 4;
+				}
+				break;
+			case this.size.height - 1:
+				this.look.y = 5;
+				break;
+			default:
+				if (row === 1) {
+					this.look.y = 1;
+				} else {
+					if (row % 2 === 0) {
+						this.look.y = 2;
+					} else {
+						this.look.y = 3;
+					}
+				}
+		}
+    }
+}
+class BreakBlock extends Block {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height, "");
+		this.setSize(width, height, );
+    }
+}
+class Mask extends Block {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height, "./Sprites/ground.png");
+		this.setSize(width, height, 32);
+	}
+
+	/** @override */
+	draw(context) {
+		let col, row;
+		for (col = 0; col < this.size.width; col++) {
+			for (row = 0; row < this.size.height; row++) {
+				context.drawImage(
+					this.spritesheet, 64, 32, this.dim.x, this.dim.y,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
+					this.scaleDim.y, this.scaleDim.y);
+			}
+		}
+		this.worldBB.display(this.game);
+    }
 }
 
 class Key extends Entity {
@@ -67,7 +178,6 @@ class Key extends Entity {
 		this.worldBB.display(this.game);
 	}
 }
-
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");

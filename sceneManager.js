@@ -21,6 +21,15 @@ class SceneManager {
 					ground.width, ground.height));
 			}
 		}
+		if (level.mask) {
+			for (i = 0; i < level.mask.length; i++) {
+				let mask = level.mask[i];
+				this.game.addEntity(new Mask(this.game,
+					PARAMS.TILE_WIDTH * mask.x,
+					PARAMS.TILE_WIDTH * mask.y,
+					mask.width, mask.height));
+            }
+        }
 		if (level.flies) {
 			for (i = 0; i < level.flies.length; i++) {
 				let fly = level.flies[i];

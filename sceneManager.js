@@ -4,13 +4,24 @@ class SceneManager {
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
 
-
-		this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+		this.startScreen();
 	};
+
+	startScreen() {
+		let canvas = document.getElementById("gameWorld");
+		canvas.setAttribute('style', 'background: black');
+		canvas.addEventListener('click', () => {
+			this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+		});
+	}
 
 	loadLevel(level, x, y) {
 		this.game.entities = [];
 		this.x = 0;
+
+		if (level.music) {
+			AUDIO_PLAYER.playMusic(level.music);
+		}
 
 		if (level.grounds) {
 			for (var i = 0; i < level.grounds.length; i++) {

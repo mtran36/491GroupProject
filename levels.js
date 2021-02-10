@@ -1,4 +1,9 @@
 var levelOne = {
+
+	music: "./Audio/TestAudio.mp3",
+
+	background: "cyan",
+	
 	grounds: [
 		// Ground
 		{ x: 0, y: 1, size: 16 },

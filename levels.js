@@ -1,6 +1,6 @@
 var levelOne = {
 
-	music: "./Audio/TestAudio.mp3",
+	music: "./Audio/TestMusic.mp3",
 
 	background: "cyan",
 	

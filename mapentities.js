@@ -72,7 +72,6 @@ class Background extends Entity {
 		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };	// left to the camera
 		this.midImagePos = { x: x, y: y };									// at the camera position
 		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };	// right to the camera
-
 	};
 
 /** @override */

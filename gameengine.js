@@ -138,7 +138,6 @@ class GameEngine {
                 case "KeyP":
                     that.pausePressed = false;
                     break;
-            }
         });
     };
 
@@ -180,12 +179,13 @@ class GameEngine {
 
     /** Main game loop. Defines the update/render order of the engine. */
     loop() {
-        if (this.pause || !document.hasFocus() || document.activeFocus !== this.canvas) {
-
+        if (this.pause || !document.hasFocus() || document.activeElement !== this.canvas) {
+            AUDIO_PLAYER.pauseAudio();
             return;
         }
         this.clockTick = this.timer.tick();
         this.update();
+        AUDIO_PLAYER.unpauseAudio();
         this.draw();
     };
 };

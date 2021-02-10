@@ -190,6 +190,7 @@ class Fly extends Enemy {
 	/** @override */
 	checkCollisions() {
 		let that = this;
+		let bounce = false;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
@@ -197,22 +198,29 @@ class Fly extends Enemy {
 					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
+						bounce = true;
 					}
 					if (direction.up) { // moving up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = -that.vel.y;
+						bounce = true;
 					}
 					if (direction.left) { // moving left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
+						bounce = true;
 					}
 					if (direction.right) { //  right
 						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
+						bounce = true;
 					}
 				}
 			}
 		});
+		if (bounce) {
+			AUDIO_PLAYER.playSound("./Audio/TestSound.mp3");
+		}
 	}
 }
 

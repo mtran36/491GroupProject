@@ -10,13 +10,17 @@ class SceneManager {
 	startScreen() {
 		let canvas = document.getElementById("gameWorld");
 		canvas.setAttribute('style', 'background: black');
-		canvas.addEventListener('click', () => {
+		var clickStart = () => {
+			canvas.removeEventListener('click', clickStart);
 			this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
-		});
+			this.game.start();
+		}
+		canvas.addEventListener('click', clickStart);
 	}
 
 	loadLevel(level, x, y) {
 		this.game.entities = [];
+		AUDIO_PLAYER.stopAll();
 		this.x = 0;
 
 		// Author: tommy
@@ -29,6 +33,10 @@ class SceneManager {
 
 		if (level.music) {
 			AUDIO_PLAYER.playMusic(level.music);
+		}
+
+		if (level.background) {
+			document.getElementById("gameWorld").setAttribute('style', 'background: cyan');
 		}
 
 		if (level.grounds) {

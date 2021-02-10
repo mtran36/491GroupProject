@@ -17,6 +17,12 @@ class AssetManager {
         this.downloadImgQueue.push(path);
     };
 
+    /**
+     * Adds the audio source path and amount of audio players to be created 
+     * to the download queue.
+     * @param {string} path
+     * @param {int} amt
+     */
     queueAudioDownload(path, amt) {
         console.log("Queueing " + path);
         this.downloadAudioQueue.push({path, amt});
@@ -29,13 +35,14 @@ class AssetManager {
     };
 
     /**
-     * Downloads each image placed into the download queue.
-     * @param {Function} callback Function to be called when all images are downloaded.
+     * Downloads each image and audio placed into the download queues.
+     * @param {Function} callback Function to be called when all downloads are done.
      */
     downloadAll(callback) {
         if (this.downloadImgQueue.length === 0) {
             setTimeout(callback, 10);
         }
+        // Download images.
         for (var i = 0; i < this.downloadImgQueue.length; i++) {
             var img = new Image();
             var that = this;
@@ -54,10 +61,10 @@ class AssetManager {
             img.src = path;
             this.imgCache[path] = img;
         }
+        // Download audio files.
         if (this.downloadAudioQueue.length === 0) {
             setTimeout(callback, 10);
         }
-//        let canvas = document.getElementById("gameWorld");
         for (var i = 0; i < this.downloadAudioQueue.length; i++) {
             var audioArr = [];
             var path = this.downloadAudioQueue[i].path;
@@ -72,12 +79,16 @@ class AssetManager {
                     that.successCount++;
                     if (that.isDone()) callback();
                 });
-                img.addEventListener("error", function () {
+                audio.addEventListener("error", function () {
                     console.log("Error loading " + this.src);
                     that.errorCount++;
                     if (that.isDone()) callback();
                 });
                 audio.setAttribute('src', path);
+                // Remove audio from playing if the audio has ended.
+                audio.addEventListener('ended', function () {
+                    AUDIO_PLAYER.playing.splice(audio, 1);
+                });
                 audioArr.push(audio);
             }
             this.audioCache[path] = audioArr;
@@ -85,13 +96,17 @@ class AssetManager {
     };
 
     /**
-     * Returns the desired asset.
+     * Returns the desired image asset.
      * @param {String} path String location of the image. Same used to queue download.
      */
     getImgAsset(path) {
         return this.imgCache[path];
     };
 
+    /**
+     * Returns the desired audio asset.
+     * @param {string} path String location of the audio file. Same used to queue download.
+     */
     getAudioAsset(path) {
         return this.audioCache[path];
     }

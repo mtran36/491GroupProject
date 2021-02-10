@@ -34,7 +34,7 @@ class RangedPowerUp extends PowerUp {
 
 	addPowerToDruid(DRUID) {
 		DRUID.rangeAttackCooldown = 0;
-		DRUID.attacks.push(function () {
+		DRUID.attacks.push(function (DRUID) {
 			DRUID.rangeAttackCooldown -= DRUID.game.clockTick;
 			if (DRUID.rangeAttackCooldown <= 0 && DRUID.game.A) {
 				if (DRUID.facing === 0) { // shoot left
@@ -61,7 +61,7 @@ class RangedPowerUp extends PowerUp {
 	draw(context) {
 		context.drawImage(this.spritesheet, 0, 16, 32, 32,
 			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.dim.x, this.dim.y);
+			this.scaleDim.x, this.scaleDim.y);
 	}
 
 }

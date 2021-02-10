@@ -6,8 +6,8 @@ var levelOne = {
 	
 	grounds: [
 		// Ground
-		{ x: 0, y: 1, size: 16 },
-		{ x: 0, y: 2, size: 1 }, { x: 1, y: 2, size: 1 },
+		{ x: 0, y: 1, size: 100 },
+		{ x: 0, y: 2, size: 1 },
 
 		// Left Platform
 		{ x: 0, y: 5, size: 3 }, { x: 0, y: 6, size: 2 },
@@ -26,9 +26,11 @@ var levelOne = {
 
 	flies: [{ x: 5, y: 10 }, { x: 5.5, y: 10 }, { x: 11, y: 4, prize: "Key", prizeRate: 1 }],
 
+	rangedFlies: [{x:5, y:7, prizeRate: 0.75}],
+
 	beetles: [{ x: 11, y: 10, prize: "Potion", prizeRate: 1 }],
 
-	flybeetles: [{x: 2, y: 5, prizeRate: 1}],
+	flyBeetles: [{x: 2, y: 5, prizeRate: 1}],
 
 	hopper: [{ x: 1, y: 10 , prizeRate: 0.5}],
 

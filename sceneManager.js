@@ -19,6 +19,14 @@ class SceneManager {
 		this.game.entities = [];
 		this.x = 0;
 
+		// Author: tommy
+		// backgroung testing
+		// 4 layers, lowest layer doesn't have speed, layer speed increases as layer inceases, speed different for this set is 50
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 0));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 50));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 100));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 150));
+
 		if (level.music) {
 			AUDIO_PLAYER.playMusic(level.music);
 		}
@@ -48,17 +56,24 @@ class SceneManager {
 					fly.x * PARAMS.TILE_WIDTH, fly.y * PARAMS.TILE_WIDTH, fly.prize, fly.prizeRate));
 			}
 		}
+		if (level.rangedFlies) {
+			for (var i = 0; i < level.rangedFlies.length; i++) {
+				let rangedFly = level.rangedFlies[i];
+				this.game.addEntity(new RangedFly(this.game,
+					rangedFly.x * PARAMS.TILE_WIDTH, rangedFly.y * PARAMS.TILE_WIDTH, rangedFly.prize, rangedFly.prizeRate));
+			}
+		}
 		if (level.beetles) {
 			for (var i = 0; i < level.beetles.length; i++) {
 				let beetle = level.beetles[i];
 				this.game.addEntity(new Beetle(this.game,
 					beetle.x * PARAMS.TILE_WIDTH, beetle.y * PARAMS.TILE_WIDTH, beetle.prize, beetle.prizeRate));
 			}
-		} if (level.flybeetles) {
-			for (var i = 0; i < level.flybeetles.length; i++) {
-				let flybeetle = level.flybeetles[i];
+		} if (level.flyBeetles) {
+			for (var i = 0; i < level.flyBeetles.length; i++) {
+				let flyBeetle = level.flyBeetles[i];
 				this.game.addEntity(new FlyBeetle(this.game,
-					flybeetle.x * PARAMS.TILE_WIDTH, flybeetle.y * PARAMS.TILE_WIDTH, flybeetle.prize, flybeetle.prizeRate));
+					flyBeetle.x * PARAMS.TILE_WIDTH, flyBeetle.y * PARAMS.TILE_WIDTH, flyBeetle.prize, flyBeetle.prizeRate));
 			}
 		}
 		if (level.hopper) {
@@ -106,6 +121,8 @@ class SceneManager {
 		
 		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
 		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+		this.pos.x = Math.floor(this.pos.x);
+		this.pos.y = Math.floor(this.pos.y);
 	};
 
 	draw() {

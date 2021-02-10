@@ -138,6 +138,7 @@ class GameEngine {
                 case "KeyP":
                     that.pausePressed = false;
                     break;
+            };
         });
     };
 

@@ -77,6 +77,10 @@ class AudioPlayer {
         this.playing = [];
     }
 
+    /**
+     * Checks to see if any audio clips have ended. If they have they are remove from the
+     * playing list.
+     */
     update() {
         this.playing.forEach((audio) => {
             if (audio.ended) {

@@ -21,6 +21,8 @@ class GameEngine {
         this.A = false;
         this.pause = false;
         this.pausePressed = false;
+        this.mute = false;
+        this.mutePressed = false;
     };
 
     /**
@@ -103,6 +105,12 @@ class GameEngine {
                         that.pausePressed = true;
                     }
                     break;
+                case "KeyM":
+                    if (!that.mutePressed) {
+                        AUDIO_PLAYER.mute = !AUDIO_PLAYER.mute;
+                        that.mutePressed = true;
+                    }
+                    break;
             }
         });
         this.context.canvas.addEventListener("keyup", function (e) {
@@ -137,6 +145,9 @@ class GameEngine {
                     break;
                 case "KeyP":
                     that.pausePressed = false;
+                    break;
+                case "KeyM":
+                    that.mutePressed = false;
                     break;
             };
         });

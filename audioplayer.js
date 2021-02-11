@@ -5,6 +5,8 @@ class AudioPlayer {
     constructor() {
         this.indexArr = [];
         this.playing = [];
+        this.volume = 0.5;
+        this.mute = false;
     }
 
     /**
@@ -21,6 +23,7 @@ class AudioPlayer {
         let audioArr = ASSET_MANAGER.getAudioAsset(path);
         let audio = audioArr[i];
         audio.loop = true;
+        audio.muted = this.mute;
         audio.play();
         // Check to ensure only one copy of an audio element is allowed in the playing list.
         if (!this.playing.includes(audio)) {
@@ -41,7 +44,7 @@ class AudioPlayer {
         let i = this.indexArr[path];
         let audioArr = ASSET_MANAGER.getAudioAsset(path);
         let audio = audioArr[i];
-        // Precision is not critical, so fastSeek is used.
+        audio.muted = this.mute;
         audio.currentTime = 0;
         audio.play();
         // Check to ensure only one copy of an audio element is allowed in the playing list.
@@ -82,12 +85,14 @@ class AudioPlayer {
      * playing list.
      */
     update() {
+        this.volume = document.getElementById("volume").value;
         this.playing.forEach((audio) => {
             if (audio.ended) {
                 this.playing.splice(this.playing.findIndex((a) => {
                     return a === audio;
                 }), 1);
             }
+            audio.volume = this.mute ? 0 : this.volume;
         });
     }
 }

@@ -8,8 +8,16 @@ class SceneManager {
 	};
 
 	startScreen() {
-		let canvas = document.getElementById("gameWorld");
+		let canvas = this.game.canvas;
+		let context = this.game.context;
 		canvas.setAttribute('style', 'background: black');
+		context.save();
+		context.strokeStyle = 'red';
+		context.fillStyle = 'white';
+		context.font = "bold 64px sans-serif";
+		this.game.context.fillText("Click to Start", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+		this.game.context.strokeText("Click to Start", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+		context.restore();
 		var clickStart = () => {
 			canvas.removeEventListener('click', clickStart);
 			this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);

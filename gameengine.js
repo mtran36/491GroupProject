@@ -5,6 +5,7 @@ class GameEngine {
     constructor() {
         this.entities = [];
         this.showOutlines = false;
+        this.canvas = null;
         this.context = null;
         this.click = null;
         this.mouse = null;
@@ -26,8 +27,9 @@ class GameEngine {
      * Sets up the game engine and gives it a reference to a canvas to use for drawing.
      * @param {CanvasImageSource} context Canvas to draw on.
      */
-    init(context) {
-        this.context = context;
+    init(canvas) {
+        this.canvas = canvas;
+        this.context = canvas.getContext('2d');
         this.surfaceWidth = this.context.canvas.width;
         this.surfaceHeight = this.context.canvas.height;
         this.startInput();
@@ -136,7 +138,7 @@ class GameEngine {
                 case "KeyP":
                     that.pausePressed = false;
                     break;
-            }
+            };
         });
     };
 
@@ -174,13 +176,18 @@ class GameEngine {
                 this.entities.splice(i, 1);
             }
         }
+        AUDIO_PLAYER.update();
     };
 
     /** Main game loop. Defines the update/render order of the engine. */
     loop() {
-        if (this.pause) return;
+        if (this.pause || !document.hasFocus() || document.activeElement !== this.canvas) {
+            AUDIO_PLAYER.pauseAudio();
+            return;
+        }
         this.clockTick = this.timer.tick();
         this.update();
+        AUDIO_PLAYER.unpauseAudio();
         this.draw();
     };
 };

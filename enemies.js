@@ -9,11 +9,12 @@ class Enemy extends Agent {
 		this.attack = 5;
 		this.defense = 0;
 		this.health = 3;
-		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
 		this.prizeRate = prizeRate ? prizeRate : 0.1;
 		this.prize = prize ? prize : "Potion";
+		this.sightRange = 400;
+		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
 	}
 
 	/**
@@ -113,6 +114,11 @@ class Enemy extends Agent {
 		}
 		return { up, down, left, right };
 	}
+
+	canSee(DRUID) {
+		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
+		return this.sight.collide(DRUID.agentBB);
+	}
 }
 
 /**
@@ -124,10 +130,10 @@ class Fly extends Enemy {
 		super(game, x, y, "./Sprites/TestFly.png", prize, prizeRate);
 		this.setDimensions(1, 32, 32);
 		// Override default values
-		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
 		this.attack = 3;
-//		this.health = 1;
+		this.sightRange = 500;
+		this.health = 1;
 		// End override
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
@@ -145,12 +151,11 @@ class Fly extends Enemy {
 
 	/** @override */
 	update() {
-		var xdist = this.pos.x - this.game.druid.pos.x;
-		var ydist = this.pos.y - this.game.druid.pos.y;
-		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
-			this.left = xdist > 0;
-			this.up = ydist > 0;
+		const DRUID = this.game.druid;
+		if (this.canSee(DRUID)) {
 			this.accelerate = true;
+			this.left = this.sight.x > DRUID.agentBB.x;
+			this.up = this.sight.y > DRUID.agentBB.y;
 		} else {
 			this.accelerate = false;
 		}
@@ -185,6 +190,7 @@ class Fly extends Enemy {
 	/** @override */
 	checkCollisions() {
 		let that = this;
+		let bounce = false;
 		this.game.entities.forEach(function (entity) {
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
 				var direction = that.worldCollisionDirection(entity);
@@ -192,22 +198,29 @@ class Fly extends Enemy {
 					if (direction.down) { // moving dowm
 						that.pos.y = entity.worldBB.top - that.scaleDim.y;
 						that.vel.y = -that.vel.y;
+						bounce = true;
 					}
 					if (direction.up) { // moving up
 						that.pos.y = entity.worldBB.bottom;
 						that.vel.y = -that.vel.y;
+						bounce = true;
 					}
 					if (direction.left) { // moving left
 						that.pos.x = entity.worldBB.right;
 						that.vel.x = -that.vel.x;
+						bounce = true;
 					}
 					if (direction.right) { //  right
 						that.pos.x = entity.worldBB.left - that.scaleDim.x;
 						that.vel.x = -that.vel.x;
+						bounce = true;
 					}
 				}
 			}
 		});
+		if (bounce) {
+			AUDIO_PLAYER.playSound("./Audio/TestSound.mp3");
+		}
 	}
 }
 
@@ -220,8 +233,9 @@ class RangedFly extends Fly {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
 		this.setDimensions(2, 32, 32);
-		this.range = { x: 900, y: 900 };
+		this.sightRange = 900;
 		this.ACC = { x: 500, y: 500 };
+		this.health = 3;
 		this.flyTime = 2.5;
 		this.currFlyTime = 0;
 		this.canShoot = false;
@@ -241,7 +255,7 @@ class RangedFly extends Fly {
 			}
 			if (this.vel.x === 0 && this.vel.y === 0) {
 				this.game.addEntity(new EnemyRangedAttack(this.game, this.agentBB.x, this.agentBB.y,
-					this.agentBB.x - this.game.druid.agentBB.x, this.agentBB.y - this.game.druid.agentBB.y));
+					this.game.druid.agentBB.x - this.agentBB.x, this.game.druid.agentBB.y - this.agentBB.y));
 				this.canShoot = false;;
 			}
 			this.move(this.game.clockTick);
@@ -331,24 +345,27 @@ class Beetle extends Enemy{
 				}
 			}
 		});
-		// If the beetles leftmost position is not on ground and it is moving in the left
-		// direction and it is not moving vertically, then it will start moving right.
-		if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.pos.x = farLeft;
-		}
-		// If the beetle's rightmost position is not on ground and it is moving in the right
-		// direction and it is not moving vertically, then it will start moving left.
-		if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.pos.x = farRight - this.dim.x;
+		//Only perform ground check if moving at normal velocity or below.
+		if (Math.abs(that.vel.x) <= that.velMax.x) {
+			// If the beetles leftmost position is not on ground and it is moving in the left
+			// direction and it is not moving vertically, then it will start moving right.
+			if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
+				this.vel.x = -this.vel.x;
+				this.pos.x = farLeft;
+			}
+			// If the beetle's rightmost position is not on ground and it is moving in the right
+			// direction and it is not moving vertically, then it will start moving left.
+			if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
+				this.vel.x = -this.vel.x;
+				this.pos.x = farRight - this.dim.x;
+			}
 		}
 	}
 }
 
 class FlyBeetle extends Beetle {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestBeetle.png)", prize, prizeRate);
+		super(game, x, y, prize, prizeRate);
 	}
 
 	/** @override */
@@ -417,7 +434,6 @@ class Hopper extends Enemy {
 		this.jumpForce = -800;
 		this.xspeed = 300;
 		this.left = false;
-		this.range = { x: 300, y: 300 };
 		this.landLag = 0.3;
 		this.landTime = this.landLag;
 		this.jumping = false;
@@ -441,15 +457,13 @@ class Hopper extends Enemy {
 
 	/** @override */
 	update() {
+		const DRUID = this.game.druid;
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
-		let xdist = this.pos.x - this.game.druid.pos.x;
-		let ydist = this.pos.y - this.game.druid.pos.y;
-		if (Math.abs(xdist) < this.range.x
-			&& Math.abs(ydist) < this.range.y
+		if (this.canSee(DRUID)
 			&& !this.jumping
 			&& this.landTime < 0) {
-			this.left = xdist > 0;
+			this.left = this.agentBB.x > DRUID.agentBB.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}

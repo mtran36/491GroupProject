@@ -143,7 +143,7 @@ class EnemyRangedAttack extends Agent {
 		if (ydist === 0) {
 			this.vel.y = this.force;
 		} else {
-			let angle = Math.atan2(-ydist, -xdist);
+			let angle = Math.atan2(ydist, xdist);
 			this.vel.y = this.force * Math.sin(angle);
 			this.vel.x = this.force * Math.cos(angle);
 		}

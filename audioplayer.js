@@ -42,7 +42,7 @@ class AudioPlayer {
         let audioArr = ASSET_MANAGER.getAudioAsset(path);
         let audio = audioArr[i];
         // Precision is not critical, so fastSeek is used.
-        audio.fastSeek(0);
+        audio.currentTime = 0;
         audio.play();
         // Check to ensure only one copy of an audio element is allowed in the playing list.
         if (!this.playing.includes(audio)) {

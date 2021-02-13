@@ -25,11 +25,11 @@ class SceneManager {
 
 		// Author: tommy
 		// backgroung testing
-		// 4 layers, lowest layer doesn't have speed, layer speed increases as layer inceases, speed different for this set is 50
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 0));
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 50));
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 100));
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 150));
+		// 4 layers, lowest layer doesn't have speed, layer speed increases as layer inceases, speed different for this set is 20
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 60));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 40));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 20));
+		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 0));
 
 		if (level.music) {
 			AUDIO_PLAYER.playMusic(level.music);

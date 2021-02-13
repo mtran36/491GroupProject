@@ -5,6 +5,7 @@ class SceneManager {
 		this.pos = { x: 0, y: 0 };
 
 		this.startScreen();
+		this.minimap = new Minimap(this.game, 260, 100, 740);
 	};
 
 	startScreen() {
@@ -133,7 +134,60 @@ class SceneManager {
 		this.pos.y = Math.floor(this.pos.y);
 	};
 
-	draw() {
+	draw(ctx) {
+		ctx.fillStyle = "white";
+		ctx.font = "16px Verdana";
+		ctx.fillText("LVL", 360, 25);
+		ctx.fillText("Name: ", 30, 25);
+		ctx.fillText("Keys: " + this.game.druid.keyCounter, 30, 115);
 
+		// Druid Health Bar
+		ctx.fillStyle = "Red";
+		ctx.fillRect(30, 30, this.game.druid.health, 30);
+		ctx.fillStyle = "White";
+		ctx.fillRect(this.game.druid.health + 30, 30, this.game.druid.maxHealth - this.game.druid.health, 30);
+		ctx.beginPath();
+		ctx.strokeStyle = "Black";
+		ctx.rect(30, 30, this.game.druid.maxHealth, 30)
+		ctx.stroke();
+		ctx.fillStyle = "black";
+		ctx.font = "16px Verdana";
+		ctx.fillText(this.game.druid.health + "/" + this.game.druid.maxHealth + "HP", 330, 50);
+
+		// Potion bar
+		ctx.fillStyle = "Blue";
+		ctx.fillRect(30, 65, this.game.druid.potionCounter, 30);
+		ctx.fillStyle = "White";
+		ctx.fillRect(this.game.druid.potionCounter + 30, 65, this.game.druid.maxHealth - this.game.druid.potionCounter, 30);
+		ctx.beginPath();
+		ctx.strokeStyle = "Black";
+		ctx.rect(30, 65, this.game.druid.maxHealth, 30)
+		ctx.stroke();
+		ctx.fillStyle = "black";
+		ctx.font = "16px Verdana";
+		ctx.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
+
+		if (PARAMS.DEBUG) {
+			this.minimap.draw(ctx);
+        }
 	};
 }
+
+class Minimap {
+	constructor(game, x, y, w) {
+		Object.assign(this, { game, x, y, w });
+	};
+
+	update() {
+
+	};
+
+	draw(ctx) {
+		ctx.strokeStyle = "Black";
+		ctx.strokeRect(this.x, this.y, this.w, PARAMS.BLOCKWIDTH * 10);
+		this.game.druid.drawMinimap(ctx, this.x, this.y);
+		//for (var i = 0; i < this.game.entities.length; i++) {
+		//	this.game.entities[i].drawMinimap(ctx, this.x, this.y);
+		//}
+	};
+};

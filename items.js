@@ -3,6 +3,20 @@ class Items extends Agent {
         super(game, x, y, spritesheet);
         this.emerging = false;
     }
+
+    /** @override */
+    update() {
+        this.checkDruidCollision();
+    }
+
+    checkDruidCollision() {
+        const DRUID = this.game.druid;
+
+        if (this.worldBB.collide(DRUID.worldBB)) {
+            this.removeFromWorld = true;
+            this.addItemsToDruid(DRUID);
+        }
+    }
 }
 
 class Potions extends Items {
@@ -19,14 +33,13 @@ class Potions extends Items {
 
     /** @override */
     update() {
-
+        const FALL_ACC = 1500;
+        const TICK = this.game.clockTick;
+        this.vel.y += FALL_ACC * TICK;
     }
 
     /** @override */
     updateBB() {
         super.updateBB();
-        //this.agentBB.radius = this.agentBB.radius - 3;
-        //this.worldBB = new BoundingBox(
-        //    this.pos.x + 2, this.pos.y + 4, this.dim.x - 5, this.dim.y - 6);
     }
 }

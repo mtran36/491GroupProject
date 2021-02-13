@@ -6,7 +6,7 @@
 class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
-        this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
+        this.spritesheet = ASSET_MANAGER.getImgAsset(spritesheet);
         this.pos = { x: x, y: y };
         this.setDimensions(1, PARAMS.TILE_WIDTH);
         this.worldBB = this.makeDefaultBoundingBox();

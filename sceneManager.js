@@ -4,12 +4,23 @@ class SceneManager {
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
 
-
-		this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+		this.startScreen();
 	};
+
+	startScreen() {
+		let canvas = document.getElementById("gameWorld");
+		canvas.setAttribute('style', 'background: black');
+		var clickStart = () => {
+			canvas.removeEventListener('click', clickStart);
+			this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+			this.game.start();
+		}
+		canvas.addEventListener('click', clickStart);
+	}
 
 	loadLevel(level, x, y) {
 		this.game.entities = [];
+		AUDIO_PLAYER.stopAll();
 		this.x = 0;
 
 		// Author: tommy
@@ -20,6 +31,13 @@ class SceneManager {
 		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 100));
 		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 150));
 
+		if (level.music) {
+			AUDIO_PLAYER.playMusic(level.music);
+		}
+
+		if (level.background) {
+			document.getElementById("gameWorld").setAttribute('style', 'background: cyan');
+		}
 
 		if (level.grounds) {
 			for (var i = 0; i < level.grounds.length; i++) {
@@ -111,6 +129,8 @@ class SceneManager {
 		
 		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
 		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+		this.pos.x = Math.floor(this.pos.x);
+		this.pos.y = Math.floor(this.pos.y);
 	};
 
 	draw() {

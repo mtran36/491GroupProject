@@ -23,6 +23,7 @@ class GameEngine {
         this.pausePressed = false;
         this.mute = false;
         this.mutePressed = false;
+        this.screen = false;
     };
 
     /**
@@ -103,12 +104,6 @@ class GameEngine {
                 case "KeyJ":
                     that.A = true;
                     break;
-                case "KeyP":
-                    if (!that.pausePressed) {
-                        that.pause = !that.pause;
-                        that.pausePressed = true;
-                    }
-                    break;
                 case "KeyM":
                     if (!that.mutePressed) {
                         AUDIO_PLAYER.mute = !AUDIO_PLAYER.mute;
@@ -147,9 +142,6 @@ class GameEngine {
                 case "KeyJ":
                     that.A = false;
                     break;
-                case "KeyP":
-                    that.pausePressed = false;
-                    break;
                 case "KeyM":
                     that.mutePressed = false;
                     break;
@@ -172,8 +164,13 @@ class GameEngine {
         let entity;
         this.context.clearRect(
             0, 0, this.context.canvas.width, this.context.canvas.height);
-        for (entity = 0; entity < this.entities.length; entity++) {
-            this.entities[entity].draw(this.context);
+        if (this.screen) {
+            this.screen.display(this.context);
+        } else {
+            for (entity = 0; entity < this.entities.length; entity++) {
+                this.entities[entity].draw(this.context);
+            }
+            this.camera.draw(this.context);
         }
     };
 
@@ -203,13 +200,13 @@ class GameEngine {
      * Main game loop. Defines the update/render order of the engine. 
      */
     loop() {
-        if (this.pause || !document.hasFocus() || document.activeElement !== this.canvas) {
-            AUDIO_PLAYER.pauseAudio();
-            return;
+        if (!document.hasFocus() || document.activeElement !== this.canvas) {
+            this.screen = this.camera.pauseScreen;
+        } else if (!this.screen) {
+            this.clockTick = this.timer.tick();
+            this.update();
+            AUDIO_PLAYER.unpauseAudio();
         }
-        this.clockTick = this.timer.tick();
-        this.update();
-        AUDIO_PLAYER.unpauseAudio();
         this.draw();
     };
 };

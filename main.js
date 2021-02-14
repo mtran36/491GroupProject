@@ -32,6 +32,7 @@ AUDIO_PATHS.forEach(function (params) {
 });
 ASSET_LOADER.downloadAll(function () {
 	let canvas = document.getElementById('gameWorld');
+	canvas.focus();
 	GAME_ENGINE.init(canvas);
 	new Scene(GAME_ENGINE);
 });

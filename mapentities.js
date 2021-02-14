@@ -214,7 +214,9 @@ class Minimap extends Entity {
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
 		context.restore();
 		for (entity = 0; entity < this.game.entities.length; entity++) {
-			this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+			if (this.game.entities[entity].drawMinimap) {
+				this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+			}
 		}
 	};
 };
@@ -248,13 +250,12 @@ class Background extends Entity {
 	/** @override */
 	update() {
 		if (this.game.druid.vel.x > 0) {
-			this.speed = this.game.clockTick * this.speedRate;
-		} else if (this.game.druid.vel.x < 0) {
 			this.speed = this.game.clockTick * -this.speedRate;
+		} else if (this.game.druid.vel.x < 0) {
+			this.speed = this.game.clockTick * this.speedRate;
 		} else {
 			this.speed = 0;
 		}
-
 		this.leftImagePos.x = this.leftImagePos.x + this.speed;
 		this.midImagePos.x = this.midImagePos.x + this.speed;
 		this.rightImagePos.x = this.rightImagePos.x + this.speed;

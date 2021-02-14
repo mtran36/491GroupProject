@@ -3,7 +3,7 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 1) {
+	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 0.1) {
 		super(game, x, y, spritesheet);
 		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.
@@ -137,17 +137,17 @@ class Fly extends Enemy {
 			if (collisions.down) {
 				this.pos.y = entity.worldBB.top - this.scaleDim.y;
 				this.vel.y = -this.vel.y;
-				bounce = true
+				bounce = true;
 			}
 			if (collisions.up) {
 				this.pos.y = entity.worldBB.bottom;
 				this.vel.y = -this.vel.y;
-				bounce = true
+				bounce = true;
 			}
 			if (collisions.left) {
 				this.pos.x = entity.worldBB.right;
 				this.vel.x = -this.vel.x;
-				bounce = true
+				bounce = true;
 			}
 			if (collisions.right) {
 				this.pos.x = entity.worldBB.left - this.scaleDim.x;
@@ -198,7 +198,7 @@ class RangedFly extends Fly {
 					this.agentBB.x, this.agentBB.y,
 					this.game.druid.agentBB.x - this.agentBB.x,
 					this.game.druid.agentBB.y - this.agentBB.y));
-				this.canShoot = false;;
+				this.canShoot = false;
 			}
 			this.move(this.game.clockTick);
 		} else {
@@ -224,7 +224,7 @@ class Beetle extends Enemy{
 		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
-		this.farLeft = PARAMS.CANVAS_WIDTH;
+		this.farLeft = -1;
 		this.farRight = -1;
 	}
 
@@ -239,13 +239,13 @@ class Beetle extends Enemy{
 			&& this.vel.x < 0
 			&& this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
-			this.pos.x = this.farLeft;
+			this.facing = 1;
 		}
-		if (this.farRight < this.pos.x + this.dim.x
+		if (this.farRight < this.pos.x + this.scaleDim.x
 			&& this.vel.x > 0
 			&& this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
-			this.pos.x = this.farRight - this.dim.x;
+			this.facing = 0;
 		}
     }
 
@@ -282,12 +282,7 @@ class Beetle extends Enemy{
 			this.vel.y + this.game.clockTick * this.ACC.y,
 			this.velMax.y);
 		this.move(this.game.clockTick);
-		if (this.removeFromWorld) {
-			switch (prize) {
-				case 'Potion':
-					this.game.addEntity(new Potions(this.game, this.x, this.y));
-            }
-		}
+		this.avoidLedge();
 	}
 
 	/** @override */
@@ -343,27 +338,8 @@ class FlyBeetle extends Beetle {
 		this.move(this.game.clockTick);
 	}
 
-	/** @override */
-	defineWorldCollisions(entity, collisions) {
-		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-			if (collisions.down) {
-				this.pos.y = entity.worldBB.top - this.scaleDim.y;
-				this.vel.y = -this.vel.y;
-			}
-			if (collisions.up) {
-				this.pos.y = entity.worldBB.bottom;
-				this.vel.y = -this.vel.y;
-			}
-			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
-				this.vel.x = -this.vel.x;
-			}
-			if (collisions.right) {
-				this.pos.x = entity.worldBB.left - this.scaleDim.x;
-				this.vel.x = -this.vel.x;
-			}
-		}
-    }
+
+
 }
 
 /**
@@ -412,8 +388,8 @@ class Hopper extends Enemy {
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
-		if (this.jumping && this.knockbackTime === 0) {
-			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
+		if (this.jumping) {
+			this.vel.x = this.left ? -this.xspeed : this.xspeed;
 		}
 		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
 		this.move(this.game.clockTick);

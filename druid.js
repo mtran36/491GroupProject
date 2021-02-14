@@ -14,6 +14,8 @@ class Druid extends Agent {
 		this.flashing = false;
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
+		this.potionCounter = 0;
+		this.keyCounter = 0;
 
 		this.attacks = [];
 		this.attacks.push(this.meleeAttack);
@@ -23,6 +25,7 @@ class Druid extends Agent {
 		if (!PARAMS.DEBUG) {
 			this.health -= damage;
 			if (this.health <= 0) {
+				this.health = 0;
 				this.removeFromWorld = true;
 			}
 		}
@@ -110,11 +113,24 @@ class Druid extends Agent {
 				// Temporary collision detection for key and door
 				if (entity instanceof Key) {
 					that.hasKey = true;
+					that.keyCounter += 1;
 					entity.removeFromWorld = true;
 				}
 				if (entity instanceof Door) {
-					if (that.hasKey == true) entity.removeFromWorld = true;
+					if (that.hasKey == true) {
+						entity.removeFromWorld = true;
+						that.keyCounter -= 1;
+					}
 				}
+				if (entity instanceof Potions) {
+					that.hasPotions = true;
+					if (that.health < that.maxHealth) {
+						that.health += 10;
+					} else if (that.health = that.maxHealth) {
+						that.potionCounter += 10;
+                    }
+					entity.removeFromWorld = true;
+                }
 			}
 		});
 	}
@@ -166,28 +182,15 @@ class Druid extends Agent {
 		this.move(TICK);
 	}
 
+	drawMinimap(ctx, mmX, mmY) {
+		ctx.fillStyle = "Red";
+		ctx.fillRect(mmX + this.x / 16, mmY + this.y / 16, 3, 3 * Math.min(0 + 1, 2));
+	}
+
+
 	/** @override */
 	draw(context) {
-
-		context.fillStyle = "Red";
-		context.fillRect(30, 30, this.health, 30);
-		context.fillStyle = "White";
-		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
-		context.beginPath();
-		context.strokeStyle = "Black";
-		context.rect(30, 30, this.maxHealth, 30)
-		context.stroke();
-
-		context.fillStyle = "black";
-		context.font = "16px Verdana";
-		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
-		context.fillStyle = "grey";
-		context.font = "16px Verdana";
-		context.fillText("LVL", 360, 25);
-		context.fillText("Name Here if want", 30, 25);
-
 		if (this.flashing) return;
-
 		super.draw(context);
 	}
 }

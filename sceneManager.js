@@ -4,8 +4,8 @@ class SceneManager {
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
 
+//		this.minimap = new Minimap(this.game, 260, 100, 740);
 		this.startScreen();
-		this.minimap = new Minimap(this.game, 260, 100, 740);
 	};
 
 	startScreen() {
@@ -25,12 +25,12 @@ class SceneManager {
 			this.game.start();
 		}
 		canvas.addEventListener('click', clickStart);
-	}
+	};
 
 	loadLevel(level, x, y) {
+		this.pos = { x: 0, y: 0 };
 		this.game.entities = [];
 		AUDIO_PLAYER.stopAll();
-		this.x = 0;
 		let i;
 
 		// Author: tommy
@@ -49,9 +49,9 @@ class SceneManager {
 			document.getElementById("gameWorld").setAttribute('style', 'background: cyan');
 		}
 
-		if (level.grounds) {
-			for (var i = 0; i < level.grounds.length; i++) {
-				let ground = level.grounds[i];
+		if (level.ground) {
+			for (i = 0; i < level.ground.length; i++) {
+				let ground = level.ground[i];
 				this.game.addEntity(new Ground(this.game,
 					PARAMS.TILE_WIDTH * ground.x,
 					PARAMS.TILE_WIDTH * ground.y,
@@ -77,7 +77,7 @@ class SceneManager {
 			}
 		}
 		if (level.rangedFlies) {
-			for (var i = 0; i < level.rangedFlies.length; i++) {
+			for (i = 0; i < level.rangedFlies.length; i++) {
 				let rangedFly = level.rangedFlies[i];
 				this.game.addEntity(new RangedFly(this.game,
 					rangedFly.x * PARAMS.TILE_WIDTH, rangedFly.y * PARAMS.TILE_WIDTH, rangedFly.prize, rangedFly.prizeRate));
@@ -92,7 +92,7 @@ class SceneManager {
 					beetle.prize, beetle.prizeRate));
 			}
 		} if (level.flyBeetles) {
-			for (var i = 0; i < level.flyBeetles.length; i++) {
+			for (i = 0; i < level.flyBeetles.length; i++) {
 				let flyBeetle = level.flyBeetles[i];
 				this.game.addEntity(new FlyBeetle(this.game,
 					flyBeetle.x * PARAMS.TILE_WIDTH, flyBeetle.y * PARAMS.TILE_WIDTH, flyBeetle.prize, flyBeetle.prizeRate));
@@ -130,9 +130,8 @@ class SceneManager {
 					door.y * PARAMS.TILE_WIDTH));
 			}
 		}
-
 		if (level.powerups) {
-			for (var i = 0; i < level.powerups.length; i++) {
+			for (i = 0; i < level.powerups.length; i++) {
 				let powerup = level.powerups[i];
 				this.game.addEntity(new RangedPowerUp(this.game, powerup.x * PARAMS.TILE_WIDTH, powerup.y * PARAMS.TILE_WIDTH));
 			}
@@ -184,7 +183,7 @@ class SceneManager {
 		ctx.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
 
 		if (PARAMS.DEBUG) {
-			this.minimap.draw(ctx);
+			//this.minimap.draw(ctx);
         }
 	};
 }

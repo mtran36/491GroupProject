@@ -147,7 +147,7 @@ class Fly extends Enemy {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
-		bounce = false;
+		let bounce = false;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
 				bounce = true;
@@ -165,7 +165,7 @@ class Fly extends Enemy {
 				this.vel.x = -this.vel.x;
 			}
 			if (collisions.right) {
-				bounce true;
+				bounce = true;
 				this.pos.x = entity.worldBB.left - this.scaleDim.x;
 				this.vel.x = -this.vel.x;
 			}
@@ -234,7 +234,7 @@ class Beetle extends Enemy{
 		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
-		this.farLeft = PARAMS.CANVAS_WIDTH;
+		this.farLeft = -1;
 		this.farRight = -1;
 	}
 
@@ -249,13 +249,13 @@ class Beetle extends Enemy{
 			&& this.vel.x < 0
 			&& this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
-			this.pos.x = this.farLeft;
+			this.facing = 1;
 		}
-		if (this.farRight < this.pos.x + this.dim.x
+		if (this.farRight < this.pos.x + this.scaleDim.x
 			&& this.vel.x > 0
 			&& this.vel.y === 0) {
 			this.vel.x = -this.vel.x;
-			this.pos.x = this.farRight - this.dim.x;
+			this.facing = 0;
 		}
     }
 
@@ -284,12 +284,6 @@ class Beetle extends Enemy{
 		}
 		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.move(this.game.clockTick);
-		if (this.removeFromWorld) {
-			switch (prize) {
-				case 'Potion':
-					this.game.addEntity(new Potions(this.game, this.x, this.y));
-			}
-		}
 		this.avoidLedge();
 	}
 
@@ -400,8 +394,8 @@ class Hopper extends Enemy {
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
-		if (this.jumping && this.knockbackTime === 0) {
-			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
+		if (this.jumping) {
+			this.vel.x = this.left ? -this.xspeed : this.xspeed;
 		}
 		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
 		this.move(this.game.clockTick);
@@ -414,8 +408,9 @@ class Hopper extends Enemy {
 				this.pos.y = entity.worldBB.top - this.scaleDim.y;
 				this.vel.y = 0;
 				this.vel.x = 0;
-				if (this.jumping)
+				if (this.jumping) {
 					this.landTime = this.landLag;
+				}
 				this.jumping = false;
 			}
 			if (collisions.up) {

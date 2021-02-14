@@ -246,45 +246,28 @@ class EnemyRangedAttack extends Agent {
 
 	}
 
-	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
-				if (entity instanceof Druid) {
-					entity.takeDamage(that.attack);
-					that.removeFromWorld = true;
-				}
+	/** @override
+	 * If the projectile hits the druid, then damage druid and remove projectile.
+	 * @param {Entity} entity
+	 */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			entity.takeDamage(this.attack);
+			this.removeFromWorld = true;
+		}
+	}
+
+	/** @override
+	 * If the projectile hits a solid wall or door, then remove the projectile.
+	 * @param {Entity} entity
+	 * @param {{boolean up, boolean down, boolean left, boolean right}} collisions
+	 */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Door) {
+			if (collisions.up || collisions.down || collisions.left || collisions.right) {
+				this.removeFromWorld = true;
 			}
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				if (entity instanceof Ground || entity instanceof Door) {
-					if (that.vel.y > 0
-						&& that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) {
-						that.removeFromWorld = true;
-					}
-					if (that.vel.y < 0
-						&& (that.lastWorldBB.top) >= entity.worldBB.bottom
-						&& (that.lastWorldBB.left) != entity.worldBB.right
-						&& (that.lastWorldBB.right) != entity.worldBB.left) {
-						that.removeFromWorld = true;
-					}
-					if (that.vel.x < 0
-						&& (that.lastWorldBB.left) >= entity.worldBB.right
-						&& (that.lastWorldBB.top) != entity.worldBB.bottom
-						&& (that.lastWorldBB.bottom) != entity.worldBB.top) {
-						that.removeFromWorld = true;
-					}
-					if (that.vel.x > 0
-						&& (that.lastWorldBB.right) <= entity.worldBB.left
-						&& (that.lastWorldBB.top) < entity.worldBB.bottom
-						&& (that.lastWorldBB.bottom) > entity.worldBB.top) {
-						that.removeFromWorld = true;
-					}
-				}
-			}
-		});
+		}
 	}
 }
 

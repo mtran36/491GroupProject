@@ -36,15 +36,18 @@ var levelOne = {
 		{ x: -5, y: 1, prizeRate: 0.2 }
 	],
 	rangedFlies: [
-		{x:9, y:11}
+		{ x: 9, y: 9 }
 	],
 	beetles: [
 		{ x: -3, y: 4, prizeRate: 1 }
 	],
 	flyBeetles: [
-		{ x: 2, y: 5, prizeRate: 1 }
+		{ x: 10, y: 1, prizeRate: 1 }
 	],
 	hopper: [
 		{ x: -2, y: 3 }
+	],
+	powerups: [
+		{ x: 25, y: 5 }
 	]
 }

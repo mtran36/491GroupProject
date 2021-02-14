@@ -6,11 +6,20 @@
 class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
-        this.spritesheet = ASSET_MANAGER.getImgAsset(spritesheet);
-        this.pos = { x: x, y: y };
-        this.setDimensions(1, PARAMS.TILE_WIDTH);
-        this.worldBB = this.makeDefaultBoundingBox();
-        this.lastWorldBB = this.worldBB;
+        this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
+        this.scale = 1;
+        this.pos = {
+            x: x,
+            y: y
+        };
+        this.dim = {
+            x: PARAMS.TILE_WIDTH,
+            y: PARAMS.TILE_WIDTH
+        };
+        this.scaleDim = {
+            x: this.dim.x * this.scale,
+            y: this.dim.y * this.scale
+        };
         this.animations = [];
     }
 
@@ -25,12 +34,20 @@ class Entity {
             height = width;
         }
         this.scale = scale;
-        this.dim = { x: width, y: height };
-        this.scaleDim = { x: width * this.scale, y: height * this.scale };
+        this.dim = {
+            x: width,
+            y: height
+        };
+        this.scaleDim = {
+            x: width * this.scale,
+            y: height * this.scale
+        };
         this.updateBB();
     }
 
-    /** Updates the bounding box to the current position of the entity. */
+    /** 
+     * Updates the bounding box to the current position of the entity. 
+     */
     updateBB() {
         this.lastWorldBB = this.worldBB;
         this.worldBB = this.makeDefaultBoundingBox();
@@ -50,9 +67,30 @@ class Entity {
             this.scaleDim.y);         // Canvas drawing height
     }
 
-    /** Returns a default bounding box for entities. */
+    /** 
+     * Returns a default bounding box for entities. 
+     */
     makeDefaultBoundingBox() {
         return new BoundingBox(this.pos.x, this.pos.y, this.scaleDim.x, this.scaleDim.y);
+    }
+
+    /**
+     * Default drawing behavior for displaying an entity on the minimap.
+     * @param {CanvasImageSource} context
+     * @param {number} x Horizontal position of minimap.
+     * @param {any} y Vertical position of minimap.
+     */
+    drawMinimap(context, x, y) {
+        const SCALE = 16;
+        const PIP_SIZE = 3;
+
+        context.save();
+        context.fillStyle = "Red";
+        context.fillRect(
+            x + this.pos.x / SCALE,
+            y + this.pos.y / SCALE,
+            PIP_SIZE, PIP_SIZE);
+        context.restore();
     }
 
     /**
@@ -60,7 +98,7 @@ class Entity {
      * by the implementing entity if it has animations in its spritesheet.
      */
     loadAnimations() {
-        console.log(
+        console.warn(
             "Animations not defined for Entity at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
@@ -70,7 +108,7 @@ class Entity {
      * overriden by the implementing entity if it changes over time.
      */
     update() {
-        console.log(
+        console.warn(
             "Update not defined for Entity at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
@@ -93,12 +131,29 @@ class Agent extends Entity {
         this.loadAnimations();
     }
 
-    /** Updates this entity's facing direction. */
+    /** 
+     * Updates this agent's facing direction. 
+     */
     updateFacing() {
         if (this.vel.x < 0) {
             this.facing = 0;
         } else if (this.vel.x > 0) {
             this.facing = 1;
+        }
+    }
+
+    /**
+     * Causes the agent to take the specified amount of damage. The enemy removes itself 
+     * from the world after its health reaches 0.
+     * @param {number} damage Damage to health as an integer
+     */
+    takeDamage(damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            if (this.spawnPrize) {
+                this.spawnPrize();
+            }
+            this.removeFromWorld = true;
         }
     }
 
@@ -117,12 +172,109 @@ class Agent extends Entity {
         this.updateBB();
     }
 
-    /** Returns a default bounding circle for agents. */
+    /** 
+     * Returns a default bounding circle for agents. 
+     */
     makeDefaultBoundingCircle() {
         return new BoundingCircle(
             this.pos.x + this.scaleDim.x / 2,
             this.pos.y + this.scaleDim.y / 2,
             Math.min(this.scaleDim.x, this.scaleDim.y) / 2);
+    }
+
+    /**
+    * Returns a tuple of boolean values that tells what direction or directions this agent
+    * has collided with an entity. Values are stored in up, down, left, and right properties 
+    * of the tuple.
+    * @param {Entity} entity Entity to check collision against.
+    */
+    worldCollisions(entity) {
+        let down = this.vel.y > 0
+            && this.lastWorldBB.bottom <= entity.worldBB.top
+            && (this.lastWorldBB.left) < entity.worldBB.right
+            && (this.lastWorldBB.right) > entity.worldBB.left;
+        let up = this.vel.y < 0
+            && (this.lastWorldBB.top) >= entity.worldBB.bottom
+            && (this.lastWorldBB.left) !== entity.worldBB.right
+            && (this.lastWorldBB.right) !== entity.worldBB.left;
+        let left = this.vel.x < 0
+            && (this.lastWorldBB.left) >= entity.worldBB.right
+            && (this.lastWorldBB.top) !== entity.worldBB.bottom
+            && (this.lastWorldBB.bottom) !== entity.worldBB.top;
+        let right = this.vel.x > 0
+            && (this.lastWorldBB.right) <= entity.worldBB.left
+            && (this.lastWorldBB.top) < entity.worldBB.bottom
+            && (this.lastWorldBB.bottom) > entity.worldBB.top;
+        // Bottom corners to entity's top corners collision
+        if (down) { 
+            if (this.lastWorldBB.bottom > entity.worldBB.top) {
+                if (this.vel.x > 0
+                    && this.lastWorldBB.right > entity.worldBB.left) {
+                    right = true;
+                } else if (this.vel.x < 0
+                    && this.lastWorldBB.left < entity.worldBB.right) {
+                    left = true;
+                }
+            }
+        }
+        // Top corners to entity's bottom corners
+        if (up) { 
+            if (this.vel.x > 0
+                && this.lastWorldBB.top < entity.worldBB.bottom
+                && this.lastWorldBB.right > entity.worldBB.left) {
+                right = true;
+            } else if (this.vel.x < 0
+                && this.lastWorldBB.top < entity.worldBB.bottom
+                && this.lastWorldBB.left < entity.worldBB.right) {
+                left = true;
+            }
+        }
+        return { up, down, left, right };
+    }
+
+    /** 
+     * Checks this entity's collisisons with all other bounding shapes in the scene. 
+     * Passes information needed to handle collisions to the define collisions 
+     * methods so that each entity may define their own collision behavior.
+     */
+    checkCollisions() {
+        let that = this;
+        this.game.entities.forEach(function (entity) {
+            // Check agent collisions
+            if (entity.agentBB
+                && that.agentBB.collide(entity.agentBB)
+                && that != entity) {
+                that.defineAgentCollisions(entity);
+            }
+            // Check world collisions
+            if (entity.worldBB
+                && that.worldBB.collide(entity.worldBB)
+                && that != entity) {
+                let collisions = that.worldCollisions(entity);
+                that.defineWorldCollisions(entity, collisions);
+            }
+        });
+    }
+
+    /**
+     * 
+     * @param {any} entity
+     */
+    defineAgentCollisions(entity) {
+        console.warn(
+            "Agent collisions not defined for Agent at x="
+            + this.pos.x + ", y=" + this.pos.y);
+    }
+
+    /**
+     * 
+     * @param {any} entity
+     * @param {any} collisions
+     */
+    defineWorldCollisions(entity, collisions) {
+        console.warn(
+            "World collisions not defined for Agent at x="
+            + this.pos.x + ", y=" + this.pos.y);
     }
 
     /** @override */
@@ -135,16 +287,6 @@ class Agent extends Entity {
         this.agentBB.display(this.game);
     }
 
-    /** 
-     * Checks for when this entity collides with another entity in the game world.
-	 * Updates position and variables accordingly.
-     */
-    checkCollisions() {
-        console.log(
-            "Collisions not defined for Agent at x="
-            + this.pos.x + ", y=" + this.pos.y);
-    }
-
     /** @override */
     updateBB() {
         super.updateBB();
@@ -154,20 +296,22 @@ class Agent extends Entity {
 
     /** @override */
     loadAnimations() {
-        console.log(
+        console.warn(
             "Animations not defined for Agent at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
 
     /** @override */
     update() {
-        console.log(
+        console.warn(
             "Update not defined for Agent at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
 }
 
-/** Checks collisions with entities. */ 
+/** 
+ * Checks collisions with entities. 
+ */ 
 class BoundingBox {
     constructor(x, y, width, height) {
         Object.assign(this, { x, y, width, height });
@@ -207,7 +351,9 @@ class BoundingBox {
     }
 }
 
-/** Checks collisions between agents. */
+/** 
+ * Checks collisions between agents. 
+ */
 class BoundingCircle {
     constructor(x, y, radius) {
         Object.assign(this, { x, y, radius });

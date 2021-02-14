@@ -1,4 +1,6 @@
-/** Player character */
+/** 
+ * Player character 
+ */
 class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druid.png");
@@ -19,17 +21,10 @@ class Druid extends Agent {
 		this.attacks.push(this.meleeAttack);
 	}
 
-	takeDamage(damage) {
-		if (!PARAMS.DEBUG) {
-			this.health -= damage;
-			if (this.health <= 0) {
-				this.removeFromWorld = true;
-			}
-		}
-		this.invincTime = 1;
-		this.flashing = true;
-	}
-
+	/**
+	 * 
+	 * @param {any} DRUID
+	 */
 	meleeAttack(DRUID) {
 		DRUID.meleeAttackCooldown -= DRUID.game.clockTick;
 		if (DRUID.meleeAttackCooldown <= 0 && DRUID.game.C) {
@@ -43,81 +38,93 @@ class Druid extends Agent {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	rangedAttack() {
+		this.rangeAttackCooldown -= this.game.clockTick;
+		if (this.rangeAttackCooldown <= 0 && this.game.A) {
+			if (this.facing === 0) { // shoot left
+				this.game.addEntity(new RangeAttack(this.game,
+					this.pos.x - PARAMS.TILE_WIDTH,
+					this.pos.y + this.scaleDim.y / 2,
+					this.facing));
+			} else { // shoot right
+				this.game.addEntity(new RangeAttack(this.game,
+					this.pos.x + this.scaleDim.x,
+					this.pos.y + this.scaleDim.y / 2,
+					this.facing));
+			}
+			this.game.A = false;
+			this.rangeAttackCooldown = 1;
+		}
+	}
+
+	/**
+	 * 
+	 * @param {any} context
+	 */
+	drawHealthBar(context) {
+		context.fillStyle = "Red";
+		context.fillRect(30, 30, this.health, 30);
+		context.fillStyle = "White";
+		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
+		context.beginPath();
+		context.strokeStyle = "Black";
+		context.rect(30, 30, this.maxHealth, 30)
+		context.stroke();
+
+		context.fillStyle = "black";
+		context.font = "16px Verdana";
+		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
+		context.fillStyle = "grey";
+		context.font = "16px Verdana";
+		context.fillText("LVL", 360, 25);
+		context.fillText("Name Here if want", 30, 25);
+    }
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.agentBB && that.agentBB.collide(entity.agentBB)) {
-				if (entity instanceof Enemy && that.invincTime <= 0) {
-					that.takeDamage(entity.attack);
-				}
+	takeDamage(damage) {
+		if (!PARAMS.DEBUG) {
+			this.health -= damage;
+			if (this.health <= 0) {
+				this.removeFromWorld = true;
 			}
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& that !== entity) {
-				if (entity instanceof Ground || entity instanceof Door) {
-					if (that.vel.y > 0) {
-						if (that.lastWorldBB.bottom <= entity.worldBB.top
-							&& (that.lastWorldBB.left) < entity.worldBB.right
-							&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-							that.pos.y = entity.worldBB.top - that.scaleDim.y;
-							that.vel.y = 0;
-							that.isJumping = false;
-						}
-						// bottom corners to entity's top corners collision
-						if (that.lastWorldBB.bottom > entity.worldBB.top) {
-							if (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left) {
-								that.pos.x = entity.worldBB.left - that.scaleDim.x;
-								that.vel.x = 0;
-							} else if (that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right) {
-								that.pos.x = entity.worldBB.right;
-								that.vel.x = 0;
-							}
-						}
-					}
-					if (that.vel.y < 0) {
-						if ((that.lastWorldBB.top) >= entity.worldBB.bottom
-							&& (that.lastWorldBB.left) != entity.worldBB.right
-							&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
-							that.pos.y = entity.worldBB.bottom;
-							that.vel.y = 0;
-							that.isJumping = true;
-						}
-						// top corners to entity's bottom corners
-						if (that.vel.x > 0 && that.lastWorldBB.top < entity.worldBB.bottom
-							&& that.lastWorldBB.right > entity.worldBB.left) {
-							that.pos.x = entity.worldBB.left - that.scaleDim.x;
-							that.vel.x = 0;
-						} else if (that.vel.x < 0 && that.lastWorldBB.top < entity.worldBB.bottom
-							&& that.lastWorldBB.left < entity.worldBB.right) {
-							that.pos.x = entity.worldBB.right;
-							that.vel.x = 0;
-						}
-					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right
-						&& that.lastWorldBB.top < entity.worldBB.bottom
-						&& that.lastWorldBB.bottom > entity.worldBB.top) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = 0;
-					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left
-						&& that.lastWorldBB.top < entity.worldBB.bottom
-						&& that.lastWorldBB.bottom > entity.worldBB.top) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = 0;
-					}
-				}
-				// Temporary collision detection for key and door
-				if (entity instanceof Key) {
-					that.hasKey = true;
-					entity.removeFromWorld = true;
-				}
-				if (entity instanceof Door) {
-					if (that.hasKey == true) entity.removeFromWorld = true;
-				}
-			}
-		});
+		}
+		this.invincTime = 1;
+		this.flashing = true;
 	}
+
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy && this.invincTime <= 0) {
+			this.takeDamage(entity.attack);
+		}
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = 0;
+				this.isJumping = false;
+			}
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = 0;
+				this.isJumping = true;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = 0;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = 0;
+			}
+		}
+    }
 
 	/** @override */
 	loadAnimations() {
@@ -168,26 +175,8 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-
-		context.fillStyle = "Red";
-		context.fillRect(30, 30, this.health, 30);
-		context.fillStyle = "White";
-		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
-		context.beginPath();
-		context.strokeStyle = "Black";
-		context.rect(30, 30, this.maxHealth, 30)
-		context.stroke();
-
-		context.fillStyle = "black";
-		context.font = "16px Verdana";
-		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
-		context.fillStyle = "grey";
-		context.font = "16px Verdana";
-		context.fillText("LVL", 360, 25);
-		context.fillText("Name Here if want", 30, 25);
-
+		//this.drawHealthBar(context);
 		if (this.flashing) return;
-
 		super.draw(context);
 	}
 }

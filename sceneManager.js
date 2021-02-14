@@ -4,28 +4,15 @@ class SceneManager {
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
 
-//		this.minimap = new Minimap(this.game, 260, 100, 740);
-		this.startScreen();
+		//this.minimap = new Minimap(this.game, 260, 100, 740);
+		this.createScreens();
+		this.game.start();
 	};
 
-	startScreen() {
-		let canvas = this.game.canvas;
-		let context = this.game.context;
-		canvas.setAttribute('style', 'background: black');
-		context.save();
-		context.strokeStyle = 'red';
-		context.fillStyle = 'white';
-		context.font = "bold 64px sans-serif";
-		this.game.context.fillText("Click to Start", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-		this.game.context.strokeText("Click to Start", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-		context.restore();
-		var clickStart = () => {
-			canvas.removeEventListener('click', clickStart);
-			this.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
-			this.game.start();
-		}
-		canvas.addEventListener('click', clickStart);
-	};
+	createScreens() {
+		this.pauseScreen = new PauseScreen(this.game, { fill: 'white', stroke: 'red' });
+		this.game.screen = new StartScreen(this.game, {fill: 'white', stroke: 'red'});
+	}
 
 	loadLevel(level, x, y) {
 		this.pos = { x: 0, y: 0 };

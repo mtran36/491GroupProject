@@ -21,6 +21,60 @@ class Druid extends Agent {
 		this.attacks.push(this.meleeAttack);
 	}
 
+	meleeAttack() {
+		this.meleeAttackCooldown -= this.game.clockTick;
+		if (this.meleeAttackCooldown <= 0 && this.game.C) {
+			if (this.facing === 0) { // stab left
+				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
+			} else { // stab right
+				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
+			}
+			this.game.C = false;
+			this.meleeAttackCooldown = 1;
+		}
+	}
+
+	rangedAttack() {
+		this.rangeAttackCooldown -= this.game.clockTick;
+		if (this.rangeAttackCooldown <= 0 && this.game.A) {
+			if (this.facing === 0) { // shoot left
+				this.game.addEntity(new RangeAttack(
+					this.game,
+					this.pos.x - PARAMS.TILE_WIDTH,
+					this.pos.y + this.scaleDim.y / 2,
+					this.facing));
+			} else { // shoot right
+				this.game.addEntity(new RangeAttack(
+					this.game,
+					this.pos.x + this.scaleDim.x,
+					this.pos.y + this.scaleDim.y / 2,
+					this.facing));
+			}
+			this.game.A = false;
+			this.rangeAttackCooldown = 1;
+		}
+	}
+
+	drawHealthBar(context) {
+		context.fillStyle = "Red";
+		context.fillRect(30, 30, this.health, 30);
+		context.fillStyle = "White";
+		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
+		context.beginPath();
+		context.strokeStyle = "Black";
+		context.rect(30, 30, this.maxHealth, 30)
+		context.stroke();
+
+		context.fillStyle = "black";
+		context.font = "16px Verdana";
+		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
+		context.fillStyle = "grey";
+		context.font = "16px Verdana";
+		context.fillText("LVL", 360, 25);
+		context.fillText("Name Here if want", 30, 25);
+    }
+
+	/** @override */
 	takeDamage(damage) {
 		if (!PARAMS.DEBUG) {
 			this.health -= damage;
@@ -48,92 +102,44 @@ class Druid extends Agent {
 
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.agentBB && that.agentBB.collide(entity.agentBB)) {
-				if (entity instanceof Enemy && that.invincTime <= 0) {
-					that.takeDamage(entity.attack);
-				}
-			}
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& that !== entity) {
-				if (entity instanceof Ground || entity instanceof Door) {
-					if (that.vel.y > 0) {
-						if (that.lastWorldBB.bottom <= entity.worldBB.top
-							&& (that.lastWorldBB.left) < entity.worldBB.right
-							&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-							that.pos.y = entity.worldBB.top - that.scaleDim.y;
-							that.vel.y = 0;
-							that.isJumping = false;
-						}
-						// bottom corners to entity's top corners collision
-						if (that.lastWorldBB.bottom > entity.worldBB.top) {
-							if (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left) {
-								that.pos.x = entity.worldBB.left - that.scaleDim.x;
-								that.vel.x = 0;
-							} else if (that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right) {
-								that.pos.x = entity.worldBB.right;
-								that.vel.x = 0;
-							}
-						}
-					}
-					if (that.vel.y < 0) {
-						if ((that.lastWorldBB.top) >= entity.worldBB.bottom
-							&& (that.lastWorldBB.left) != entity.worldBB.right
-							&& (that.lastWorldBB.right) != entity.worldBB.left) { // jumping up
-							that.pos.y = entity.worldBB.bottom;
-							that.vel.y = 0;
-							that.isJumping = true;
-						}
-						// top corners to entity's bottom corners
-						if (that.vel.x > 0 && that.lastWorldBB.top < entity.worldBB.bottom
-							&& that.lastWorldBB.right > entity.worldBB.left) {
-							that.pos.x = entity.worldBB.left - that.scaleDim.x;
-							that.vel.x = 0;
-						} else if (that.vel.x < 0 && that.lastWorldBB.top < entity.worldBB.bottom
-							&& that.lastWorldBB.left < entity.worldBB.right) {
-							that.pos.x = entity.worldBB.right;
-							that.vel.x = 0;
-						}
-					}
-					if (that.vel.x < 0 && (that.lastWorldBB.left) >= entity.worldBB.right
-						&& that.lastWorldBB.top < entity.worldBB.bottom
-						&& that.lastWorldBB.bottom > entity.worldBB.top) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = 0;
-					}
-					if (that.vel.x > 0 && (that.lastWorldBB.right) <= entity.worldBB.left
-						&& that.lastWorldBB.top < entity.worldBB.bottom
-						&& that.lastWorldBB.bottom > entity.worldBB.top) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = 0;
-					}
-				}
-				// Temporary collision detection for key and door
-				if (entity instanceof Key) {
-					that.hasKey = true;
-					that.keyCounter += 1;
-					entity.removeFromWorld = true;
-				}
-				if (entity instanceof Door) {
-					if (that.hasKey == true) {
-						entity.removeFromWorld = true;
-						that.keyCounter -= 1;
-					}
-				}
-				if (entity instanceof Potions) {
-					that.hasPotions = true;
-					if (that.health < that.maxHealth) {
-						that.health += 10;
-					} else if (that.health = that.maxHealth) {
-						that.potionCounter += 10;
-                    }
-					entity.removeFromWorld = true;
-                }
-			}
-		});
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy && this.invincTime <= 0) {
+			this.takeDamage(entity.attack);
+			this.invincTime = 1;
+		}
 	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = 0;
+				this.isJumping = false;
+			}
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = 0;
+				this.isJumping = true;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = 0;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = 0;
+			}
+		}
+		// Temporary collision detection for key and door
+		if (entity instanceof Key) {
+			this.hasKey = true;
+			entity.removeFromWorld = true;
+		}
+		if (entity instanceof Door && this.hasKey === true) {
+			entity.removeFromWorld = true;
+		}
+    }
 
 	/** @override */
 	loadAnimations() {

@@ -2,43 +2,49 @@ var levelOne = {
 
 	music: "./Audio/TestMusic.mp3",
 
-	background: "cyan",
-	
-	grounds: [
-		// Ground
-		{ x: 0, y: 1, size: 100 },
-		{ x: 0, y: 2, size: 1 },
+	ground: [
+		// Entrance
+		{ x: -1, y: -1, width: 3, height: 3 },
+		{ x: -10, y: 6, width: 22, height: 22 },
+		{ x: 3, y: -9, width: 3, height: 12 },
+		{ x: 32, y: -9, height: 22, width: 9 },
+		{ x: 3, y: -9, width: 33, height: 8 },
+		{ x: 20, y: 6, height: 15, width: 5 },
+		{ x: 20, y: 6, height: 6, width: 15 },
 
-		// Left Platform
-		{ x: 0, y: 5, size: 3 }, { x: 0, y: 6, size: 2 },
-		{ x: 0, y: 7, size: 1 }, { x: 0, y: 8, size: 1 },
-		{ x: 0, y: 9, size: 1 }, { x: 0, y: 10, size: 1 },
+		// Shaft platforms
+		{ x: 15, y: 7, width: 2 },
+		{ x: 9, y: 11, width: 6 },
+		{ x: 18, y: 15, width: 2 },
+		{ x: 15, y: 19, width: 2 },
+		{ x: 12, y: 23, width: 2 },
 
-		// Right Platform
-		{ x: 1, y: 7, size: 1 }, { x: 1, y: 8, size: 1 },
-		{ x: 1, y: 9, size: 1 }, { x: 1, y: 10, size: 1 }],
-
-	middle: [
-		// Middle Patform
-		{ x: 6, y: 7, size: 5 }, { x: 8, y: 8, size: 1 },
-		{ x: 6, y: 6, size: 1 }, { x: 10, y: 6, size: 1 },
-		{ x: 13, y: 5, size: 3 }, { x: 14, y: 6, size: 2 }],
-
-	flies: [{ x: 5, y: 10 }, { x: 5.5, y: 10 }, { x: 11, y: 4, prize: "Key", prizeRate: 1 }],
-
-	rangedFlies: [{x:5, y:7, prizeRate: 0.75}],
-
-	beetles: [{ x: 11, y: 10, prize: "Potion", prizeRate: 1 }],
-
-	flyBeetles: [{x: 2, y: 5, prizeRate: 1}],
-
-	hopper: [{ x: 1, y: 10 , prizeRate: 0.5}],
-
-	potions: [{ x: 1, y: 1 }],  //Temporary
-
-	keys: [{ x: 10, y: 4 }],	//Temporary
-
-	doors: [{ x: 13, y: 8 }],		//Temporary
-
-	powerups: [{x: 10, y: 1}]
-};
+		// Lower Area
+		{ x: 11, y: 27, width: 45, height: 8 },
+		{ x: 20, y: 20, width: 9 },
+		{ x: 28, y: 20, height: 4 },
+		{ x: 28, y: 23, width: 3 },
+		{ x: 49, y: 20, width: 7 },
+		{ x: 55, y: 20, height: 8 },
+		{ x: 55, y: 13, height: 4 }
+	],
+	mask: [
+		{ x: 9, y: 11, width: 2 },
+		{ x: 33, y: 5, width: 3, height: 6 }
+	],
+	flies: [
+		{ x: -5, y: 1, prizeRate: 0.2 }
+	],
+	rangedFlies: [
+		{x:9, y:11}
+	],
+	beetles: [
+		{ x: -3, y: 4, prizeRate: 1 }
+	],
+	flyBeetles: [
+		{ x: 2, y: 5, prizeRate: 1 }
+	],
+	hopper: [
+		{ x: -2, y: 3 }
+	]
+}

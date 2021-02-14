@@ -38,7 +38,9 @@ class GameEngine {
         this.timer = new Timer();
     };
 
-    /** Starts the game engine by beginning the game loop. */
+    /** 
+     * Starts the game engine by beginning the game loop. 
+     */
     start() {
         var that = this;
         (function gameLoop() {
@@ -47,7 +49,9 @@ class GameEngine {
         })();
     };
 
-    /** Recieves input from the keyboard and mouse. */
+    /** 
+     * Recieves input from the keyboard and mouse. 
+     */
     startInput() {
         var that = this;
         var getXandY = function (e) {
@@ -161,7 +165,9 @@ class GameEngine {
         this.entities.push(entity);
     };
 
-    /** Draws all entities according to their draw functionality. */
+    /** 
+     * Draws all entities according to their draw functionality. 
+     */
     draw() {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
         for (var i = 0; i < this.entities.length; i++) {
@@ -176,14 +182,15 @@ class GameEngine {
      */
     update() {
         var entitiesCount = this.entities.length;
-        for (var i = 0; i < entitiesCount; i++) {
+        let i;
+        for (i = 0; i < entitiesCount; i++) {
             var entity = this.entities[i];
             if (!entity.removeFromWorld) {
                 entity.update();
             }
         }
         this.camera.update();
-        for (var i = this.entities.length - 1; i >= 0; --i) {
+        for (i = this.entities.length - 1; i >= 0; --i) {
             if (this.entities[i].removeFromWorld) {
                 this.entities.splice(i, 1);
             }
@@ -191,7 +198,9 @@ class GameEngine {
         AUDIO_PLAYER.update();
     };
 
-    /** Main game loop. Defines the update/render order of the engine. */
+    /** 
+     * Main game loop. Defines the update/render order of the engine. 
+     */
     loop() {
         if (this.pause || !document.hasFocus() || document.activeElement !== this.canvas) {
             AUDIO_PLAYER.pauseAudio();

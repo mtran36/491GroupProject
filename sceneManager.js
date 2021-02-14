@@ -31,6 +31,7 @@ class SceneManager {
 		this.game.entities = [];
 		AUDIO_PLAYER.stopAll();
 		this.x = 0;
+		let i;
 
 		// Author: tommy
 		// backgroung testing
@@ -52,25 +53,27 @@ class SceneManager {
 			for (var i = 0; i < level.grounds.length; i++) {
 				let ground = level.grounds[i];
 				this.game.addEntity(new Ground(this.game,
-					(PARAMS.CANVAS_WIDTH - PARAMS.TILE_WIDTH) * ground.x,
-					PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * ground.y,
-					ground.size));
+					PARAMS.TILE_WIDTH * ground.x,
+					PARAMS.TILE_WIDTH * ground.y,
+					ground.width, ground.height));
 			}
 		}
-		if (level.middle) {
-			for (var i = 0; i < level.middle.length; i++) {
-				let middle = level.middle[i];
-				this.game.addEntity(new Ground(this.game,
-					(PARAMS.TILE_WIDTH) * middle.x,
-					PARAMS.CANVAS_HEIGHT - PARAMS.TILE_WIDTH * middle.y,
-					middle.size));
-			}
-		}
+		if (level.mask) {
+			for (i = 0; i < level.mask.length; i++) {
+				let mask = level.mask[i];
+				this.game.addEntity(new Mask(this.game,
+					PARAMS.TILE_WIDTH * mask.x,
+					PARAMS.TILE_WIDTH * mask.y,
+					mask.width, mask.height));
+            }
+        }
 		if (level.flies) {
-			for (var i = 0; i < level.flies.length; i++) {
+			for (i = 0; i < level.flies.length; i++) {
 				let fly = level.flies[i];
 				this.game.addEntity(new Fly(this.game,
-					fly.x * PARAMS.TILE_WIDTH, fly.y * PARAMS.TILE_WIDTH, fly.prize, fly.prizeRate));
+					fly.x * PARAMS.TILE_WIDTH,
+					fly.y * PARAMS.TILE_WIDTH,
+					fly.prize, fly.prizeRate));
 			}
 		}
 		if (level.rangedFlies) {
@@ -81,10 +84,12 @@ class SceneManager {
 			}
 		}
 		if (level.beetles) {
-			for (var i = 0; i < level.beetles.length; i++) {
+			for (i = 0; i < level.beetles.length; i++) {
 				let beetle = level.beetles[i];
 				this.game.addEntity(new Beetle(this.game,
-					beetle.x * PARAMS.TILE_WIDTH, beetle.y * PARAMS.TILE_WIDTH, beetle.prize, beetle.prizeRate));
+					beetle.x * PARAMS.TILE_WIDTH,
+					beetle.y * PARAMS.TILE_WIDTH,
+					beetle.prize, beetle.prizeRate));
 			}
 		} if (level.flyBeetles) {
 			for (var i = 0; i < level.flyBeetles.length; i++) {
@@ -94,30 +99,35 @@ class SceneManager {
 			}
 		}
 		if (level.hopper) {
-			for (var i = 0; i < level.hopper.length; i++) {
+			for (i = 0; i < level.hopper.length; i++) {
 				let hopper = level.hopper[i];
 				this.game.addEntity(new Hopper(this.game,
-					hopper.x * PARAMS.TILE_WIDTH, hopper.y * PARAMS.TILE_WIDTH, hopper.prize, hopper.prizeRate));
+					hopper.x * PARAMS.TILE_WIDTH,
+					hopper.y * PARAMS.TILE_WIDTH,
+					hopper.prize, hopper.prizeRate));
 			}
 		}
 		if (level.potions) {
-			for (var i = 0; i < level.potions.length; i++) {
+			for (i = 0; i < level.potions.length; i++) {
 				let potion = level.potions[i];
-				this.game.addEntity(new Potions(this.game, potion.x, potion.y));
+				this.game.addEntity(new Potions(
+					this.game, potion.x, potion.y));
             }
         }
-
 		if (level.keys) {
-			for (var i = 0; i < level.keys.length; i++) {
+			for (i = 0; i < level.keys.length; i++) {
 				let key = level.keys[i];
-				this.game.addEntity(new Key(this.game, key.x * PARAMS.TILE_WIDTH, key.y * PARAMS.TILE_WIDTH));
+				this.game.addEntity(new Key(
+					this.game, key.x * PARAMS.TILE_WIDTH,
+					key.y * PARAMS.TILE_WIDTH));
 			}
         }
-
 		if (level.doors) {
-			for (var i = 0; i < level.doors.length; i++) {
+			for (i = 0; i < level.doors.length; i++) {
 				let door = level.doors[i];
-				this.game.addEntity(new Door(this.game, door.x * PARAMS.TILE_WIDTH, door.y * PARAMS.TILE_WIDTH));
+				this.game.addEntity(new Door(
+					this.game, door.x * PARAMS.TILE_WIDTH,
+					door.y * PARAMS.TILE_WIDTH));
 			}
 		}
 
@@ -135,11 +145,9 @@ class SceneManager {
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
-		
-		this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
-		this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
-		this.pos.x = Math.floor(this.pos.x);
-		this.pos.y = Math.floor(this.pos.y);
+
+		this.pos.x = Math.floor(this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2);
+		this.pos.y = Math.floor(this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2);
 	};
 
 	draw(ctx) {

@@ -135,22 +135,19 @@ class Fly extends Enemy {
 		let bounce = false;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				bounce = true;
 				this.pos.y = entity.worldBB.top - this.scaleDim.y;
 				this.vel.y = -this.vel.y;
-				bounce = true
+				bounce = true;
 			}
 			if (collisions.up) {
-				bounce = true;
 				this.pos.y = entity.worldBB.bottom;
 				this.vel.y = -this.vel.y;
-				bounce = true
+				bounce = true;
 			}
 			if (collisions.left) {
-				bounce = true;
 				this.pos.x = entity.worldBB.right;
 				this.vel.x = -this.vel.x;
-				bounce = true
+				bounce = true;
 			}
 			if (collisions.right) {
 				this.pos.x = entity.worldBB.left - this.scaleDim.x;

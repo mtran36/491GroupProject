@@ -44,7 +44,8 @@ class Druid extends Agent {
 	 * 
 	 * @param {any} context
 	 */
-	drawHealthBar(context) {
+	drawBars(context) {
+		context.save();
 		context.fillStyle = "Red";
 		context.fillRect(30, 30, this.health, 30);
 		context.fillStyle = "White";
@@ -61,6 +62,20 @@ class Druid extends Agent {
 		context.font = "16px Verdana";
 		context.fillText("LVL", 360, 25);
 		context.fillText("Name Here if want", 30, 25);
+
+		// Potion bar
+		context.fillStyle = "Blue";
+		context.fillRect(30, 65, this.game.druid.potionCounter, 30);
+		context.fillStyle = "White";
+		context.fillRect(this.game.druid.potionCounter + 30, 65, this.game.druid.maxHealth - this.game.druid.potionCounter, 30);
+		context.beginPath();
+		context.strokeStyle = "Black";
+		context.rect(30, 65, this.game.druid.maxHealth, 30)
+		context.stroke();
+		context.fillStyle = "black";
+		context.font = "16px Verdana";
+		context.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
+		context.restore();
     }
 
 	/** @override */
@@ -162,7 +177,7 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-		this.drawHealthBar(context);
+		this.drawBars(context);
 		if (this.flashing) return;
 		super.draw(context);
 	}

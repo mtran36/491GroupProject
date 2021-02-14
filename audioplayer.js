@@ -14,7 +14,7 @@ class AudioPlayer {
     /**
      * Plays the music file at the specified path. Loop = true. Will play from where the sound 
      * was last paused.
-     * @param {string} path
+     * @param {String} path
      */
     playMusic(path) {
         // If no index for the audio array, then create one.
@@ -22,7 +22,7 @@ class AudioPlayer {
             this.indexArr[path] = 0;
         }
         let i = this.indexArr[path];
-        let audioArr = ASSET_MANAGER.getAudioAsset(path);
+        let audioArr = ASSET_LOADER.getAudioAsset(path);
         let audio = audioArr[i];
         audio.loop = true;
         audio.muted = this.mute;
@@ -36,7 +36,7 @@ class AudioPlayer {
 
     /**
      * Plays the sound at the specified path. Loop = false. Always plays from start.
-     * @param {any} path
+     * @param {String} path
      */
     playSound(path) {
         // If no index for the audio array, then create one.
@@ -44,7 +44,7 @@ class AudioPlayer {
             this.indexArr[path] = 0;
         }
         let i = this.indexArr[path];
-        let audioArr = ASSET_MANAGER.getAudioAsset(path);
+        let audioArr = ASSET_LOADER.getAudioAsset(path);
         let audio = audioArr[i];
         audio.muted = this.mute;
         audio.currentTime = 0;

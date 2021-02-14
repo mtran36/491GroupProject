@@ -1,4 +1,6 @@
-/** Player character */
+/** 
+ * Player character 
+ */
 class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druid.png");
@@ -21,31 +23,36 @@ class Druid extends Agent {
 		this.attacks.push(this.meleeAttack);
 	}
 
-	meleeAttack() {
-		this.meleeAttackCooldown -= this.game.clockTick;
-		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			if (this.facing === 0) { // stab left
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
+	/**
+	 * 
+	 * @param {any} DRUID
+	 */
+	meleeAttack(DRUID) {
+		DRUID.meleeAttackCooldown -= DRUID.game.clockTick;
+		if (DRUID.meleeAttackCooldown <= 0 && DRUID.game.C) {
+			if (DRUID.facing === 0) { // stab left
+				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
 			} else { // stab right
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
+				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
 			}
-			this.game.C = false;
-			this.meleeAttackCooldown = 1;
+			DRUID.game.C = false;
+			DRUID.meleeAttackCooldown = 1;
 		}
 	}
 
+	/**
+	 * 
+	 */
 	rangedAttack() {
 		this.rangeAttackCooldown -= this.game.clockTick;
 		if (this.rangeAttackCooldown <= 0 && this.game.A) {
 			if (this.facing === 0) { // shoot left
-				this.game.addEntity(new RangeAttack(
-					this.game,
+				this.game.addEntity(new RangeAttack(this.game,
 					this.pos.x - PARAMS.TILE_WIDTH,
 					this.pos.y + this.scaleDim.y / 2,
 					this.facing));
 			} else { // shoot right
-				this.game.addEntity(new RangeAttack(
-					this.game,
+				this.game.addEntity(new RangeAttack(this.game,
 					this.pos.x + this.scaleDim.x,
 					this.pos.y + this.scaleDim.y / 2,
 					this.facing));
@@ -55,6 +62,10 @@ class Druid extends Agent {
 		}
 	}
 
+	/**
+	 * 
+	 * @param {any} context
+	 */
 	drawHealthBar(context) {
 		context.fillStyle = "Red";
 		context.fillRect(30, 30, this.health, 30);
@@ -87,25 +98,10 @@ class Druid extends Agent {
 		this.flashing = true;
 	}
 
-	meleeAttack(DRUID) {
-		DRUID.meleeAttackCooldown -= DRUID.game.clockTick;
-		if (DRUID.meleeAttackCooldown <= 0 && DRUID.game.C) {
-			if (DRUID.facing === 0) { // stab left
-				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
-			} else { // stab right
-				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
-			}
-			DRUID.game.C = false;
-			DRUID.meleeAttackCooldown = 1;
-		}
-	}
-
-
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy && this.invincTime <= 0) {
 			this.takeDamage(entity.attack);
-			this.invincTime = 1;
 		}
 	}
 
@@ -122,22 +118,14 @@ class Druid extends Agent {
 				this.vel.y = 0;
 				this.isJumping = true;
 			}
-			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
-				this.vel.x = 0;
-			}
 			if (collisions.right) {
 				this.pos.x = entity.worldBB.left - this.scaleDim.x;
 				this.vel.x = 0;
 			}
-		}
-		// Temporary collision detection for key and door
-		if (entity instanceof Key) {
-			this.hasKey = true;
-			entity.removeFromWorld = true;
-		}
-		if (entity instanceof Door && this.hasKey === true) {
-			entity.removeFromWorld = true;
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = 0;
+			}
 		}
     }
 
@@ -196,6 +184,7 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
+		//this.drawHealthBar(context);
 		if (this.flashing) return;
 		super.draw(context);
 	}

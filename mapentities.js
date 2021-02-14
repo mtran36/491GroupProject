@@ -192,29 +192,60 @@ class Door extends Entity {
 	/** @override */
 	draw(context) {
 		context.drawImage(this.spritesheet, 0, 0, 128, 384,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.pos.x - this.game.camera.pos.x,
+			this.pos.y - this.game.camera.pos.y,
 			this.dim.x, this.dim.y);
 		this.worldBB.display(this.game);
 	}
 }
 
-// parallax background entity
-class Background extends Entity {
-	constructor(game, x, y, spriteSheetName, spriteWidth, spriteLength, speedRate) {
-		super(game, x, y, spriteSheetName);
-
-		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
-		this.spriteWidth = spriteWidth;		// picture width (different background might have different ratio)
-		this.spriteLength = spriteLength;	// picture length (different background might have different ratio)
-		this.speedRate = speedRate;					// background scrolling speed (different layer needs different speed)
-		this.speed = 0;
-		// to make the horizontal parallax scrolling effect, we use three images leftImage, midImage, rightImage
-		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };	// left to the camera
-		this.midImagePos = { x: x, y: y };									// at the camera position
-		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };	// right to the camera
+class Minimap extends Entity {
+	constructor(game, x, y, width) {
+		super(game, x, y);
+		this.width = width;
+		this.update = function () {  };
 	};
 
-/** @override */
+	draw(context) {
+		let entity;
+		context.save();
+		context.strokeStyle = "black";
+		context.lineWidth = 1;
+		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
+		context.restore();
+		for (entity = 0; entity < this.game.entities.length; entity++) {
+			this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+		}
+	};
+};
+
+
+/**
+ * Background entity with parallax scrolling. To make the horizontal parallax 
+ * scrolling effect, we use three images leftImage, midImage, rightImage.
+ */
+class Background extends Entity {
+	constructor(game, x, y, spriteSheetName, spriteWidth, spriteHeight, speedRate) {
+		super(game, x, y, spriteSheetName);
+		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+
+		/** Picture width (different backgrounds might have different ratios) */
+		this.spriteWidth = spriteWidth;
+		/** Picture length (different backgrounds might have different ratios) */
+		this.spriteLength = spriteHeight;
+		/** Background scrolling speed (different layers need different speeds) */
+		this.speedRate = speedRate;
+		this.speed = 0;
+
+		/** Left to the camera */
+		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };
+		/** At the camera position */
+		this.midImagePos = { x: x, y: y };
+		/** Right to the camera */
+		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };
+	};
+
+	/** @override */
 	update() {
 		if (this.game.druid.vel.x > 0) {
 			this.speed = this.game.clockTick * -this.speedRate;
@@ -227,7 +258,7 @@ class Background extends Entity {
 		this.midImagePos.x = this.midImagePos.x + this.speed;
 		this.rightImagePos.x = this.rightImagePos.x + this.speed;
 
-		// camera reach the left or right image then reposition the three images
+		// If camera reaches the left or right image, reposition the three images
 		if (this.game.camera.pos.x >= this.rightImagePos.x) {
 			this.leftImagePos = this.midImagePos;
 			this.midImagePos = this.rightImagePos;
@@ -243,7 +274,6 @@ class Background extends Entity {
 				y: this.midImagePos.y
 			};	
         }
-
     }
 
 	/** @override */

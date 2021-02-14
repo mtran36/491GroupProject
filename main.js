@@ -1,29 +1,37 @@
-var GAME_ENGINE = new GameEngine();
-var ASSET_MANAGER = new AssetManager();
-var AUDIO_PLAYER = new AudioPlayer();
+const GAME_ENGINE = new GameEngine();
+const ASSET_LOADER = new AssetLoader();
+const AUDIO_PLAYER = new AudioPlayer();
+const IMAGE_PATHS = [
+	"./Sprites/TestFly.png",
+	"./Sprites/TestBeetle.png",
+	"./Sprites/TestHopper.png",
+	"./Sprites/druid.png",
+	"./Sprites/ground.png",
+	"./Sprites/ball.png",
+	"./Sprites/sword.png",
+	"./Sprites/testpotion.png",
+	"./Sprites/door.png",
+	"./Sprites/key.png",
+	"./Sprites/TestEnemyAttack.png",
+	"./Sprites/layer1.png",
+	"./Sprites/layer2.png",
+	"./Sprites/layer3.png",
+	"./Sprites/layer4.png"
+]
+const AUDIO_PATHS = [
+	{ path: "./Audio/TestMusic.mp3", players: 1 },
+	{ path: "./Audio/TestSound.mp3", players: 4 }
+]
 
-ASSET_MANAGER.queueImgDownload("./Sprites/TestFly.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/TestBeetle.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/TestHopper.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/druid.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/ground.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/ball.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/sword.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/testpotion.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/door.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/key.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/TestEnemyAttack.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/layer1.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/layer2.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/layer3.png");
-ASSET_MANAGER.queueImgDownload("./Sprites/layer4.png");
-ASSET_MANAGER.queueAudioDownload("./Audio/TestMusic.mp3", 1);
-ASSET_MANAGER.queueAudioDownload("./Audio/TestSound.mp3", 4);
-
-ASSET_MANAGER.downloadAll(function () {
-	var canvas = document.getElementById('gameWorld');
-	canvas.focus();
-
+// ENTRY POINT
+IMAGE_PATHS.forEach(function (path) {
+	ASSET_LOADER.queueImageDownload(path);
+});
+AUDIO_PATHS.forEach(function (params) {
+	ASSET_LOADER.queueAudioDownload(params.path, params.players);
+});
+ASSET_LOADER.downloadAll(function () {
+	let canvas = document.getElementById('gameWorld');
 	GAME_ENGINE.init(canvas);
-	new SceneManager(GAME_ENGINE);
+	new Scene(GAME_ENGINE);
 });

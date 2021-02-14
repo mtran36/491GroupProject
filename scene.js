@@ -1,4 +1,4 @@
-class SceneManager {
+class Scene {
 	constructor(game) {
 		this.game = game;
 		this.game.camera = this;
@@ -15,27 +15,25 @@ class SceneManager {
 	}
 
 	loadLevel(level, x, y) {
-		this.pos = { x: 0, y: 0 };
 		this.game.entities = [];
 		AUDIO_PLAYER.stopAll();
 		let i;
 
-		// Author: tommy
-		// backgroung testing
-		// 4 layers, lowest layer doesn't have speed, layer speed increases as layer inceases, speed different for this set is 20
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 60));
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 40));
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 20));
-		this.game.addEntity(new Background(this.game, this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 0));
+		this.game.addEntity(new Background(this.game,
+			this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 0));
+		this.game.addEntity(new Background(this.game,
+			this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 50));
+		this.game.addEntity(new Background(this.game,
+			this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 100));
+		this.game.addEntity(new Background(this.game,
+			this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 150));
 
 		if (level.music) {
 			AUDIO_PLAYER.playMusic(level.music);
 		}
-
 		if (level.background) {
 			document.getElementById("gameWorld").setAttribute('style', 'background: cyan');
 		}
-
 		if (level.ground) {
 			for (i = 0; i < level.ground.length; i++) {
 				let ground = level.ground[i];
@@ -67,7 +65,9 @@ class SceneManager {
 			for (i = 0; i < level.rangedFlies.length; i++) {
 				let rangedFly = level.rangedFlies[i];
 				this.game.addEntity(new RangedFly(this.game,
-					rangedFly.x * PARAMS.TILE_WIDTH, rangedFly.y * PARAMS.TILE_WIDTH, rangedFly.prize, rangedFly.prizeRate));
+					rangedFly.x * PARAMS.TILE_WIDTH,
+					rangedFly.y * PARAMS.TILE_WIDTH,
+					rangedFly.prize, rangedFly.prizeRate));
 			}
 		}
 		if (level.beetles) {
@@ -82,7 +82,9 @@ class SceneManager {
 			for (i = 0; i < level.flyBeetles.length; i++) {
 				let flyBeetle = level.flyBeetles[i];
 				this.game.addEntity(new FlyBeetle(this.game,
-					flyBeetle.x * PARAMS.TILE_WIDTH, flyBeetle.y * PARAMS.TILE_WIDTH, flyBeetle.prize, flyBeetle.prizeRate));
+					flyBeetle.x * PARAMS.TILE_WIDTH,
+					flyBeetle.y * PARAMS.TILE_WIDTH,
+					flyBeetle.prize, flyBeetle.prizeRate));
 			}
 		}
 		if (level.hopper) {
@@ -120,76 +122,28 @@ class SceneManager {
 		if (level.powerups) {
 			for (i = 0; i < level.powerups.length; i++) {
 				let powerup = level.powerups[i];
-				this.game.addEntity(new RangedPowerUp(this.game, powerup.x * PARAMS.TILE_WIDTH, powerup.y * PARAMS.TILE_WIDTH));
+				this.game.addEntity(new RangedPowerUp(this.game,
+					powerup.x * PARAMS.TILE_WIDTH,
+					powerup.y * PARAMS.TILE_WIDTH));
 			}
 		}
-
 		this.game.druid = new Druid(
 			this.game, x, y)
 		this.game.addEntity(this.game.druid);
+		this.game.addEntity(new Minimap(this.game, 100, 100, 100));
 	};
 
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
-
-		this.pos.x = Math.floor(this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2);
-		this.pos.y = Math.floor(this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2);
+		if (this.game.druid) {
+			this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
+			this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+			this.pos.x = Math.floor(this.pos.x);
+			this.pos.y = Math.floor(this.pos.y);
+		}
 	};
 
-	draw(ctx) {
-		ctx.fillStyle = "white";
-		ctx.font = "16px Verdana";
-		ctx.fillText("LVL", 360, 25);
-		ctx.fillText("Name: ", 30, 25);
-		ctx.fillText("Keys: " + this.game.druid.keyCounter, 30, 115);
+	draw() {
 
-		// Druid Health Bar
-		ctx.fillStyle = "Red";
-		ctx.fillRect(30, 30, this.game.druid.health, 30);
-		ctx.fillStyle = "White";
-		ctx.fillRect(this.game.druid.health + 30, 30, this.game.druid.maxHealth - this.game.druid.health, 30);
-		ctx.beginPath();
-		ctx.strokeStyle = "Black";
-		ctx.rect(30, 30, this.game.druid.maxHealth, 30)
-		ctx.stroke();
-		ctx.fillStyle = "black";
-		ctx.font = "16px Verdana";
-		ctx.fillText(this.game.druid.health + "/" + this.game.druid.maxHealth + "HP", 330, 50);
-
-		// Potion bar
-		ctx.fillStyle = "Blue";
-		ctx.fillRect(30, 65, this.game.druid.potionCounter, 30);
-		ctx.fillStyle = "White";
-		ctx.fillRect(this.game.druid.potionCounter + 30, 65, this.game.druid.maxHealth - this.game.druid.potionCounter, 30);
-		ctx.beginPath();
-		ctx.strokeStyle = "Black";
-		ctx.rect(30, 65, this.game.druid.maxHealth, 30)
-		ctx.stroke();
-		ctx.fillStyle = "black";
-		ctx.font = "16px Verdana";
-		ctx.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
-
-		if (PARAMS.DEBUG) {
-			//this.minimap.draw(ctx);
-        }
 	};
 }
-
-class Minimap {
-	constructor(game, x, y, w) {
-		Object.assign(this, { game, x, y, w });
-	};
-
-	update() {
-
-	};
-
-	draw(ctx) {
-		ctx.strokeStyle = "Black";
-		ctx.strokeRect(this.x, this.y, this.w, PARAMS.BLOCKWIDTH * 10);
-		this.game.druid.drawMinimap(ctx, this.x, this.y);
-		//for (var i = 0; i < this.game.entities.length; i++) {
-		//	this.game.entities[i].drawMinimap(ctx, this.x, this.y);
-		//}
-	};
-};

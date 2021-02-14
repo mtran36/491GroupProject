@@ -1,7 +1,6 @@
 var levelOne = {
-
 	music: "./Audio/TestMusic.mp3",
-
+	background: "cyan",
 	ground: [
 		// Entrance
 		{ x: -1, y: -1, width: 3, height: 3 },
@@ -36,7 +35,7 @@ var levelOne = {
 		{ x: -5, y: 1, prizeRate: 0.2 }
 	],
 	rangedFlies: [
-		{ x: 9, y: 9 }
+		{ x: 11, y: 3 }
 	],
 	beetles: [
 		{ x: -3, y: 4, prizeRate: 1 }

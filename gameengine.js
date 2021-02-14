@@ -169,9 +169,11 @@ class GameEngine {
      * Draws all entities according to their draw functionality. 
      */
     draw() {
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
-        for (var i = 0; i < this.entities.length; i++) {
-            this.entities[i].draw(this.context);
+        let entity;
+        this.context.clearRect(
+            0, 0, this.context.canvas.width, this.context.canvas.height);
+        for (entity = 0; entity < this.entities.length; entity++) {
+            this.entities[entity].draw(this.context);
         }
     };
 

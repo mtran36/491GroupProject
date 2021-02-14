@@ -198,6 +198,25 @@ class Door extends Entity {
 	}
 }
 
+class Minimap {
+	constructor(game, x, y, width) {
+		Object.assign(this, { game, x, y, width });
+		this.update = function () { /* Do nothing */ };
+	};
+
+	draw(context) {
+		let entity;
+		context.save();
+		context.strokeStyle = "Black";
+		context.strokeRect(this.x, this.y, this.w, PARAMS.BLOCKWIDTH * 10);
+		context.restore();
+		this.game.druid.drawMinimap(context, this.x, this.y);
+		for (entity = 0; entity < this.game.entities.length; entity++) {
+			this.game.entities[entity].drawMinimap(context, this.x, this.y);
+		}
+	};
+};
+
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 
  * scrolling effect, we use three images leftImage, midImage, rightImage.

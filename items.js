@@ -6,22 +6,70 @@ class Items extends Agent {
 
     /** @override */
     update() {
-        this.checkDruidCollision();
+        this.checkCollision();
     }
 
-    checkDruidCollision() {
-        const DRUID = this.game.druid;
+    //checkCollision() {
+    //    const DRUID = this.game.druid;
+    //    if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+    //        && that !== entity) {
+    //        if (entity instanceof Ground) {
+    //            if (that.vel.y > 0) {
+    //                if (that.lastWorldBB.bottom <= entity.worldBB.top
+    //                    && (that.lastWorldBB.left) < entity.worldBB.right
+    //                    && (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+    //                    that.pos.y = entity.worldBB.top - that.scaleDim.y;
+    //                    that.vel.y = 0;
+    //                }
+    //            }
+    //        }
+    //    }
 
-        if (this.worldBB.collide(DRUID.worldBB)) {
-            this.removeFromWorld = true;
-            this.addItemsToDruid(DRUID);
-        }
-    }
+    //    if (this.worldBB.collide(DRUID.worldBB)) {
+    //        this.removeFromWorld = true;
+    //        this.addItemsToDruid(DRUID);
+    //    }
+    //}
+
+    checkCollision() {
+		let that = this;
+		this.game.entities.forEach(function (entity) {
+			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
+				&& that !== entity) {
+				if (entity instanceof Ground || entity instanceof Door) {
+					if (that.vel.y > 0) {
+						if (that.lastWorldBB.bottom <= entity.worldBB.top
+							&& (that.lastWorldBB.left) < entity.worldBB.right
+							&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
+							that.pos.y = entity.worldBB.top - that.scaleDim.y;
+							that.vel.y = 0;
+						}
+						// bottom corners to entity's top corners collision
+						if (that.lastWorldBB.bottom > entity.worldBB.top) {
+							if (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left) {
+								that.pos.x = entity.worldBB.left - that.scaleDim.x;
+								that.vel.x = 0;
+							} else if (that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right) {
+								that.pos.x = entity.worldBB.right;
+								that.vel.x = 0;
+							}
+						}
+					}
+				}
+				// Temporary collision detection for key and door
+				if (this.worldBB.collide(DRUID.worldBB)) {
+					this.removeFromWorld = true;
+					this.addItemsToDruid(DRUID);
+				}
+			}
+		});
+	}
 }
 
 class Potions extends Items {
     constructor(game, x, y) {
         super(game, x, y, "./Sprites/testpotion.png");
+        //super(game, x, y, spriteSheetName);
         this.setDimensions(1, 32, 32);
     }
 

@@ -175,7 +175,7 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-		this.drawHealthBar(context);
+		//this.drawHealthBar(context);
 		if (this.flashing) return;
 		super.draw(context);
 	}

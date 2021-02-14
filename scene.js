@@ -145,7 +145,7 @@ class Scene {
 		this.game.druid = new Druid(
 			this.game, x, y)
 		this.game.addEntity(this.game.druid);
-		this.game.addEntity(new Minimap(this.game, 10, 10, 100));
+		this.game.addEntity(new Minimap(this.game, 100, 100, 100));
 	};
 
 	update() {

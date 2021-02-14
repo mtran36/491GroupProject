@@ -192,30 +192,33 @@ class Door extends Entity {
 	/** @override */
 	draw(context) {
 		context.drawImage(this.spritesheet, 0, 0, 128, 384,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.pos.x - this.game.camera.pos.x,
+			this.pos.y - this.game.camera.pos.y,
 			this.dim.x, this.dim.y);
 		this.worldBB.display(this.game);
 	}
 }
 
-class Minimap {
+class Minimap extends Entity {
 	constructor(game, x, y, width) {
-		Object.assign(this, { game, x, y, width });
-		this.update = function () { /* Do nothing */ };
+		super(game, x, y);
+		this.width = width;
+		this.update = function () {  };
 	};
 
 	draw(context) {
 		let entity;
 		context.save();
-		context.strokeStyle = "Black";
-		context.strokeRect(this.x, this.y, this.w, PARAMS.BLOCKWIDTH * 10);
+		context.strokeStyle = "black";
+		context.lineWidth = 1;
+		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
 		context.restore();
-		this.game.druid.drawMinimap(context, this.x, this.y);
 		for (entity = 0; entity < this.game.entities.length; entity++) {
-			this.game.entities[entity].drawMinimap(context, this.x, this.y);
+			this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
 		}
 	};
 };
+
 
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 

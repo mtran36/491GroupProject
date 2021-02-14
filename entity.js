@@ -75,6 +75,25 @@ class Entity {
     }
 
     /**
+     * Default drawing behavior for displaying an entity on the minimap.
+     * @param {CanvasImageSource} context
+     * @param {number} x Horizontal position of minimap.
+     * @param {any} y Vertical position of minimap.
+     */
+    drawMinimap(context, x, y) {
+        const SCALE = 16;
+        const PIP_SIZE = 3;
+
+        context.save();
+        context.fillStyle = "Red";
+        context.fillRect(
+            x + this.pos.x / SCALE,
+            y + this.pos.y / SCALE,
+            PIP_SIZE, PIP_SIZE);
+        context.restore();
+    }
+
+    /**
      * Location to define animations for this entity. This method should be overridden 
      * by the implementing entity if it has animations in its spritesheet.
      */

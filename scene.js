@@ -6,12 +6,11 @@ class Scene {
 
 		//this.minimap = new Minimap(this.game, 260, 100, 740);
 		this.createScreens();
-		this.game.start();
 	};
 
 	createScreens() {
 		this.pauseScreen = new PauseScreen(this.game, { fill: 'white', stroke: 'red' });
-		this.game.screen = new StartScreen(this.game, {fill: 'white', stroke: 'red'});
+		new StartScreen(this.game, {fill: 'white', stroke: 'red'});
 	}
 
 	loadLevel(level, x, y) {

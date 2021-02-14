@@ -214,7 +214,9 @@ class Minimap extends Entity {
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
 		context.restore();
 		for (entity = 0; entity < this.game.entities.length; entity++) {
-			this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+			if (this.game.entities[entity].drawMinimap) {
+				this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+			}
 		}
 	};
 };

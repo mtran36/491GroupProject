@@ -42,28 +42,6 @@ class Druid extends Agent {
 
 	/**
 	 * 
-	 */
-	rangedAttack() {
-		this.rangeAttackCooldown -= this.game.clockTick;
-		if (this.rangeAttackCooldown <= 0 && this.game.A) {
-			if (this.facing === 0) { // shoot left
-				this.game.addEntity(new RangeAttack(this.game,
-					this.pos.x - PARAMS.TILE_WIDTH,
-					this.pos.y + this.scaleDim.y / 2,
-					this.facing));
-			} else { // shoot right
-				this.game.addEntity(new RangeAttack(this.game,
-					this.pos.x + this.scaleDim.x,
-					this.pos.y + this.scaleDim.y / 2,
-					this.facing));
-			}
-			this.game.A = false;
-			this.rangeAttackCooldown = 1;
-		}
-	}
-
-	/**
-	 * 
 	 * @param {any} context
 	 */
 	drawHealthBar(context) {
@@ -184,7 +162,7 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-		//this.drawHealthBar(context);
+		this.drawHealthBar(context);
 		if (this.flashing) return;
 		super.draw(context);
 	}

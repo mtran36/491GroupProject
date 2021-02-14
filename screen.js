@@ -68,10 +68,11 @@ class StartScreen {
         this.style = style;
         var clickStart = () => {
             this.game.canvas.removeEventListener('click', clickStart);
-            this.game.screen = false;
             this.game.camera.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+            this.game.start();
         }
         this.game.canvas.addEventListener('click', clickStart);
+        this.display(this.game.context);
     }
 
     /**

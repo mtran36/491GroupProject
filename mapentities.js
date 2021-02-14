@@ -197,3 +197,77 @@ class Door extends Entity {
 		this.worldBB.display(this.game);
 	}
 }
+
+/**
+ * Background entity with parallax scrolling. To make the horizontal parallax 
+ * scrolling effect, we use three images leftImage, midImage, rightImage.
+ */
+class Background extends Entity {
+	constructor(game, x, y, spriteSheetName, spriteWidth, spriteHeight, speedRate) {
+		super(game, x, y, spriteSheetName);
+		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+
+		/** Picture width (different backgrounds might have different ratios) */
+		this.spriteWidth = spriteWidth;
+		/** Picture length (different backgrounds might have different ratios) */
+		this.spriteLength = spriteHeight;
+		/** Background scrolling speed (different layers need different speeds) */
+		this.speedRate = speedRate;
+		this.speed = 0;
+
+		/** Left to the camera */
+		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };
+		/** At the camera position */
+		this.midImagePos = { x: x, y: y };
+		/** Right to the camera */
+		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };
+	};
+
+	/** @override */
+	update() {
+		if (this.game.druid.vel.x > 0) {
+			this.speed = this.game.clockTick * this.speedRate;
+		} else if (this.game.druid.vel.x < 0) {
+			this.speed = this.game.clockTick * -this.speedRate;
+		} else {
+			this.speed = 0;
+		}
+
+		this.leftImagePos.x = this.leftImagePos.x + this.speed;
+		this.midImagePos.x = this.midImagePos.x + this.speed;
+		this.rightImagePos.x = this.rightImagePos.x + this.speed;
+
+		// If camera reaches the left or right image, reposition the three images
+		if (this.game.camera.pos.x >= this.rightImagePos.x) {
+			this.leftImagePos = this.midImagePos;
+			this.midImagePos = this.rightImagePos;
+			this.rightImagePos = {
+				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
+				y: this.midImagePos.y
+			};	
+		}else if (this.game.camera.pos.x <= this.leftImagePos.x) {
+			this.rightImagePos = this.midImagePos;
+			this.midImagePos = this.leftImagePos;
+			this.leftImagePos = {
+				x: this.midImagePos.x - PARAMS.CANVAS_WIDTH,
+				y: this.midImagePos.y
+			};	
+        }
+    }
+
+	/** @override */
+	draw(context) {
+			// leftImage:
+			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
+				this.leftImagePos.x - this.game.camera.pos.x + this.speed, this.leftImagePos.y,
+				this.dim.x, this.dim.y);
+			// midImage:
+			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
+				this.midImagePos.x - this.game.camera.pos.x + this.speed, this.midImagePos.y,
+				this.dim.x, this.dim.y);
+			// rightImage:
+			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
+				this.rightImagePos.x - this.game.camera.pos.x + this.speed, this.rightImagePos.y,
+				this.dim.x, this.dim.y);
+	}
+}

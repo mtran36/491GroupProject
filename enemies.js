@@ -7,20 +7,41 @@ class Enemy extends Agent {
 		super(game, x, y, spritesheet);
 		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.
-		this.attack = 1;
+		this.attack = 5;
 		this.defense = 0;
-		this.health = 2;
-		this.range = { x: 400, y: 400 };
+		this.health = 3;
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
+		this.sightRange = 400;
+		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
 		this.defineAgentCollisions = function () { /* Do nothing */ };
 	}
 
 	/**
+	 * Uses an attack agent to knock this enemy in a direction. The angle of the collision
+	 * is determined and then the force is used as a force vector with that angle to 
+	 * detemine the x and y components of the force vector. The x and y components of the 
+	 * force vector are then applied to the enemies x and y velocities respectively.
+	 * @param {Agent} attack Agent that has a knockback force value defined.
+	 */
+	knockback(attack) {
+		if (this.agentBB.x - attack.agentBB.x === 0) {
+			// If the collision is directly vertical, then the entire force applies to 
+			// the y velocity.
+			this.vel.y = attack.force;
+		} else {
+			let angle = Math.atan2(
+				this.agentBB.y - attack.agentBB.y,
+				this.agentBB.x - attack.agentBB.x);
+			this.vel.y = attack.force * Math.sin(angle);
+			this.vel.x = attack.force * Math.cos(angle);
+		}
+	}
+
+	/**
 	 * Spawns a prize at this Enemy location if PARAMS.DEBUG is true or on a random
-	 * chance based on this.prizeRate.
-	 * e.g. a prize rate of 0.1 yields a 10% chance of spawning a prize.
-	 * Currently only spawns potions.
+	 * chance based on this.prizeRate. Prize rate is a standard probablity value in range
+	 * 0-1.
 	 */
 	spawnPrize() {
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
@@ -36,19 +57,25 @@ class Enemy extends Agent {
 			}
 		}
 	}
+
+	canSee(DRUID) {
+		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
+		return this.sight.collide(DRUID.agentBB);
+	}
 }
 
-/**
- * Enemy type: Fly
- * Movement pattern: Flies straight at player. Collides with ground and other enemies.
+/** 
+ * Flies straight at the druid, colliding with enemies and blocks. Deals damage by 
+ * touching the druid.
  */
 class Fly extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/TestFly.png", prize, prizeRate);
 		this.setDimensions(1, 32, 32);
 		// Override default values
-		this.range = { x: 600, y: 600 };
 		this.ACC = { x: 700, y: 700 };
+		this.attack = 3;
+		this.sightRange = 500;
 		this.health = 1;
 		// End override
 		this.velMax = { x: 400, y: 400 };
@@ -66,21 +93,12 @@ class Fly extends Enemy {
 	}
 
 	/** @override */
-	updateBB() {
-		super.updateBB();
-		this.agentBB.radius = this.agentBB.radius - 3;
-		this.worldBB = new BoundingBox(
-			this.pos.x + 2, this.pos.y + 4, this.dim.x - 5, this.dim.y - 6);
-	}
-
-	/** @override */
 	update() {
-		var xdist = this.pos.x - this.game.druid.pos.x;
-		var ydist = this.pos.y - this.game.druid.pos.y;
-		if (Math.abs(xdist) < this.range.x && Math.abs(ydist) < this.range.y) {
-			this.left = xdist > 0;
-			this.up = ydist > 0;
+		const DRUID = this.game.druid;
+		if (this.canSee(DRUID)) {
 			this.accelerate = true;
+			this.left = this.sight.x > DRUID.agentBB.x;
+			this.up = this.sight.y > DRUID.agentBB.y;
 		} else {
 			this.accelerate = false;
 		}
@@ -114,35 +132,96 @@ class Fly extends Enemy {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
+		let bounce = false;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
 				this.pos.y = entity.worldBB.top - this.scaleDim.y;
 				this.vel.y = -this.vel.y;
+				bounce = true
 			}
 			if (collisions.up) {
 				this.pos.y = entity.worldBB.bottom;
 				this.vel.y = -this.vel.y;
+				bounce = true
 			}
 			if (collisions.left) {
 				this.pos.x = entity.worldBB.right;
 				this.vel.x = -this.vel.x;
+				bounce = true
 			}
 			if (collisions.right) {
 				this.pos.x = entity.worldBB.left - this.scaleDim.x;
 				this.vel.x = -this.vel.x;
+				bounce = true;
 			}
+		}
+		if (bounce) {
+			AUDIO_PLAYER.playSound("./Audio/TestSound.mp3");
 		}
     }
 }
 
 /**
- * Enemy type: Beetle
- * Movement pattern: Moves back and forth on a platform or the ground.
+ * Flies straight at player, colliding with enemies and blocks. Shoots a ranged attack at
+ * the druids location.
+ */
+class RangedFly extends Fly {
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, prize, prizeRate);
+		this.setDimensions(2, 32, 32);
+		this.sightRange = 900;
+		this.ACC = { x: 500, y: 500 };
+		this.health = 3;
+		this.flyTime = 2.5;
+		this.currFlyTime = 0;
+		this.canShoot = false;
+	}
+
+	update() {
+		if (this.canShoot) {
+			if (this.vel.x > 0) {
+				this.vel.x = Math.max(
+					0, this.vel.x - this.ACC.x * this.game.clockTick);
+			} else {
+				this.vel.x = Math.min(
+					0, this.vel.x + this.ACC.x * this.game.clockTick);
+			}
+			if (this.vel.y > 0) {
+				this.vel.y = Math.max(
+					0, this.vel.y - this.ACC.y * this.game.clockTick);
+			} else {
+				this.vel.y = Math.min(
+					0, this.vel.y + this.ACC.y * this.game.clockTick);
+			}
+			if (this.vel.x === 0 && this.vel.y === 0) {
+				this.game.addEntity(new EnemyRangedAttack(this.game,
+					this.agentBB.x, this.agentBB.y,
+					this.game.druid.agentBB.x - this.agentBB.x,
+					this.game.druid.agentBB.y - this.agentBB.y));
+				this.canShoot = false;;
+			}
+			this.move(this.game.clockTick);
+		} else {
+			super.update();
+			if (this.accelerate && this.currFlyTime > this.flyTime) {
+				this.canShoot = true;
+				this.currFlyTime = 0;
+			} else {
+				this.currFlyTime += this.game.clockTick;
+			}
+		}
+	}
+}
+
+/**
+ * Moves back and forth on a platform or the ground. Turns around when it reaches the end
+ * of a platform. Deals damage to the druid by touching them.
  */
 class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/TestBeetle.png", prize, prizeRate);
 		this.setDimensions(2, 32, 32);
+		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
 		this.farLeft = PARAMS.CANVAS_WIDTH;
@@ -180,7 +259,28 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
-		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
+		// Cap speed to return beetle to normal speed after being hit
+		if (this.facing === 0) { // Facing left
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
+			}
+		} else { // Facing right
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
+			}
+		}
+		this.avoidLedge();
+		this.vel.y = Math.min(
+			this.vel.y + this.game.clockTick * this.ACC.y,
+			this.velMax.y);
 		this.move(this.game.clockTick);
 		if (this.removeFromWorld) {
 			switch (prize) {
@@ -188,7 +288,6 @@ class Beetle extends Enemy{
 					this.game.addEntity(new Potions(this.game, this.x, this.y));
             }
 		}
-		this.avoidLedge();
 	}
 
 	/** @override */
@@ -221,16 +320,55 @@ class Beetle extends Enemy{
 }
 
 class FlyBeetle extends Beetle {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/TestBeetle.png)");
-
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, prize, prizeRate);
 	}
+
+	/** @override */
+	update() {
+		if (this.vel.x > this.velMax.x) {
+			this.vel.x -= this.ACC.x * this.game.clockTick;
+			this.vel.x = Math.max(this.velMax.x, this.vel.x);
+		} else if (this.vel.x < -this.velMax.x) {
+			this.vel.x += this.ACC.x * this.game.clockTick;
+			this.vel.x = Math.min(-this.velMax.x, this.vel.x);
+		}
+		if (this.vel.y > 0) {
+			this.vel.y -= this.ACC.y * this.game.clockTick;
+			this.vel.y = Math.max(0, this.vel.y);
+		} else if (this.vel.y < 0) {
+			this.vel.y += this.ACC.y * this.game.clockTick;
+			Math.min(0, this.vel.y);
+		}
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = -this.vel.y;
+			}
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = -this.vel.y;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = -this.vel.x;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+			}
+		}
+    }
 }
 
 /**
- * Enemy type: Hopper
- * Movement pattern: Hops towards the player in an arc if the player is within range. Has
- * a bit of landing lag before it can hop again.
+ * Hops towards the player in an arc if the player is within range. Has a bit of landing 
+ * lag before it can hop again. Deals damage to the druid by jumping into them.
  */
 class Hopper extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
@@ -238,12 +376,12 @@ class Hopper extends Enemy {
 		this.setDimensions(2, 32, 32);
 		// Override default values
 		this.ACC = { y: 2000 };
+		this.attack = 7;
 		// End Override
 		this.velMax = { y: 550 };
 		this.jumpForce = -800;
 		this.xspeed = 300;
 		this.left = false;
-		this.range = { x: 300, y: 300 };
 		this.landLag = 0.3;
 		this.landTime = this.landLag;
 		this.jumping = false;
@@ -259,20 +397,22 @@ class Hopper extends Enemy {
 	}
 
 	/** @override */
+	knockback(attack) {
+		super.knockback(attack);
+		this.left = this.vel.x < 0;
+	}
+
+	/** @override */
 	update() {
+		const DRUID = this.game.druid;
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
-		let xdist = this.pos.x - this.game.druid.pos.x;
-		let ydist = this.pos.y - this.game.druid.pos.y;
-		if (Math.abs(xdist) < this.range.x
-			&& Math.abs(ydist) < this.range.y
-			&& !this.jumping
-			&& this.landTime < 0) {
-			this.left = xdist > 0;
+		if (this.canSee(DRUID) && !this.jumping && this.landTime < 0) {
+			this.left = this.agentBB.x > DRUID.agentBB.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
-		if (this.jumping) {
+		if (this.jumping && this.knockbackTime === 0) {
 			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
 		}
 		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
@@ -286,8 +426,9 @@ class Hopper extends Enemy {
 				this.pos.y = entity.worldBB.top - this.scaleDim.y;
 				this.vel.y = 0;
 				this.vel.x = 0;
-				if (this.jumping)
+				if (this.jumping) {
 					this.landTime = this.landLag;
+				}
 				this.jumping = false;
 			}
 			if (collisions.up) {

@@ -6,7 +6,7 @@
 class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
-        this.spritesheet = ASSET_MANAGER.getAsset(spritesheet);
+        this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
         this.scale = 1;
         this.pos = {
             x: x,
@@ -113,13 +113,28 @@ class Agent extends Entity {
     }
 
     /** 
-     * Updates this entity's facing direction. 
+     * Updates this agent's facing direction. 
      */
     updateFacing() {
         if (this.vel.x < 0) {
             this.facing = 0;
         } else if (this.vel.x > 0) {
             this.facing = 1;
+        }
+    }
+
+    /**
+     * Causes the agent to take the specified amount of damage. The enemy removes itself 
+     * from the world after its health reaches 0.
+     * @param {number} damage Damage to health as an integer
+     */
+    takeDamage(damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            if (this.spawnPrize) {
+                this.spawnPrize();
+            }
+            this.removeFromWorld = true;
         }
     }
 
@@ -155,39 +170,67 @@ class Agent extends Entity {
     * @param {Entity} entity Entity to check collision against.
     */
     worldCollisions(entity) {
-        var down = this.vel.y > 0
+        let down = this.vel.y > 0
             && this.lastWorldBB.bottom <= entity.worldBB.top
             && (this.lastWorldBB.left) < entity.worldBB.right
             && (this.lastWorldBB.right) > entity.worldBB.left;
-        var up = this.vel.y < 0
+        let up = this.vel.y < 0
             && (this.lastWorldBB.top) >= entity.worldBB.bottom
             && (this.lastWorldBB.left) !== entity.worldBB.right
             && (this.lastWorldBB.right) !== entity.worldBB.left;
-        var left = this.vel.x < 0
+        let left = this.vel.x < 0
             && (this.lastWorldBB.left) >= entity.worldBB.right
             && (this.lastWorldBB.top) !== entity.worldBB.bottom
             && (this.lastWorldBB.bottom) !== entity.worldBB.top;
-        var right = this.vel.x > 0
+        let right = this.vel.x > 0
             && (this.lastWorldBB.right) <= entity.worldBB.left
             && (this.lastWorldBB.top) < entity.worldBB.bottom
             && (this.lastWorldBB.bottom) > entity.worldBB.top;
+        // Bottom corners to entity's top corners collision
+        if (down) { 
+            if (this.lastWorldBB.bottom > entity.worldBB.top) {
+                if (this.vel.x > 0
+                    && this.lastWorldBB.right > entity.worldBB.left) {
+                    right = true;
+                } else if (this.vel.x < 0
+                    && this.lastWorldBB.left < entity.worldBB.right) {
+                    left = true;
+                }
+            }
+        }
+        // Top corners to entity's bottom corners
+        if (up) { 
+            if (this.vel.x > 0
+                && this.lastWorldBB.top < entity.worldBB.bottom
+                && this.lastWorldBB.right > entity.worldBB.left) {
+                right = true;
+            } else if (this.vel.x < 0
+                && this.lastWorldBB.top < entity.worldBB.bottom
+                && this.lastWorldBB.left < entity.worldBB.right) {
+                left = true;
+            }
+        }
         return { up, down, left, right };
     }
 
     /** 
-     * Checks this entity's collisisons with all other bounding shapes in the scene. Passes
-     * information needed to handle collisions to the define collisions methods so that each
-     * entity may define their own collision behavior.
+     * Checks this entity's collisisons with all other bounding shapes in the scene. 
+     * Passes information needed to handle collisions to the define collisions 
+     * methods so that each entity may define their own collision behavior.
      */
     checkCollisions() {
         let that = this;
         this.game.entities.forEach(function (entity) {
             // Check agent collisions
-            if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that != entity) {
+            if (entity.agentBB
+                && that.agentBB.collide(entity.agentBB)
+                && that != entity) {
                 that.defineAgentCollisions(entity);
             }
             // Check world collisions
-            if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that != entity) {
+            if (entity.worldBB
+                && that.worldBB.collide(entity.worldBB)
+                && that != entity) {
                 let collisions = that.worldCollisions(entity);
                 that.defineWorldCollisions(entity, collisions);
             }
@@ -195,24 +238,20 @@ class Agent extends Entity {
     }
 
     /**
-     * Causes the agent to take the specified amount of damage. The enemy removes itself 
-     * from the world after its health reaches 0.
-     * @param {number} damage Damage to health as an integer
+     * 
+     * @param {any} entity
      */
-    takeDamage(damage) {
-        this.health -= damage;
-        if (this.health <= 0) {
-            if (this.spawnPrize) this.spawnPrize();
-            this.removeFromWorld = true;
-        }
-    }
-
     defineAgentCollisions(entity) {
         console.warn(
             "Agent collisions not defined for Agent at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
 
+    /**
+     * 
+     * @param {any} entity
+     * @param {any} collisions
+     */
     defineWorldCollisions(entity, collisions) {
         console.warn(
             "World collisions not defined for Agent at x="

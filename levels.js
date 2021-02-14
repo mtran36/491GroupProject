@@ -15,7 +15,7 @@ var levelOne = {
 		{ x: 18, y: 15, width: 2 },
 		{ x: 15, y: 19, width: 2 },
 		{ x: 12, y: 23, width: 2 },
-		
+
 		// Lower Area
 		{ x: 11, y: 27, width: 45, height: 8 },
 		{ x: 20, y: 20, width: 9 },
@@ -28,5 +28,14 @@ var levelOne = {
 	mask: [
 		{ x: 9, y: 11, width: 2 },
 		{ x: 33, y: 5, width: 3, height: 6 }
+	],
+	flies: [
+		{ x: -5, y: 1 }
+	],
+	beetles: [
+		{ x: -3, y: 4 }
+	],
+	hopper: [
+		{ x: -2, y: 3 }
 	]
 }

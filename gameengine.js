@@ -34,7 +34,9 @@ class GameEngine {
         this.timer = new Timer();
     };
 
-    /** Starts the game engine by beginning the game loop. */
+    /** 
+     * Starts the game engine by beginning the game loop. 
+     */
     start() {
         var that = this;
         (function gameLoop() {
@@ -43,7 +45,9 @@ class GameEngine {
         })();
     };
 
-    /** Recieves input from the keyboard and mouse. */
+    /** 
+     * Recieves input from the keyboard and mouse. 
+     */
     startInput() {
         var that = this;
         var getXandY = function (e) {
@@ -148,7 +152,9 @@ class GameEngine {
         this.entities.push(entity);
     };
 
-    /** Draws all entities according to their draw functionality. */
+    /** 
+     * Draws all entities according to their draw functionality. 
+     */
     draw() {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
         for (var i = 0; i < this.entities.length; i++) {
@@ -177,7 +183,9 @@ class GameEngine {
         }
     };
 
-    /** Main game loop. Defines the update/render order of the engine. */
+    /** 
+     * Main game loop. Defines the update/render order of the engine. 
+     */
     loop() {
         if (this.pause) return;
         this.clockTick = this.timer.tick();

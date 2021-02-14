@@ -79,7 +79,7 @@ class Entity {
      * by the implementing entity if it has animations in its spritesheet.
      */
     loadAnimations() {
-        console.log(
+        console.warn(
             "Animations not defined for Entity at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
@@ -89,7 +89,7 @@ class Entity {
      * overriden by the implementing entity if it changes over time.
      */
     update() {
-        console.log(
+        console.warn(
             "Update not defined for Entity at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
@@ -148,6 +148,77 @@ class Agent extends Entity {
             Math.min(this.scaleDim.x, this.scaleDim.y) / 2);
     }
 
+    /**
+    * Returns a tuple of boolean values that tells what direction or directions this agent
+    * has collided with an entity. Values are stored in up, down, left, and right properties 
+    * of the tuple.
+    * @param {Entity} entity Entity to check collision against.
+    */
+    worldCollisions(entity) {
+        var down = this.vel.y > 0
+            && this.lastWorldBB.bottom <= entity.worldBB.top
+            && (this.lastWorldBB.left) < entity.worldBB.right
+            && (this.lastWorldBB.right) > entity.worldBB.left;
+        var up = this.vel.y < 0
+            && (this.lastWorldBB.top) >= entity.worldBB.bottom
+            && (this.lastWorldBB.left) !== entity.worldBB.right
+            && (this.lastWorldBB.right) !== entity.worldBB.left;
+        var left = this.vel.x < 0
+            && (this.lastWorldBB.left) >= entity.worldBB.right
+            && (this.lastWorldBB.top) !== entity.worldBB.bottom
+            && (this.lastWorldBB.bottom) !== entity.worldBB.top;
+        var right = this.vel.x > 0
+            && (this.lastWorldBB.right) <= entity.worldBB.left
+            && (this.lastWorldBB.top) < entity.worldBB.bottom
+            && (this.lastWorldBB.bottom) > entity.worldBB.top;
+        return { up, down, left, right };
+    }
+
+    /** 
+     * Checks this entity's collisisons with all other bounding shapes in the scene. Passes
+     * information needed to handle collisions to the define collisions methods so that each
+     * entity may define their own collision behavior.
+     */
+    checkCollisions() {
+        let that = this;
+        this.game.entities.forEach(function (entity) {
+            // Check agent collisions
+            if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that != entity) {
+                that.defineAgentCollisions(entity);
+            }
+            // Check world collisions
+            if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that != entity) {
+                let collisions = that.worldCollisions(entity);
+                that.defineWorldCollisions(entity, collisions);
+            }
+        });
+    }
+
+    /**
+     * Causes the agent to take the specified amount of damage. The enemy removes itself 
+     * from the world after its health reaches 0.
+     * @param {number} damage Damage to health as an integer
+     */
+    takeDamage(damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            if (this.spawnPrize) this.spawnPrize();
+            this.removeFromWorld = true;
+        }
+    }
+
+    defineAgentCollisions(entity) {
+        console.warn(
+            "Agent collisions not defined for Agent at x="
+            + this.pos.x + ", y=" + this.pos.y);
+    }
+
+    defineWorldCollisions(entity, collisions) {
+        console.warn(
+            "World collisions not defined for Agent at x="
+            + this.pos.x + ", y=" + this.pos.y);
+    }
+
     /** @override */
     draw(context) {
         this.animations[this.facing].drawFrame(
@@ -156,16 +227,6 @@ class Agent extends Entity {
             this.scale, this.game.camera);
         this.worldBB.display(this.game);
         this.agentBB.display(this.game);
-    }
-
-    /** 
-     * Checks for when this entity collides with another entity in the game world.
-	 * Updates position and variables accordingly.
-     */
-    checkCollisions() {
-        console.log(
-            "Collisions not defined for Agent at x="
-            + this.pos.x + ", y=" + this.pos.y);
     }
 
     /** @override */
@@ -177,14 +238,14 @@ class Agent extends Entity {
 
     /** @override */
     loadAnimations() {
-        console.log(
+        console.warn(
             "Animations not defined for Agent at x="
             + this.pos.x + ", y=" + this.pos.y);
     }
 
     /** @override */
     update() {
-        console.log(
+        console.warn(
             "Update not defined for Agent at x="
             + this.pos.x + ", y=" + this.pos.y);
     }

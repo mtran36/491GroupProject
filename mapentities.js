@@ -136,12 +136,14 @@ class Ground extends Block {
 		}
     }
 }
+
 class BreakBlock extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "");
 		this.setSize(width, height, );
     }
 }
+
 class Mask extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");
@@ -178,6 +180,7 @@ class Key extends Entity {
 		this.worldBB.display(this.game);
 	}
 }
+
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");

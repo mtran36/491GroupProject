@@ -3,8 +3,9 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet, prize, prizeRate) {
+	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 1) {
 		super(game, x, y, spritesheet);
+		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.
 		this.attack = 1;
 		this.defense = 0;
@@ -12,21 +13,7 @@ class Enemy extends Agent {
 		this.range = { x: 400, y: 400 };
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
-		this.prizeRate = prizeRate ? prizeRate : 0.1;
-		this.prize = prize ? prize : "Potion";
-	}
-
-	/**
-	 * Causes the enemy to take the specified amount of damage. The enemy removes itself 
-	 * from the world after its health reaches 0.
-	 * @param {number} damage Damage to health as an integer
-	 */
-	takeDamage(damage) {
-		this.health -= damage;
-		if (this.health <= 0) {
-			this.spawnPrize();
-			this.removeFromWorld = true;
-		}
+		this.defineAgentCollisions = function () { /* Do nothing */ };
 	}
 
 	/**
@@ -39,39 +26,15 @@ class Enemy extends Agent {
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
 			switch (this.prize) {
 				case "Potion":
-					this.game.addEntity(new Potions(this.game, this.agentBB.x, this.agentBB.y));
+					this.game.addEntity(new Potions(
+						this.game, this.agentBB.x, this.agentBB.y));
 					break;
 				case "Key":
-					this.game.addEntity(new Key(this.game, this.agentBB.x, this.agentBB.y));
+					this.game.addEntity(new Key(
+						this.game, this.agentBB.x, this.agentBB.y));
 					break;
 			}
 		}
-	}
-
-	/**
-	 * Returns a tuple of boolean values that tells what direction or directions this object
-	 * has collided with entity. Values are stored in up, down, left, and right properties 
-	 * of the tuple.
-	 * @param {BoundingBox} othWorldBB
-	 */
-	worldCollisionDirection(entity) {
-		var down = this.vel.y > 0
-			&& this.lastWorldBB.bottom <= entity.worldBB.top
-			&& (this.lastWorldBB.left) < entity.worldBB.right
-			&& (this.lastWorldBB.right) > entity.worldBB.left;
-		var up = this.vel.y < 0
-			&& (this.lastWorldBB.top) >= entity.worldBB.bottom
-			&& (this.lastWorldBB.left) != entity.worldBB.right
-			&& (this.lastWorldBB.right) != entity.worldBB.left;
-		var left = this.vel.x < 0
-			&& (this.lastWorldBB.left) >= entity.worldBB.right
-			&& (this.lastWorldBB.top) != entity.worldBB.bottom
-			&& (this.lastWorldBB.bottom) != entity.worldBB.top;
-		var right = this.vel.x > 0
-			&& (this.lastWorldBB.right) <= entity.worldBB.left
-			&& (this.lastWorldBB.top) < entity.worldBB.bottom
-			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
-		return { up, down, left, right };
 	}
 }
 
@@ -150,32 +113,26 @@ class Fly extends Enemy {
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = -that.vel.y;
-					}
-					if (direction.up) { // jumping up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = -that.vel.y;
-					}
-					if (direction.left) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-					}
-					if (direction.right) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-					}
-				}
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = -this.vel.y;
 			}
-		});
-	}
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = -this.vel.y;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = -this.vel.x;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+			}
+		}
+    }
 }
 
 /**
@@ -188,7 +145,30 @@ class Beetle extends Enemy{
 		this.setDimensions(2, 32, 32);
 		this.vel.x = -200;
 		this.loadAnimations();
+		this.farLeft = PARAMS.CANVAS_WIDTH;
+		this.farRight = -1;
 	}
+
+	/**
+	 * If the beetles leftmost position is not on ground and it is moving in the left
+	 * direction and it is not moving vertically, then it will start moving right.
+	 * If the beetle's rightmost position is not on ground and it is moving in the right
+	 * direction and it is not moving vertically, then it will start moving left.
+	 */
+	avoidLedge() {
+		if (this.farLeft > this.pos.x
+			&& this.vel.x < 0
+			&& this.vel.y === 0) {
+			this.vel.x = -this.vel.x;
+			this.pos.x = this.farLeft;
+		}
+		if (this.farRight < this.pos.x + this.dim.x
+			&& this.vel.x > 0
+			&& this.vel.y === 0) {
+			this.vel.x = -this.vel.x;
+			this.pos.x = this.farRight - this.dim.x;
+		}
+    }
 
 	/** @override */
 	loadAnimations() {
@@ -207,56 +187,37 @@ class Beetle extends Enemy{
 				case 'Potion':
 					this.game.addEntity(new Potions(this.game, this.x, this.y));
             }
-        }
+		}
+		this.avoidLedge();
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		var farLeft = PARAMS.CANVAS_WIDTH;
-		var farRight = -1;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = 0;
-					}
-					if (direction.up) { // moving up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = 0;
-					}
-					if (direction.left) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-					}
-					if (direction.right) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-					}
-					if (entity instanceof Ground) {
-						farLeft = entity.worldBB.left < farLeft
-							? entity.worldBB.left : farLeft;
-						farRight = entity.worldBB.right > farRight
-							? entity.worldBB.right : farRight;
-					}
-				}
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = 0;
 			}
-		});
-		// If the beetles leftmost position is not on ground and it is moving in the left
-		// direction and it is not moving vertically, then it will start moving right.
-		if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.pos.x = farLeft;
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = 0;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = -this.vel.x;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+			}
+			if (entity instanceof Ground) {
+				this.farLeft = entity.worldBB.left < this.farLeft
+					? entity.worldBB.left : this.farLeft;
+				this.farRight = entity.worldBB.right > this.farRight
+					? entity.worldBB.right : this.farRight;
+			}
 		}
-		// If the beetle's rightmost position is not on ground and it is moving in the right
-		// direction and it is not moving vertically, then it will start moving left.
-		if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.pos.x = farRight - this.dim.x;
-		}
-	}
+    }
 }
 
 class FlyBeetle extends Beetle {
@@ -319,34 +280,28 @@ class Hopper extends Enemy {
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				let direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = 0;
-						that.vel.x = 0;
-						if (that.jumping)
-							that.landTime = that.landLag;
-						that.jumping = false;
-					}
-					if (direction.up) { // jumping up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = 0;
-					}
-					if (direction.left) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-					}
-					if (direction.right) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-					}
-				}
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = 0;
+				this.vel.x = 0;
+				if (this.jumping)
+					this.landTime = this.landLag;
+				this.jumping = false;
 			}
-		});
-	}
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = 0;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = -this.vel.x;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+			}
+		}
+    }
 }

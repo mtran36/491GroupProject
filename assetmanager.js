@@ -15,7 +15,9 @@ class AssetManager {
         this.downloadQueue.push(path);
     };
 
-    /** Returns whether or not all downloads have been completed. */
+    /** 
+     * Returns whether or not all downloads have been completed. 
+     */
     isDone() {
         return this.downloadQueue.length === this.successCount + this.errorCount;
     };

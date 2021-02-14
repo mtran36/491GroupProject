@@ -77,13 +77,12 @@ class Background extends Entity {
 /** @override */
 	update() {
 		if (this.game.druid.vel.x > 0) {
-			this.speed = this.game.clockTick * this.speedRate;
-		} else if (this.game.druid.vel.x < 0) {
 			this.speed = this.game.clockTick * -this.speedRate;
+		} else if (this.game.druid.vel.x < 0) {
+			this.speed = this.game.clockTick * this.speedRate;
 		} else {
 			this.speed = 0;
 		}
-
 		this.leftImagePos.x = this.leftImagePos.x + this.speed;
 		this.midImagePos.x = this.midImagePos.x + this.speed;
 		this.rightImagePos.x = this.rightImagePos.x + this.speed;

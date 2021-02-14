@@ -2,25 +2,25 @@
  * Superclass holding default code for all powerups. Checks collision with druid and
  * calls method to add power to druid upon collision.
  */
-class PowerUp extends Entity {
+class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
+		this.defineAgentCollisions = () => { };
+		this.updateBB();
 	} 
 
 	/** @override */
 	update() {
-		this.checkDruidCollision();
+		this.checkCollisions();
 	}
 
-	checkDruidCollision() {
-		const DRUID = this.game.druid;
-
-		if (this.worldBB.collide(DRUID.worldBB)) {
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Druid) {
 			this.removeFromWorld = true;
-			this.addPowerToDruid(DRUID);
+			this.addPowerToDruid(this.game.druid);
 		}
 	}
-
 }
 
 /**
@@ -38,17 +38,62 @@ class RangedPowerUp extends PowerUp {
 			DRUID.rangeAttackCooldown -= DRUID.game.clockTick;
 			if (DRUID.rangeAttackCooldown <= 0 && DRUID.game.A) {
 				if (DRUID.facing === 0) { // shoot left
-					DRUID.game.addEntity(new RangeAttack(
+					// basic ranged attack:
+					//DRUID.game.addEntity(new BasicRangedAttack(
+					//	DRUID.game,
+					//	DRUID.pos.x - PARAMS.TILE_WIDTH,
+					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
+					//	180, 16));
+
+					// mutiple ranged arrack in any angle:
+					DRUID.game.addEntity(new SpecialRangedAttack(
 						DRUID.game,
 						DRUID.pos.x - PARAMS.TILE_WIDTH,
 						DRUID.pos.y + DRUID.scaleDim.y / 2,
-						DRUID.facing));
+						180, 16, 6, 0));
+
+					// attack type 1:
+					//DRUID.game.addEntity(new SpecialRangedAttack(
+					//	DRUID.game,
+					//	DRUID.pos.x - PARAMS.TILE_WIDTH,
+					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
+					//	180, 16, 5, 1));
+
+					// attack type 2:
+					//DRUID.game.addEntity(new SpecialRangedAttack(
+					//	DRUID.game,
+					//	DRUID.pos.x + DRUID.scaleDim.x,
+					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
+					//	180, 16, 6, 2));
+
 				} else { // shoot right
-					DRUID.game.addEntity(new RangeAttack(
+					// basic ranged attack:
+					//DRUID.game.addEntity(new BasicRangedAttack(
+					//	DRUID.game,
+					//	DRUID.pos.x + DRUID.scaleDim.x,
+					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
+					//	0, 16));
+
+					// mutiple ranged arrack in any angle:
+					//DRUID.game.addEntity(new SpecialRangedAttack(
+					//	DRUID.game,
+					//	DRUID.pos.x + DRUID.scaleDim.x,
+					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
+					//	0, 16, 6, 0));
+
+					// attack type 1:
+					//DRUID.game.addEntity(new SpecialRangedAttack(
+					//	DRUID.game,
+					//	DRUID.pos.x - PARAMS.TILE_WIDTH,
+					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
+					//	0, 16, 5, 1));
+
+					// attack type 2:
+					DRUID.game.addEntity(new SpecialRangedAttack(
 						DRUID.game,
 						DRUID.pos.x + DRUID.scaleDim.x,
 						DRUID.pos.y + DRUID.scaleDim.y / 2,
-						DRUID.facing));
+						0, 16, 6, 2));
 				}
 				DRUID.game.A = false;
 				DRUID.rangeAttackCooldown = 1;

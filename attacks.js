@@ -78,15 +78,15 @@ class SwordAttack extends Agent {
 	}
 }
 
-class RangeAttack extends Agent {
-	constructor(game, x, y, direction) {
+class BasicRangedAttack extends Agent {
+	constructor(game, x, y, degree, radius) {
 		super(game, x, y, "./Sprites/ball.png");
-		this.setDimensions(2, 32, 32);
-		if (direction === 0) {
-			this.vel.x = -400;
-		} else {
-			this.vel.x = 400;
-		}
+		this.setDimensions(2, radius * 2, radius * 2);
+
+		var radian = degree * (Math.PI / 180);
+		this.vel.x = Math.round((400 * Math.cos(radian)) * 100) / 100;
+		this.vel.y = Math.round(-(400 * Math.sin(radian)) * 100) / 100;
+
 		this.attack = 1;
 		this.hit = false
 		this.loadAnimations();
@@ -122,9 +122,89 @@ class RangeAttack extends Agent {
 						|| (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left)) {
 						that.removeFromWorld = true;
 					}
+					if ((that.vel.y < 0 && that.lastWorldBB.top < entity.worldBB.bottom)
+						|| (that.vel.y > 0 && that.lastWorldBB.bottom > entity.worldBB.top)) {
+						that.removeFromWorld = true;
+					}
 				}
 			}
 		});
+	}
+}
+
+class SpecialRangedAttack {
+	/**
+	 * @param {any} game: this game
+	 * @param {any} x: x
+	 * @param {any} y: y
+	 * @param {any} direction
+	 * @param {any} radius: radius of the bounding circle
+	 * @param {any} length: number of projectile
+	 * @param {any} attackType: 0 is multi projectile in a line, 1 is vertical multi projectile, 2 is spreaded projectiles
+	 */
+	constructor(game, x, y, degree, radius, length, attackType) {
+		this.game = game;
+		this.x = x;
+		this.y = y;
+		this.degree = degree % 360;
+		this.radius = radius;
+		this.length = length;
+		this.attackType = attackType;
+		this.projectiles = [];
+		this.createProjectileList();
+		this.addEntityList();
+
+		this.draw = function () { /* Do nothing. */ };
+	}
+
+	createProjectileList() {
+		if (this.attackType == 0) {
+			var radian = this.degree * (Math.PI / 180);
+			var XDiff = this.radius * 2 * Math.cos(radian);
+			var YDiff = -this.radius * 2 * Math.sin(radian);
+
+			for (var i = 0; i < this.length; i++) {
+				this.projectiles.push(new BasicRangedAttack(this.game,
+					this.x + i * XDiff, this.y + i * YDiff,
+					this.degree, this.radius));
+			}
+		} else if (this.attackType == 1) {
+			for (var i = 0; i < this.length; i++) {
+				this.projectiles.push(new BasicRangedAttack(this.game,
+					this.x, this.y - i * this.radius * 2,
+					this.degree, this.radius));
+			}
+		} else if (this.attackType == 2) {
+			var degreeDiff = 180 / (this.length - 1);
+			this.degree -= 90;
+			for (var i = 0; i < this.length; i++) {
+				this.projectiles.push(new BasicRangedAttack(this.game,
+					this.x, this.y,
+					this.degree + i * degreeDiff, this.radius));
+			}
+        }
+	}
+
+	addEntityList() {
+		let that = this;
+		this.projectiles.forEach(function (entity) {
+			that.game.addEntity(entity);
+		});
+	}
+
+	update() {
+		if (this.attackType != 2) {
+			for (var i = 0; i < this.projectiles.length; i++) {
+				if (this.projectiles[i].removeFromWorld == true) {
+					this.removeFromWorld = true;
+					for (var j = 0; j < this.projectiles.length; j++) {
+						this.projectiles[j].removeFromWorld = true;
+					}
+				}
+			}
+		} else {
+			this.removeFromWorld = true;
+        }
 	}
 }
 
@@ -166,45 +246,28 @@ class EnemyRangedAttack extends Agent {
 
 	}
 
-	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
-				if (entity instanceof Druid) {
-					entity.takeDamage(that.attack);
-					that.removeFromWorld = true;
-				}
+	/** @override
+	 * If the projectile hits the druid, then damage druid and remove projectile.
+	 * @param {Entity} entity
+	 */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			entity.takeDamage(this.attack);
+			this.removeFromWorld = true;
+		}
+	}
+
+	/** @override
+	 * If the projectile hits a solid wall or door, then remove the projectile.
+	 * @param {Entity} entity
+	 * @param {{boolean up, boolean down, boolean left, boolean right}} collisions
+	 */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Door) {
+			if (collisions.up || collisions.down || collisions.left || collisions.right) {
+				this.removeFromWorld = true;
 			}
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				if (entity instanceof Ground || entity instanceof Door) {
-					if (that.vel.y > 0
-						&& that.lastWorldBB.bottom <= entity.worldBB.top
-						&& (that.lastWorldBB.left) < entity.worldBB.right
-						&& (that.lastWorldBB.right) > entity.worldBB.left) {
-						that.removeFromWorld = true;
-					}
-					if (that.vel.y < 0
-						&& (that.lastWorldBB.top) >= entity.worldBB.bottom
-						&& (that.lastWorldBB.left) != entity.worldBB.right
-						&& (that.lastWorldBB.right) != entity.worldBB.left) {
-						that.removeFromWorld = true;
-					}
-					if (that.vel.x < 0
-						&& (that.lastWorldBB.left) >= entity.worldBB.right
-						&& (that.lastWorldBB.top) != entity.worldBB.bottom
-						&& (that.lastWorldBB.bottom) != entity.worldBB.top) {
-						that.removeFromWorld = true;
-					}
-					if (that.vel.x > 0
-						&& (that.lastWorldBB.right) <= entity.worldBB.left
-						&& (that.lastWorldBB.top) < entity.worldBB.bottom
-						&& (that.lastWorldBB.bottom) > entity.worldBB.top) {
-						that.removeFromWorld = true;
-					}
-				}
-			}
-		});
+		}
 	}
 }
 

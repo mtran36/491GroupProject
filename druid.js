@@ -16,6 +16,8 @@ class Druid extends Agent {
 		this.flashing = false;
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
+		this.potionCounter = 0;
+		this.keyCounter = 0;
 
 		this.attacks = [];
 		this.attacks.push(this.meleeAttack);
@@ -40,31 +42,10 @@ class Druid extends Agent {
 
 	/**
 	 * 
-	 */
-	rangedAttack() {
-		this.rangeAttackCooldown -= this.game.clockTick;
-		if (this.rangeAttackCooldown <= 0 && this.game.A) {
-			if (this.facing === 0) { // shoot left
-				this.game.addEntity(new RangeAttack(this.game,
-					this.pos.x - PARAMS.TILE_WIDTH,
-					this.pos.y + this.scaleDim.y / 2,
-					this.facing));
-			} else { // shoot right
-				this.game.addEntity(new RangeAttack(this.game,
-					this.pos.x + this.scaleDim.x,
-					this.pos.y + this.scaleDim.y / 2,
-					this.facing));
-			}
-			this.game.A = false;
-			this.rangeAttackCooldown = 1;
-		}
-	}
-
-	/**
-	 * 
 	 * @param {any} context
 	 */
-	drawHealthBar(context) {
+	drawBars(context) {
+		context.save();
 		context.fillStyle = "Red";
 		context.fillRect(30, 30, this.health, 30);
 		context.fillStyle = "White";
@@ -81,6 +62,20 @@ class Druid extends Agent {
 		context.font = "16px Verdana";
 		context.fillText("LVL", 360, 25);
 		context.fillText("Name Here if want", 30, 25);
+
+		// Potion bar
+		context.fillStyle = "Blue";
+		context.fillRect(30, 65, this.game.druid.potionCounter, 30);
+		context.fillStyle = "White";
+		context.fillRect(this.game.druid.potionCounter + 30, 65, this.game.druid.maxHealth - this.game.druid.potionCounter, 30);
+		context.beginPath();
+		context.strokeStyle = "Black";
+		context.rect(30, 65, this.game.druid.maxHealth, 30)
+		context.stroke();
+		context.fillStyle = "black";
+		context.font = "16px Verdana";
+		context.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
+		context.restore();
     }
 
 	/** @override */
@@ -88,6 +83,7 @@ class Druid extends Agent {
 		if (!PARAMS.DEBUG) {
 			this.health -= damage;
 			if (this.health <= 0) {
+				this.health = 0;
 				this.removeFromWorld = true;
 			}
 		}
@@ -173,9 +169,15 @@ class Druid extends Agent {
 		this.move(TICK);
 	}
 
+	drawMinimap(ctx, mmX, mmY) {
+		ctx.fillStyle = "Red";
+		ctx.fillRect(mmX + this.x / 16, mmY + this.y / 16, 3, 3 * Math.min(0 + 1, 2));
+	}
+
+
 	/** @override */
 	draw(context) {
-		//this.drawHealthBar(context);
+		this.drawBars(context);
 		if (this.flashing) return;
 		super.draw(context);
 	}

@@ -55,13 +55,13 @@ class Druid extends Agent {
 		context.rect(30, 30, this.maxHealth, 30)
 		context.stroke();
 
-		context.fillStyle = "black";
+		context.fillStyle = "Black";
 		context.font = "16px Verdana";
 		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
-		context.fillStyle = "grey";
+		context.fillStyle = "white";
 		context.font = "16px Verdana";
-		context.fillText("LVL", 360, 25);
-		context.fillText("Name Here if want", 30, 25);
+		context.fillText("LVL ", 360, 25);
+		context.fillText("Name: ", 30, 25);
 
 		// Potion bar
 		context.fillStyle = "Blue";

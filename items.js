@@ -13,9 +13,15 @@ class Items extends Agent {
 
     /** @override */
     defineWorldCollisions(entity, collisions) {
-        if (entity instanceof Druid) {
-            this.removeFromWorld = true;
-            this.addItemsToDruid(this.game.druid);
+        //if (entity instanceof Druid) {
+        //    this.removeFromWorld = true;
+        //    this.addItemsToDruid(this.game.druid);
+        //}
+        if (entity instanceof Ground) {
+            if (collisions.down) {
+                this.pos.y = entity.worldBB.top - this.scaleDim.y;
+                this.vel.y = 0;
+            }
         }
     }
 }
@@ -30,15 +36,25 @@ class Potions extends Items {
     loadAnimations() {
         this.animations[0] = new Animator(
             this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+        console.log("I'm here potion");
     }
 
     /** @override */
     update() {
+        const FALL_ACC = 1500;
+        const TICK = this.game.clockTick;
+        this.vel.y += FALL_ACC * TICK;
+        //this.move();
+        console.log("update potion");
 
     }
 
     /** @override */
     updateBB() {
         super.updateBB();
+    }
+
+    addItemsToDruid(DRUID) {
+        DRUID.game.health += 10;
     }
 }

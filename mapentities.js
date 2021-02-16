@@ -209,7 +209,7 @@ class Minimap extends Entity {
 	draw(context) {
 		let entity;
 		context.save();
-		context.strokeStyle = "black";
+		context.strokeStyle = "WhitE";
 		context.lineWidth = 1;
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
 		context.restore();

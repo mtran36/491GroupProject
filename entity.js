@@ -80,12 +80,12 @@ class Entity {
      * @param {number} x Horizontal position of minimap.
      * @param {any} y Vertical position of minimap.
      */
-    drawMinimap(context, x, y) {
+    drawMinimap(context, x, y, color) {
         const SCALE = 16;
         const PIP_SIZE = 3;
 
         context.save();
-        context.fillStyle = "Red";
+        context.fillStyle = "green";
         context.fillRect(
             x + this.pos.x / SCALE,
             y + this.pos.y / SCALE,

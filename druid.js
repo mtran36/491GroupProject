@@ -169,10 +169,10 @@ class Druid extends Agent {
 		this.move(TICK);
 	}
 
-	drawMinimap(ctx, mmX, mmY) {
-		ctx.fillStyle = "Red";
-		ctx.fillRect(mmX + this.x / 16, mmY + this.y / 16, 3, 3 * Math.min(0 + 1, 2));
-	}
+	//drawMinimap(ctx, mmX, mmY) {
+	//	ctx.fillStyle = "Red";
+	//	ctx.fillRect(mmX + this.x / 16, mmY + this.y / 16, 3, 3 * Math.min(0 + 1, 2));
+	//}
 
 
 	/** @override */

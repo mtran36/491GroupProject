@@ -3,7 +3,7 @@ var levelOne = {
 	background: "cyan",
 	ground: [
 		// Entrance
-		{ x: -1, y: -1, width: 3, height: 3 },
+		{ x: -1, y: -1, width: 1, height: 2 },
 		{ x: -10, y: 6, width: 22, height: 22 },
 		{ x: 3, y: -9, width: 3, height: 12 },
 		{ x: 32, y: -9, height: 22, width: 9 },

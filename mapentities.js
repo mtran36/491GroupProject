@@ -61,7 +61,8 @@ class Ground extends Block {
 				this.pickLook(row, col);
 				context.drawImage(
 					this.spritesheet,
-					this.look.x * this.dim.x, this.look.y * this.dim.y,
+					this.look.x * this.dim.x,
+					this.look.y * this.dim.y,
 					this.dim.x, this.dim.y,
 					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
 					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
@@ -80,45 +81,27 @@ class Ground extends Block {
 	 */
 	pickLook(row, col) {
 		switch (row) {
-			// Pick sprite column
 			case 0:
-				if (this.size.height === 1) {
-					this.look.y = 8;
-				} else {
-					this.look.y = 0;
-				}
 				switch (col) {
 					case 0:
-						this.look.x = 0;
+						this.look.x = this.size.width === 1 ? 6 : 0;
 						break;
 					case this.size.width - 1:
 						this.look.x = 5;
 						break;
 					case 1:
-						if (this.size.width === 3) {
-							this.look.x = 6;
-						} else {
-							this.look.x = 1;
-						}
+						this.look.x = this.size.width === 3 ? 6 : 1;
 						break;
 					case this.size.width - 2:
 						this.look.x = 4;
 						break;
 					default:
-						if (col % 2 === 0) {
-							this.look.x = 2;
-						} else {
-							this.look.x = 3;
-						}
+						this.look.x = col % 2 === 0 ? 2 : 3;
 				}
+				this.look.y = this.size.height === 1 ? 8 : 0;
 				break;
-			// Otherwise pick sprite row
 			case this.size.height - 2:
-				if (this.size.height === 3) {
-					this.look.y = 6;
-				} else {
-					this.look.y = 4;
-				}
+				this.look.y = this.size.height === 3 ? 6 : 4;
 				break;
 			case this.size.height - 1:
 				this.look.y = 5;
@@ -127,11 +110,7 @@ class Ground extends Block {
 				if (row === 1) {
 					this.look.y = 1;
 				} else {
-					if (row % 2 === 0) {
-						this.look.y = 2;
-					} else {
-						this.look.y = 3;
-					}
+					this.look.y = row % 2 === 0 ? 2 : 3;
 				}
 		}
     }
@@ -220,7 +199,6 @@ class Minimap extends Entity {
 		}
 	};
 };
-
 
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 

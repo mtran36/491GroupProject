@@ -45,25 +45,45 @@ class Druid extends Agent {
 	 * @param {any} context
 	 */
 	drawBars(context) {
-		context.save();
-		context.fillStyle = "Red";
-		context.fillRect(30, 30, this.health, 30);
-		context.fillStyle = "White";
-		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
-		context.beginPath();
-		context.strokeStyle = "Black";
-		context.rect(30, 30, this.maxHealth, 30)
-		context.stroke();
+		const NAME = "Name Here if want";
+		const LEVEL = "LVL";
+		const X_OFFSET = 30;
+		const Y_OFFSET = 30;
+		const OFFSET = 3;
 
+		context.save();
+		// Draw Bars
+		context.fillStyle = "Black";
+		context.fillRect(
+			X_OFFSET,
+			Y_OFFSET,
+			this.maxHealth + OFFSET,
+			Y_OFFSET + OFFSET);
+		context.fillStyle = "White";
+		context.fillRect(
+			X_OFFSET + OFFSET,
+			Y_OFFSET + OFFSET,
+			this.maxHealth - OFFSET,
+			Y_OFFSET - OFFSET);
+		context.fillStyle = "Red";
+		context.fillRect(
+			X_OFFSET + OFFSET,
+			Y_OFFSET + OFFSET,
+			this.health - OFFSET,
+			Y_OFFSET - OFFSET);
+		// Draw Text
 		context.fillStyle = "black";
 		context.font = "16px Verdana";
-		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
+		context.fillText(
+			this.health + "/" + this.maxHealth + "HP",
+			(X_OFFSET + this.maxHealth) * 0.75, 50);
 		context.fillStyle = "grey";
 		context.font = "16px Verdana";
-		context.fillText("LVL", 360, 25);
-		context.fillText("Name Here if want", 30, 25);
+		context.fillText(LEVEL, 360, 25);
+		context.fillText(NAME, 30, 25);
 
 		// Potion bar
+		/*
 		context.fillStyle = "Blue";
 		context.fillRect(30, 65, this.game.druid.potionCounter, 30);
 		context.fillStyle = "White";
@@ -76,6 +96,7 @@ class Druid extends Agent {
 		context.font = "16px Verdana";
 		context.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
 		context.restore();
+		*/
     }
 
 	/** @override */
@@ -150,7 +171,6 @@ class Druid extends Agent {
 			this.game.B = false;
 		} else {
 			this.vel.y += FALL_ACC * TICK;
-			this.isJumping = true;
 		}
 
 		// Calls each attack function to determine if an attack is made

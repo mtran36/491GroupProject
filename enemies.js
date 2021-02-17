@@ -3,48 +3,36 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet, prize, prizeRate) {
+	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 0.1) {
 		super(game, x, y, spritesheet);
+		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.
 		this.attack = 5;
 		this.defense = 0;
 		this.health = 3;
 		this.ACC = { x: 1000, y: 1500 };
 		this.velMax = { x: 400, y: 700 };
-		this.prizeRate = prizeRate ? prizeRate : 0.1;
-		this.prize = prize ? prize : "Potion";
 		this.sightRange = 400;
 		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
+		this.defineAgentCollisions = function () { /* Do nothing */ };
 	}
 
 	/**
-	 * Causes the enemy to take the specified amount of damage. The enemy removes itself 
-	 * from the world after its health reaches 0.
-	 * @param {number} damage Damage to health as an integer
-	 */
-	takeDamage(damage) {
-		this.health -= damage;
-		if (this.health <= 0) {
-			this.spawnPrize();
-			this.removeFromWorld = true;
-		}
-	}
-
-
-	/**
-	 * Takes in an attack that has a knockback force value defined. The angle of the
-	 * collision is determined and then the force is used as a force vector with that angle
-	 * to detemine the x and y components of the force vectore. The x and y components of
-	 * the force vector are then applied to the enemies x and y velocities respectively.
-	 * @param {Agent} attack
+	 * Uses an attack agent to knock this enemy in a direction. The angle of the collision
+	 * is determined and then the force is used as a force vector with that angle to 
+	 * detemine the x and y components of the force vector. The x and y components of the 
+	 * force vector are then applied to the enemies x and y velocities respectively.
+	 * @param {Agent} attack Agent that has a knockback force value defined.
 	 */
 	knockback(attack) {
-		// If the collision is directly vertical, then the entire force applies to the
-		// y velocity.
 		if (this.agentBB.x - attack.agentBB.x === 0) {
+			// If the collision is directly vertical, then the entire force applies to 
+			// the y velocity.
 			this.vel.y = attack.force;
 		} else {
-			let angle = Math.atan2((this.agentBB.y - attack.agentBB.y), (this.agentBB.x - attack.agentBB.x));
+			let angle = Math.atan2(
+				this.agentBB.y - attack.agentBB.y,
+				this.agentBB.x - attack.agentBB.x);
 			this.vel.y = attack.force * Math.sin(angle);
 			this.vel.x = attack.force * Math.cos(angle);
 		}
@@ -52,67 +40,22 @@ class Enemy extends Agent {
 
 	/**
 	 * Spawns a prize at this Enemy location if PARAMS.DEBUG is true or on a random
-	 * chance based on this.prizeRate.
-	 * e.g. a prize rate of 0.1 yields a 10% chance of spawning a prize.
-	 * Currently only spawns potions.
+	 * chance based on this.prizeRate. Prize rate is a standard probablity value in range
+	 * 0-1.
 	 */
 	spawnPrize() {
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
 			switch (this.prize) {
 				case "Potion":
-					this.game.addEntity(new Potions(this.game, this.agentBB.x, this.agentBB.y));
+					this.game.addEntity(new Potions(
+						this.game, this.agentBB.x, this.agentBB.y));
 					break;
 				case "Key":
-					this.game.addEntity(new Key(this.game, this.agentBB.x, this.agentBB.y));
+					this.game.addEntity(new Key(
+						this.game, this.agentBB.x, this.agentBB.y));
 					break;
 			}
 		}
-	}
-
-	/**
-	 * Returns a tuple of boolean values that tells what direction or directions this object
-	 * has collided with entity. Values are stored in up, down, left, and right properties 
-	 * of the tuple.
-	 * @param {BoundingBox} othWorldBB
-	 */
-	worldCollisionDirection(entity) {
-		var down = this.vel.y > 0
-			&& this.lastWorldBB.bottom <= entity.worldBB.top
-			&& (this.lastWorldBB.left) < entity.worldBB.right
-			&& (this.lastWorldBB.right) > entity.worldBB.left;
-		var up = this.vel.y < 0
-			&& (this.lastWorldBB.top) >= entity.worldBB.bottom
-			&& (this.lastWorldBB.left) != entity.worldBB.right
-			&& (this.lastWorldBB.right) != entity.worldBB.left;
-		var left = this.vel.x < 0
-			&& (this.lastWorldBB.left) >= entity.worldBB.right
-			&& (this.lastWorldBB.top) < entity.worldBB.bottom
-			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
-		var right = this.vel.x > 0
-			&& (this.lastWorldBB.right) <= entity.worldBB.left
-			&& (this.lastWorldBB.top) < entity.worldBB.bottom
-			&& (this.lastWorldBB.bottom) > entity.worldBB.top;
-		if (down) {
-			// bottom corners to entity's top corners collision
-			if (this.lastWorldBB.bottom > entity.worldBB.top) {
-				if (this.vel.x > 0 && this.lastWorldBB.right > entity.worldBB.left) {
-					right = true;
-				} else if (this.vel.x < 0 && this.lastWorldBB.left < entity.worldBB.right) {
-					left = true;
-				}
-			}
-		}
-		if (up) {
-			// top corners to entity's bottom corners
-			if (this.vel.x > 0 && this.lastWorldBB.top < entity.worldBB.bottom
-				&& this.lastWorldBB.right > entity.worldBB.left) {
-				right = true;
-			} else if (this.vel.x < 0 && this.lastWorldBB.top < entity.worldBB.bottom
-				&& this.lastWorldBB.left < entity.worldBB.right) {
-				left = true;
-			}
-		}
-		return { up, down, left, right };
 	}
 
 	canSee(DRUID) {
@@ -121,9 +64,9 @@ class Enemy extends Agent {
 	}
 }
 
-/**
- * Enemy type: Fly
- * Movement pattern: Flies straight at player. Collides with ground and other enemies.
+/** 
+ * Flies straight at the druid, colliding with enemies and blocks. Deals damage by 
+ * touching the druid.
  */
 class Fly extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
@@ -188,46 +131,39 @@ class Fly extends Enemy {
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
+	defineWorldCollisions(entity, collisions) {
 		let bounce = false;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // moving dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = -that.vel.y;
-						bounce = true;
-					}
-					if (direction.up) { // moving up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = -that.vel.y;
-						bounce = true;
-					}
-					if (direction.left) { // moving left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-						bounce = true;
-					}
-					if (direction.right) { //  right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-						bounce = true;
-					}
-				}
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = -this.vel.y;
+				bounce = true;
 			}
-		});
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = -this.vel.y;
+				bounce = true;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = -this.vel.x;
+				bounce = true;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+				bounce = true;
+			}
+		}
 		if (bounce) {
 			AUDIO_PLAYER.playSound("./Audio/TestSound.mp3");
 		}
-	}
+    }
 }
 
 /**
- * Enemy type: Ranged Attack Fly
- * Movement pattern: Flies straight at player. Collides with enemies and solid map entities.
- * Firing pattern: 
+ * Flies straight at player, colliding with enemies and blocks. Shoots a ranged attack at
+ * the druids location.
  */
 class RangedFly extends Fly {
 	constructor(game, x, y, prize, prizeRate) {
@@ -244,19 +180,25 @@ class RangedFly extends Fly {
 	update() {
 		if (this.canShoot) {
 			if (this.vel.x > 0) {
-				this.vel.x = Math.max(0, this.vel.x - this.ACC.x * this.game.clockTick);
+				this.vel.x = Math.max(
+					0, this.vel.x - this.ACC.x * this.game.clockTick);
 			} else {
-				this.vel.x = Math.min(0, this.vel.x + this.ACC.x * this.game.clockTick);
+				this.vel.x = Math.min(
+					0, this.vel.x + this.ACC.x * this.game.clockTick);
 			}
 			if (this.vel.y > 0) {
-				this.vel.y = Math.max(0, this.vel.y - this.ACC.y * this.game.clockTick);
+				this.vel.y = Math.max(
+					0, this.vel.y - this.ACC.y * this.game.clockTick);
 			} else {
-				this.vel.y = Math.min(0, this.vel.y + this.ACC.y * this.game.clockTick);
+				this.vel.y = Math.min(
+					0, this.vel.y + this.ACC.y * this.game.clockTick);
 			}
 			if (this.vel.x === 0 && this.vel.y === 0) {
-				this.game.addEntity(new EnemyRangedAttack(this.game, this.agentBB.x, this.agentBB.y,
-					this.game.druid.agentBB.x - this.agentBB.x, this.game.druid.agentBB.y - this.agentBB.y));
-				this.canShoot = false;;
+				this.game.addEntity(new EnemyRangedAttack(this.game,
+					this.agentBB.x, this.agentBB.y,
+					this.game.druid.agentBB.x - this.agentBB.x,
+					this.game.druid.agentBB.y - this.agentBB.y));
+				this.canShoot = false;
 			}
 			this.move(this.game.clockTick);
 		} else {
@@ -272,8 +214,8 @@ class RangedFly extends Fly {
 }
 
 /**
- * Enemy type: Beetle
- * Movement pattern: Moves back and forth on a platform or the ground.
+ * Moves back and forth on a platform or the ground. Turns around when it reaches the end
+ * of a platform. Deals damage to the druid by touching them.
  */
 class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
@@ -282,7 +224,30 @@ class Beetle extends Enemy{
 		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
+		this.farLeft = -1;
+		this.farRight = -1;
 	}
+
+	/**
+	 * If the beetles leftmost position is not on ground and it is moving in the left
+	 * direction and it is not moving vertically, then it will start moving right.
+	 * If the beetle's rightmost position is not on ground and it is moving in the right
+	 * direction and it is not moving vertically, then it will start moving left.
+	 */
+	avoidLedge() {
+		if (this.farLeft > this.pos.x
+			&& this.vel.x < 0
+			&& this.vel.y === 0) {
+			this.vel.x = -this.vel.x;
+			this.facing = 1;
+		}
+		if (this.farRight < this.pos.x + this.scaleDim.x
+			&& this.vel.x > 0
+			&& this.vel.y === 0) {
+			this.vel.x = -this.vel.x;
+			this.facing = 0;
+		}
+    }
 
 	/** @override */
 	loadAnimations() {
@@ -294,73 +259,59 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
-		if (this.facing === 0) {
+		// Cap speed to return beetle to normal speed after being hit
+		if (this.facing === 0) { // Facing left
 			if (this.vel.x > this.velMax.x) {
-				this.vel.x = Math.max(this.vel.x - this.ACC.x * this.game.clockTick, -this.velMax.x);
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
 			} else {
-				this.vel.x = Math.min(this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
 			}
-		} else {
+		} else { // Facing right
 			if (this.vel.x > this.velMax.x) {
-				this.vel.x = Math.max(this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
 			} else {
-				this.vel.x = Math.min(this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
 			}
 		}
-		this.vel.y = Math.min(this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
+		this.avoidLedge();
+		this.vel.y = Math.min(
+			this.vel.y + this.game.clockTick * this.ACC.y,
+			this.velMax.y);
 		this.move(this.game.clockTick);
+		this.avoidLedge();
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		var farLeft = PARAMS.CANVAS_WIDTH;
-		var farRight = -1;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // moving dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = 0;
-					}
-					if (direction.up) { // moving up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = 0;
-					}
-					if (direction.left) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-					}
-					if (direction.right) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-					}
-					if (entity instanceof Ground) {
-						farLeft = entity.worldBB.left < farLeft
-							? entity.worldBB.left : farLeft;
-						farRight = entity.worldBB.right > farRight
-							? entity.worldBB.right : farRight;
-					}
-				}
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = 0;
 			}
-		});
-		//Only perform ground check if moving at normal velocity or below.
-		if (Math.abs(that.vel.x) <= that.velMax.x) {
-			// If the beetles leftmost position is not on ground and it is moving in the left
-			// direction and it is not moving vertically, then it will start moving right.
-			if (farLeft > this.pos.x && that.vel.x < 0 && this.vel.y === 0) {
-				this.vel.x = -this.vel.x;
-				this.pos.x = farLeft;
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = 0;
 			}
-			// If the beetle's rightmost position is not on ground and it is moving in the right
-			// direction and it is not moving vertically, then it will start moving left.
-			if (farRight < this.pos.x + this.dim.x && that.vel.x > 0 && this.vel.y === 0) {
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
 				this.vel.x = -this.vel.x;
-				this.pos.x = farRight - this.dim.x;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+			}
+			if (entity instanceof Ground) {
+				this.farLeft = entity.worldBB.left < this.farLeft
+					? entity.worldBB.left : this.farLeft;
+				this.farRight = entity.worldBB.right > this.farRight
+					? entity.worldBB.right : this.farRight;
 			}
 		}
-	}
+    }
 }
 
 class FlyBeetle extends Beetle {
@@ -387,40 +338,13 @@ class FlyBeetle extends Beetle {
 		this.move(this.game.clockTick);
 	}
 
-	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				var direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // moving dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = -that.vel.y;
-					}
-					if (direction.up) { // moving up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = -that.vel.y;
-					}
-					if (direction.left) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-					}
-					if (direction.right) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-					}
-				}
-			}
-		});
-	}
+
 
 }
 
 /**
- * Enemy type: Hopper
- * Movement pattern: Hops towards the player in an arc if the player is within range. Has
- * a bit of landing lag before it can hop again.
+ * Hops towards the player in an arc if the player is within range. Has a bit of landing 
+ * lag before it can hop again. Deals damage to the druid by jumping into them.
  */
 class Hopper extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
@@ -448,11 +372,10 @@ class Hopper extends Enemy {
 			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
 	}
 
-
 	/** @override */
 	knockback(attack) {
 		super.knockback(attack);
-		this.left = this.vel.x < 0 ? true : false;
+		this.left = this.vel.x < 0;
 	}
 
 	/** @override */
@@ -460,50 +383,42 @@ class Hopper extends Enemy {
 		const DRUID = this.game.druid;
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
-		if (this.canSee(DRUID)
-			&& !this.jumping
-			&& this.landTime < 0) {
+		if (this.canSee(DRUID) && !this.jumping && this.landTime < 0) {
 			this.left = this.agentBB.x > DRUID.agentBB.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 		}
-		if (this.jumping && this.knockbackTime === 0) {
-			this.vel.x = this.left ? 0 - this.xspeed : this.xspeed;
+		if (this.jumping) {
+			this.vel.x = this.left ? -this.xspeed : this.xspeed;
 		}
 		this.vel.y = Math.min(this.velMax.y, this.vel.y + this.ACC.y * this.game.clockTick);
 		this.move(this.game.clockTick);
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				let direction = that.worldCollisionDirection(entity);
-				if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
-					if (direction.down) { // falling dowm
-						that.pos.y = entity.worldBB.top - that.scaleDim.y;
-						that.vel.y = 0;
-						that.vel.x = 0;
-						if (that.jumping)
-							that.landTime = that.landLag;
-						that.jumping = false;
-						that.knockbackTime = 0;
-					}
-					if (direction.up) { // jumping up
-						that.pos.y = entity.worldBB.bottom;
-						that.vel.y = 0;
-					}
-					if (direction.left) { // going left
-						that.pos.x = entity.worldBB.right;
-						that.vel.x = -that.vel.x;
-					}
-					if (direction.right) { // going right
-						that.pos.x = entity.worldBB.left - that.scaleDim.x;
-						that.vel.x = -that.vel.x;
-					}
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				this.vel.y = 0;
+				this.vel.x = 0;
+				if (this.jumping) {
+					this.landTime = this.landLag;
 				}
+				this.jumping = false;
 			}
-		});
-	}
+			if (collisions.up) {
+				this.pos.y = entity.worldBB.bottom;
+				this.vel.y = 0;
+			}
+			if (collisions.left) {
+				this.pos.x = entity.worldBB.right;
+				this.vel.x = -this.vel.x;
+			}
+			if (collisions.right) {
+				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				this.vel.x = -this.vel.x;
+			}
+		}
+    }
 }

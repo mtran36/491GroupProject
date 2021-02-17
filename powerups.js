@@ -2,25 +2,25 @@
  * Superclass holding default code for all powerups. Checks collision with druid and
  * calls method to add power to druid upon collision.
  */
-class PowerUp extends Entity {
+class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
+		this.defineAgentCollisions = () => { };
+		this.updateBB();
 	} 
 
 	/** @override */
 	update() {
-		this.checkDruidCollision();
+		this.checkCollisions();
 	}
 
-	checkDruidCollision() {
-		const DRUID = this.game.druid;
-
-		if (this.worldBB.collide(DRUID.worldBB)) {
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Druid) {
 			this.removeFromWorld = true;
-			this.addPowerToDruid(DRUID);
+			this.addPowerToDruid(this.game.druid);
 		}
 	}
-
 }
 
 /**

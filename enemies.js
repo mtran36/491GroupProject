@@ -62,6 +62,15 @@ class Enemy extends Agent {
 		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
 		return this.sight.collide(DRUID.agentBB);
 	}
+
+	takeDamage(damage) {
+		super.takeDamage(damage);
+		if (this.removeFromWorld) {
+			AUDIO_PLAYER.playSound("./Audio/EnemyDeath.mp3");
+		} else {
+			AUDIO_PLAYER.playSound("./Audio/EnemyDamage.mp3");
+		}
+	}
 }
 
 /** 
@@ -135,31 +144,36 @@ class Fly extends Enemy {
 		let bounce = false;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				bounce = true;
 				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				if (this.vel.y > 100) {
+					bounce = true;
+				}
 				this.vel.y = -this.vel.y;
-				bounce = true
 			}
 			if (collisions.up) {
-				bounce = true;
 				this.pos.y = entity.worldBB.bottom;
+				if (this.vel.y < -100) {
+					bounce = true;
+				}
 				this.vel.y = -this.vel.y;
-				bounce = true
 			}
 			if (collisions.left) {
-				bounce = true;
 				this.pos.x = entity.worldBB.right;
+				if (this.vel.x < -100) {
+					bounce = true;
+				}
 				this.vel.x = -this.vel.x;
-				bounce = true
 			}
 			if (collisions.right) {
 				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				if (this.vel.x > 100) {
+					bounce = true;
+				}
 				this.vel.x = -this.vel.x;
-				bounce = true;
 			}
 		}
 		if (bounce) {
-			AUDIO_PLAYER.playSound("./Audio/TestSound.mp3");
+			AUDIO_PLAYER.playSound("./Audio/EnemyBounce.mp3");
 		}
     }
 }
@@ -201,6 +215,7 @@ class RangedFly extends Fly {
 					this.agentBB.x, this.agentBB.y,
 					this.game.druid.agentBB.x - this.agentBB.x,
 					this.game.druid.agentBB.y - this.agentBB.y));
+				AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
 				this.canShoot = false;
 			}
 			this.move(this.game.clockTick);
@@ -390,6 +405,7 @@ class Hopper extends Enemy {
 			this.left = this.agentBB.x > DRUID.agentBB.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
+			AUDIO_PLAYER.playSound("./Audio/Hopper.mp3");
 		}
 		if (this.jumping) {
 			this.vel.x = this.left ? -this.xspeed : this.xspeed;
@@ -423,5 +439,13 @@ class Hopper extends Enemy {
 				this.vel.x = -this.vel.x;
 			}
 		}
-    }
+	}
+
+	static construct(game, params) {
+		return new Hopper(
+			game, params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize,
+			params.prizeRate);
+	}
 }

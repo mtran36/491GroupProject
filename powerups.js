@@ -11,7 +11,7 @@ class PowerUp extends Agent {
 
 	/** @override */
 	update() {
-		this.checkCollisions();
+		this.move(this.game.clockTick);
 	}
 
 	/** @override */

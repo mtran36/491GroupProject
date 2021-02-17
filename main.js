@@ -19,8 +19,17 @@ const IMAGE_PATHS = [
 	"./Sprites/layer4.png"
 ]
 const AUDIO_PATHS = [
-	{ path: "./Audio/TestMusic.mp3", players: 1 },
-	{ path: "./Audio/TestSound.mp3", players: 4 }
+	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
+	{ path: "./Audio/Potion.mp3", players: 1 },
+	{ path: "./Audio/DruidJump.mp3", players: 1 },
+	{ path: "./Audio/DruidDeath.mp3", players: 1 },
+	{ path: "./Audio/SwordAttack.mp3", players: 1 },
+	{ path: "./Audio/DruidDamage.mp3", players: 1 },
+	{ path: "./Audio/EnemyDeath.mp3", players: 4 },
+	{ path: "./Audio/EnemyDamage.mp3", players: 4 },
+	{ path: "./Audio/Hopper.mp3", players: 4 },
+	{ path: "./Audio/EnemyProjectile.mp3", players: 4 },
+	{ path: "./Audio/EnemyBounce.mp3", players: 4 }
 ]
 
 // ENTRY POINT

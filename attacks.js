@@ -18,6 +18,7 @@ class SwordAttack extends Agent {
 			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
 		}
 		this.updateBB();
+		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 	}
 
 	/** @override */

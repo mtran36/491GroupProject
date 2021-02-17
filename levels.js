@@ -1,5 +1,5 @@
 var levelOne = {
-	music: "./Audio/TestMusic.mp3",
+	music: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3",
 	background: "cyan",
 	ground: [
 		// Entrance

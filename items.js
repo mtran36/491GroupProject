@@ -1,7 +1,6 @@
 class Items extends Agent {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
-        this.defineAgentCollisions = () => { };
         this.emerging = false;
         this.updateBB();
     }
@@ -11,12 +10,19 @@ class Items extends Agent {
         this.checkCollisions();
     }
 
+    addItemsToDruid(DRUID) {
+        console.warn("Potion not define: ");
+    }
+
+    defineAgentCollisions(entity) {
+        if (entity instanceof Druid) {
+            this.removeFromWorld = true;
+            this.addItemsToDruid(entity);
+        }
+    }
+
     /** @override */
     defineWorldCollisions(entity, collisions) {
-        //if (entity instanceof Druid) {
-        //    this.removeFromWorld = true;
-        //    this.addItemsToDruid(this.game.druid);
-        //}
         if (entity instanceof Ground) {
             if (collisions.down) {
                 this.pos.y = entity.worldBB.top - this.scaleDim.y;
@@ -36,7 +42,6 @@ class Potions extends Items {
     loadAnimations() {
         this.animations[0] = new Animator(
             this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
-        console.log("I'm here potion");
     }
 
     /** @override */
@@ -44,7 +49,7 @@ class Potions extends Items {
         const FALL_ACC = 1500;
         const TICK = this.game.clockTick;
         this.vel.y += FALL_ACC * TICK;
-        //this.move();
+        this.move(TICK);
         console.log("update potion");
 
     }

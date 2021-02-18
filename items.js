@@ -34,14 +34,18 @@ class Items extends Agent {
 
 class Potions extends Items {
     constructor(game, x, y) {
-        super(game, x, y, "./Sprites/testpotion.png");
-        this.setDimensions(1, 32, 32);
+        super(game, x, y, "./Sprites/potions.png");
+        this.setDimensions(1, 45, 55);
     }
 
     /** @override */
     loadAnimations() {
+        //this.animations[0] = new Animator(
+        //    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
+        //this.animations[0] = new Animator(
+        //    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
         this.animations[0] = new Animator(
-            this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
     }
 
     /** @override */
@@ -60,6 +64,6 @@ class Potions extends Items {
     }
 
     addItemsToDruid(DRUID) {
-        DRUID.game.health += 10;
+        DRUID.health += 10;
     }
 }

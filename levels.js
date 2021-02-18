@@ -48,5 +48,8 @@ var levelOne = {
 	],
 	powerups: [
 		{ x: 25, y: 5 }
-	]
+	],
+	//potions: [
+	//	{ x: 30, y: 5}
+	//]
 }

@@ -3,8 +3,8 @@
  */
 class Druid extends Agent {
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/druid.png");
-		this.setDimensions(1, 97, 157);
+		super(game, x, y, "./Sprites/druidmerge.png");
+		this.setDimensions(1, 135, 145);
 		this.game.druid = this;
 		this.maxHealth = 400;
 
@@ -125,9 +125,13 @@ class Druid extends Agent {
 	/** @override */
 	loadAnimations() {
 		this.animations[0] = new Animator(
-			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, false);
+			this.spritesheet, 30, 0, this.dim.x, this.dim.y, 8, 0.25, 1, true, true, true);
 		this.animations[1] = new Animator(
-			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, true);
+			this.spritesheet, 30, 0, this.dim.x, this.dim.y, 8, 0.25, 1, true, true, false);
+		this.animations[2] = new Animator(
+			this.spritesheet, 30, 150, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, true);
+		this.animations[3] = new Animator(
+			this.spritesheet, 30, 150, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, false);
 	}
 
 	/** @override */

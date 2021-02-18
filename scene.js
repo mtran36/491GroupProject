@@ -3,8 +3,8 @@ class Scene {
 		this.game = game;
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
+		this.draw = function () { /* Do nothing */ };
 
-		//this.minimap = new Minimap(this.game, 260, 100, 740);
 		this.createScreens();
 	};
 
@@ -19,13 +19,13 @@ class Scene {
 		let i;
 
 		this.game.addEntity(new Background(this.game,
-			this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, 0));
+			this.pos.x, this.pos.y, "./Sprites/layer1.png", 592, 272, -60));
 		this.game.addEntity(new Background(this.game,
-			this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, 50));
+			this.pos.x, this.pos.y, "./Sprites/layer2.png", 592, 272, -40));
 		this.game.addEntity(new Background(this.game,
-			this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, 100));
+			this.pos.x, this.pos.y, "./Sprites/layer3.png", 592, 272, -20));
 		this.game.addEntity(new Background(this.game,
-			this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 150));
+			this.pos.x, this.pos.y, "./Sprites/layer4.png", 592, 272, 0));
 
 		if (level.music) {
 			AUDIO_PLAYER.playMusic(level.music);
@@ -143,10 +143,25 @@ class Scene {
 					powerup.y * PARAMS.TILE_WIDTH));
 			}
 		}
-		this.game.druid = new Druid(
-			this.game, x, y)
+		if (level.wingElement) {
+			for (i = 0; i < level.wingElement.length; i++) {
+				let powerup = level.wingElement[i];
+				this.game.addEntity(new WindElement(this.game,
+					powerup.x * PARAMS.TILE_WIDTH,
+					powerup.y * PARAMS.TILE_WIDTH));
+			}
+		}
+		if (level.lightElement) {
+			for (i = 0; i < level.lightElement.length; i++) {
+				let powerup = level.lightElement[i];
+				this.game.addEntity(new LightElement(this.game,
+					powerup.x * PARAMS.TILE_WIDTH,
+					powerup.y * PARAMS.TILE_WIDTH));
+			}
+		}
+		this.game.druid = new Druid(this.game, x, y)
 		this.game.addEntity(this.game.druid);
-//		this.game.addEntity(new Minimap(this.game, 100, 100, 100));
+		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
 	};
 
 	update() {
@@ -157,9 +172,5 @@ class Scene {
 			this.pos.x = Math.floor(this.pos.x);
 			this.pos.y = Math.floor(this.pos.y);
 		}
-	};
-
-	draw() {
-
 	};
 }

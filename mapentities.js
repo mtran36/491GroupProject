@@ -65,7 +65,8 @@ class Ground extends Block {
 				this.pickLook(row, col);
 				context.drawImage(
 					this.spritesheet,
-					this.look.x * this.dim.x, this.look.y * this.dim.y,
+					this.look.x * this.dim.x,
+					this.look.y * this.dim.y,
 					this.dim.x, this.dim.y,
 					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
 					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
@@ -84,45 +85,27 @@ class Ground extends Block {
 	 */
 	pickLook(row, col) {
 		switch (row) {
-			// Pick sprite column
 			case 0:
-				if (this.size.height === 1) {
-					this.look.y = 8;
-				} else {
-					this.look.y = 0;
-				}
 				switch (col) {
 					case 0:
-						this.look.x = 0;
+						this.look.x = this.size.width === 1 ? 6 : 0;
 						break;
 					case this.size.width - 1:
 						this.look.x = 5;
 						break;
 					case 1:
-						if (this.size.width === 3) {
-							this.look.x = 6;
-						} else {
-							this.look.x = 1;
-						}
+						this.look.x = this.size.width === 3 ? 6 : 1;
 						break;
 					case this.size.width - 2:
 						this.look.x = 4;
 						break;
 					default:
-						if (col % 2 === 0) {
-							this.look.x = 2;
-						} else {
-							this.look.x = 3;
-						}
+						this.look.x = col % 2 === 0 ? 2 : 3;
 				}
+				this.look.y = this.size.height === 1 ? 8 : 0;
 				break;
-			// Otherwise pick sprite row
 			case this.size.height - 2:
-				if (this.size.height === 3) {
-					this.look.y = 6;
-				} else {
-					this.look.y = 4;
-				}
+				this.look.y = this.size.height === 3 ? 6 : 4;
 				break;
 			case this.size.height - 1:
 				this.look.y = 5;
@@ -131,11 +114,7 @@ class Ground extends Block {
 				if (row === 1) {
 					this.look.y = 1;
 				} else {
-					if (row % 2 === 0) {
-						this.look.y = 2;
-					} else {
-						this.look.y = 3;
-					}
+					this.look.y = row % 2 === 0 ? 2 : 3;
 				}
 		}
     }
@@ -311,20 +290,28 @@ class Minimap extends Entity {
 	};
 
 	draw(context) {
-		let entity;
+		const SCALE = 16;
+		const PIP_SIDE_LEN = 4;
+		let that = this, entity;
+
 		context.save();
 		context.strokeStyle = "black";
-		context.lineWidth = 1;
+		context.lineWidth = 3;
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
-		context.restore();
-		for (entity = 0; entity < this.game.entities.length; entity++) {
-			if (this.game.entities[entity].drawMinimap) {
-				this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+		this.game.entities.forEach(function (entity) {
+			context.fillStyle = entity.mapPipColor;
+			let x = that.pos.x + (entity.pos.x - that.game.camera.pos.x) / SCALE;
+			let y = that.pos.y + (entity.pos.y - that.game.camera.pos.y) / SCALE;
+			if (x > that.pos.x
+				&& y > that.pos.y
+				&& y < that.pos.y + that.width
+				&& x < that.pos.x + that.width) {
+				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
 			}
-		}
+		});
+		context.restore();
 	};
 };
-
 
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 
@@ -344,11 +331,11 @@ class Background extends Entity {
 		this.speed = 0;
 
 		/** Left to the camera */
-		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };
+		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y - 300};
 		/** At the camera position */
-		this.midImagePos = { x: x, y: y };
+		this.midImagePos = { x: x, y: y - 300};
 		/** Right to the camera */
-		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };
+		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y - 300};
 	};
 
 	/** @override */
@@ -370,7 +357,7 @@ class Background extends Entity {
 			this.midImagePos = this.rightImagePos;
 			this.rightImagePos = {
 				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
-				y: this.midImagePos.y
+				y: this.midImagePos.y 
 			};	
 		}else if (this.game.camera.pos.x <= this.leftImagePos.x) {
 			this.rightImagePos = this.midImagePos;
@@ -387,14 +374,14 @@ class Background extends Entity {
 			// leftImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.leftImagePos.x - this.game.camera.pos.x + this.speed, this.leftImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 			// midImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.midImagePos.x - this.game.camera.pos.x + this.speed, this.midImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 			// rightImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.rightImagePos.x - this.game.camera.pos.x + this.speed, this.rightImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 	}
 }

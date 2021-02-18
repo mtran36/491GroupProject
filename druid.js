@@ -6,27 +6,24 @@ class Druid extends Agent {
 		super(game, x, y, "./Sprites/druid.png");
 		this.setDimensions(1, 97, 157);
 		this.game.druid = this;
-		this.maxHealth = 400;
 
 		this.loadAnimations();
 		this.isJumping = false;
 		this.health = 100;
+		this.maxHealth = 100;
 		this.damage = 0;
 		this.invincTime = 0;
 		this.flashing = false;
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
-		this.potionCounter = 0;
+		this.potionCounter = 6;
+		this.maxPotions = 10;
 		this.keyCounter = 0;
 
+		this.attackSelection = null;
 		this.attacks = [];
-		this.attacks.push(this.meleeAttack);
 	}
 
-	/**
-	 * 
-	 * @param {any} DRUID
-	 */
 	meleeAttack(DRUID) {
 		DRUID.meleeAttackCooldown -= DRUID.game.clockTick;
 		if (DRUID.meleeAttackCooldown <= 0 && DRUID.game.C) {
@@ -41,42 +38,54 @@ class Druid extends Agent {
 	}
 
 	/**
-	 * 
-	 * @param {any} context
+	 * Draws a standard resource bar which can be depleted.
+	 * @param {CanvasImageSource} context Canvas to draw to.
+	 * @param {number} xOffset Horizontal distance from origin.
+	 * @param {number} yOffset Vertical distance from origin.
+	 * @param {number} width Height of the bar.
+	 * @param {number} borderOffset Width of the black border around the bar.
+	 * @param {Object} resource Resource this bar will display, has current and max values.
+	 * @param {String} name Text to be placed on the left side of the bar.
+	 * @param {String} color Color to use for bar fill.
 	 */
-	drawBars(context) {
+	drawBar(context, xOffset, yOffset, width, borderOffset, resource, name, color) {
+		const FONT = "italic bold 16px Castellar"
+		const TEXT_COLOR = "black";
+		const X_TEXT_NUDGE = 10;
+		const X_TEXT_POS_SCALE = 0.65;
+		const Y_TEXT_NUDGE = 2;
+		const Y_TEXT_POS_SCALE = 1.5;
+
 		context.save();
-		context.fillStyle = "Red";
-		context.fillRect(30, 30, this.health, 30);
-		context.fillStyle = "White";
-		context.fillRect(this.health + 30, 30, this.maxHealth - this.health, 30);
-		context.beginPath();
-		context.strokeStyle = "Black";
-		context.rect(30, 30, this.maxHealth, 30)
-		context.stroke();
-
+		// Draw Bars
 		context.fillStyle = "black";
-		context.font = "16px Verdana";
-		context.fillText(this.health + "/" + this.maxHealth + "HP", 330, 50);
-		context.fillStyle = "grey";
-		context.font = "16px Verdana";
-		context.fillText("LVL", 360, 25);
-		context.fillText("Name Here if want", 30, 25);
-
-		// Potion bar
-		context.fillStyle = "Blue";
-		context.fillRect(30, 65, this.game.druid.potionCounter, 30);
-		context.fillStyle = "White";
-		context.fillRect(this.game.druid.potionCounter + 30, 65, this.game.druid.maxHealth - this.game.druid.potionCounter, 30);
-		context.beginPath();
-		context.strokeStyle = "Black";
-		context.rect(30, 65, this.game.druid.maxHealth, 30)
-		context.stroke();
-		context.fillStyle = "black";
-		context.font = "16px Verdana";
-		context.fillText(this.game.druid.potionCounter + "/" + this.game.druid.maxHealth + "HP", 330, 85);
+		context.fillRect(
+			xOffset, yOffset,
+			resource.max * resource.tickWidth + borderOffset,
+			width + borderOffset);
+		context.fillStyle = "white";
+		context.fillRect(
+			xOffset + borderOffset, yOffset + borderOffset,
+			resource.max * resource.tickWidth - borderOffset,
+			width - borderOffset);
+		context.fillStyle = color;
+		context.fillRect(
+			xOffset + borderOffset, yOffset + borderOffset,
+			resource.current * resource.tickWidth - borderOffset,
+			width - borderOffset);
+		// Draw Text
+		context.fillStyle = TEXT_COLOR;
+		context.font = FONT;
+		context.fillText(
+			resource.current + "/" + resource.max + resource.name,
+			(xOffset + resource.max * resource.tickWidth) * X_TEXT_POS_SCALE,
+			yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
+		context.fillText(
+			name,
+			xOffset + X_TEXT_NUDGE,
+			yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
 		context.restore();
-    }
+	}
 
 	/** @override */
 	takeDamage(damage) {
@@ -84,6 +93,7 @@ class Druid extends Agent {
 			this.health -= damage;
 			if (this.health <= 0) {
 				this.health = 0;
+				this.vel.x = 0;
 				AUDIO_PLAYER.playSound("./Audio/DruidDeath.mp3");
 				this.removeFromWorld = true;
 			} else {
@@ -159,15 +169,19 @@ class Druid extends Agent {
 			this.game.B = false;
 		} else {
 			this.vel.y += FALL_ACC * TICK;
-			this.isJumping = true;
 		}
 
-		// Calls each attack function to determine if an attack is made
-		let that = this;
-		this.attacks.forEach(function (attack) {
-			attack(that);
-		});
-
+		// check if melee attack is made
+		this.meleeAttack(this);
+		// check if switch attack
+		if (this.game.SHIFT == true && this.attackSelection != null) {
+			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
+			this.game.SHIFT = false;
+        }
+		// check if any special attack if made
+		if (this.attackSelection != null) {
+			this.attacks[this.attackSelection].attack(this);
+        }
 		if (this.game.right) { 
 			this.vel.x = WALK_SPEED;
 		} else if (this.game.left) {
@@ -178,15 +192,26 @@ class Druid extends Agent {
 		this.move(TICK);
 	}
 
-	drawMinimap(ctx, mmX, mmY) {
-		ctx.fillStyle = "Red";
-		ctx.fillRect(mmX + this.x / 16, mmY + this.y / 16, 3, 3 * Math.min(0 + 1, 2));
-	}
-
-
 	/** @override */
 	draw(context) {
-		this.drawBars(context);
+		this.drawBar(
+			context, 10, 10, 30, 3,
+			{ 
+				current: this.health,
+				max: this.maxHealth,
+				name: "",
+				tickWidth: 5
+			},
+			"DRUID", this.health / this.maxHealth <= 0.2 ? "red" : "green");
+		this.drawBar(
+			context, 10, 45, 30, 3,
+			{
+				current: this.potionCounter,
+				max: this.maxPotions,
+				name: "",
+				tickWidth: 40
+			},
+			"POTIONS", "teal");
 		if (this.flashing) return;
 		super.draw(context);
 	}

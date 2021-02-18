@@ -17,6 +17,12 @@ const IMAGE_PATHS = [
 	"./Sprites/layer2.png",
 	"./Sprites/layer3.png",
 	"./Sprites/layer4.png",
+	"./Sprites/greengem.png",
+	"./Sprites/energyball.png",
+	"./Sprites/bluegem.png",
+	"./Sprites/tornado.png",
+	"./Sprites/yellowgem.png",
+	"./Sprites/thunder.png",
 	"./Sprites/crack.png"
 ]
 const AUDIO_PATHS = [

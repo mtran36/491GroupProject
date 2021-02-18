@@ -39,6 +39,19 @@ class Enemy extends Agent {
 	}
 
 	/**
+	 * Uses an attack agent to knock this enemy up.
+	* @param {Agent} attack Agent that has a knockup force value defined.
+	*/
+	knockup(attack) {
+		if (attack.vel.x > 0) {
+			this.vel.x = attack.force / 2;
+		} else if (attack.vel.x < 0) {
+			this.vel.x = -attack.force / 2;
+        }
+		this.vel.y = -attack.force;
+	}
+
+	/**
 	 * Spawns a prize at this Enemy location if PARAMS.DEBUG is true or on a random
 	 * chance based on this.prizeRate. Prize rate is a standard probablity value in range
 	 * 0-1.

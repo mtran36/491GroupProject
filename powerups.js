@@ -7,6 +7,7 @@ class PowerUp extends Agent {
 		super(game, x, y, spritesheet);
 		this.defineAgentCollisions = () => { };
 		this.updateBB();
+		this.cooldown = 0;
 	} 
 
 	/** @override */
@@ -18,7 +19,12 @@ class PowerUp extends Agent {
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Druid) {
 			this.removeFromWorld = true;
-			this.addPowerToDruid(this.game.druid);
+			this.game.druid.attacks.push(this);
+			if (this.game.druid.attackSelection == null) {
+				this.game.druid.attackSelection = 0;
+			} else {
+				this.game.druid.attackSelection++;
+            }
 		}
 	}
 }
@@ -29,84 +35,108 @@ class PowerUp extends Agent {
 class RangedPowerUp extends PowerUp {
 
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/ball.png");
-    }
+		super(game, x, y, "./Sprites/greengem.png");
+	}
 
-	addPowerToDruid(DRUID) {
-		DRUID.rangeAttackCooldown = 0;
-		DRUID.attacks.push(function (DRUID) {
-			DRUID.rangeAttackCooldown -= DRUID.game.clockTick;
-			if (DRUID.rangeAttackCooldown <= 0 && DRUID.game.A) {
-				if (DRUID.facing === 0) { // shoot left
-					// basic ranged attack:
-					//DRUID.game.addEntity(new BasicRangedAttack(
-					//	DRUID.game,
-					//	DRUID.pos.x - PARAMS.TILE_WIDTH,
-					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
-					//	180, 16));
-
-					// mutiple ranged arrack in any angle:
-					DRUID.game.addEntity(new SpecialRangedAttack(
-						DRUID.game,
-						DRUID.pos.x - PARAMS.TILE_WIDTH,
-						DRUID.pos.y + DRUID.scaleDim.y / 2,
-						180, 16, 6, 0));
-
-					// attack type 1:
-					//DRUID.game.addEntity(new SpecialRangedAttack(
-					//	DRUID.game,
-					//	DRUID.pos.x - PARAMS.TILE_WIDTH,
-					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
-					//	180, 16, 5, 1));
-
-					// attack type 2:
-					//DRUID.game.addEntity(new SpecialRangedAttack(
-					//	DRUID.game,
-					//	DRUID.pos.x + DRUID.scaleDim.x,
-					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
-					//	180, 16, 6, 2));
-
-				} else { // shoot right
-					// basic ranged attack:
-					//DRUID.game.addEntity(new BasicRangedAttack(
-					//	DRUID.game,
-					//	DRUID.pos.x + DRUID.scaleDim.x,
-					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
-					//	0, 16));
-
-					// mutiple ranged arrack in any angle:
-					//DRUID.game.addEntity(new SpecialRangedAttack(
-					//	DRUID.game,
-					//	DRUID.pos.x + DRUID.scaleDim.x,
-					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
-					//	0, 16, 6, 0));
-
-					// attack type 1:
-					//DRUID.game.addEntity(new SpecialRangedAttack(
-					//	DRUID.game,
-					//	DRUID.pos.x - PARAMS.TILE_WIDTH,
-					//	DRUID.pos.y + DRUID.scaleDim.y / 2,
-					//	0, 16, 5, 1));
-
-					// attack type 2:
-					DRUID.game.addEntity(new SpecialRangedAttack(
-						DRUID.game,
-						DRUID.pos.x + DRUID.scaleDim.x,
-						DRUID.pos.y + DRUID.scaleDim.y / 2,
-						0, 16, 6, 2));
-				}
-				DRUID.game.A = false;
-				DRUID.rangeAttackCooldown = 1;
+	attack(DRUID) {
+		this.cooldown -= this.game.clockTick;
+		if (this.cooldown <= 0 && this.game.A) {
+			if (DRUID.facing === 0) { // shoot left
+				// basic ranged attack:
+				this.game.addEntity(new BasicRangedAttack(
+					DRUID.game,
+					DRUID.pos.x - PARAMS.BLOCKWIDTH,
+					DRUID.pos.y + DRUID.scaleDim.y / 2,
+					180, 32, 600, 1, true));
+			} else { // shoot right
+				// basic ranged attack:
+				this.game.addEntity(new BasicRangedAttack(
+					DRUID.game,
+					DRUID.pos.x + DRUID.scaleDim.x,
+					DRUID.pos.y + DRUID.scaleDim.y / 2,
+					0, 32, 600, 1, true));
 			}
-		});
+			this.game.A = false;
+			this.cooldown = 1;
+			}
+		}
 
+	/** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 64, 64,
+			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.scaleDim.x, this.scaleDim.y);
+	}
+}
+
+/**
+ * Adds the wind element power up to druid's attack
+ */
+class WindElement extends PowerUp {
+
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/bluegem.png");
+	}
+
+	attack(DRUID) {
+		this.cooldown -= this.game.clockTick;
+		if (this.cooldown <= 0 && this.game.A) {
+			if (DRUID.facing === 0) { // shoot left
+				this.game.addEntity(new TornadoAttack(
+					DRUID.game,
+					DRUID.pos.x - PARAMS.BLOCKWIDTH,
+					DRUID.pos.y - 40, 180));
+			} else { // shoot right
+				this.game.addEntity(new TornadoAttack(
+					DRUID.game,
+					DRUID.pos.x + DRUID.scaleDim.x,
+					DRUID.pos.y - 40, 0));
+			}
+			this.game.A = false;
+			this.cooldown = 1;
+		}
 	}
 
 	/** @override */
 	draw(context) {
-		context.drawImage(this.spritesheet, 0, 16, 32, 32,
+		context.drawImage(this.spritesheet, 0, 0, 64, 64,
 			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
 			this.scaleDim.x, this.scaleDim.y);
 	}
+}
 
+/**
+ * Adds the light element power up to druid's attack
+ */
+class LightElement extends PowerUp {
+
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/yellowgem.png");
+	}
+
+	attack(DRUID) {
+		this.cooldown -= this.game.clockTick;
+		if (this.cooldown <= 0 && this.game.A) {
+			if (DRUID.facing === 0) { // shoot left
+				this.game.addEntity(new ThunderAttack(
+					DRUID.game,
+					DRUID.pos.x - PARAMS.BLOCKWIDTH * 2,
+					DRUID.pos.y + PARAMS.BLOCKWIDTH, 180));
+			} else { // shoot right
+				this.game.addEntity(new ThunderAttack(
+					DRUID.game,
+					DRUID.pos.x + DRUID.scaleDim.x,
+					DRUID.pos.y + PARAMS.BLOCKWIDTH, 0));
+			}
+			this.game.A = false;
+			this.cooldown = 2;
+		}
+	}
+
+	/** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 64, 64,
+			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.scaleDim.x, this.scaleDim.y);
+	}
 }

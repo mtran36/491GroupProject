@@ -180,10 +180,6 @@ class StandingBreakBlock extends Ground {
 	draw(context) {
 		if (this.vanishedTime === 0) {
 			super.draw(context);
-			context.drawImage(
-				this.crackSprite, 0, 0, 128, 128,
-				this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-				this.size.width * 32, this.size.height * 32);
 		}
 	}
 }

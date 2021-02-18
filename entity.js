@@ -7,6 +7,7 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
+        this.mapPipColor = 'red';
         this.scale = 1;
         this.pos = {
             x: x,
@@ -75,25 +76,6 @@ class Entity {
     }
 
     /**
-     * Default drawing behavior for displaying an entity on the minimap.
-     * @param {CanvasImageSource} context
-     * @param {number} x Horizontal position of minimap.
-     * @param {any} y Vertical position of minimap.
-     */
-    drawMinimap(context, x, y, color) {
-        const SCALE = 16;
-        const PIP_SIZE = 3;
-
-        context.save();
-        context.fillStyle = "green";
-        context.fillRect(
-            x + this.pos.x / SCALE,
-            y + this.pos.y / SCALE,
-            PIP_SIZE, PIP_SIZE);
-        context.restore();
-    }
-
-    /**
      * Location to define animations for this entity. This method should be overridden 
      * by the implementing entity if it has animations in its spritesheet.
      */
@@ -148,6 +130,7 @@ class Agent extends Entity {
      * @param {number} damage Damage to health as an integer
      */
     takeDamage(damage) {
+        console.log("before hit:" + this.health);
         this.health -= damage;
         if (this.health <= 0) {
             if (this.spawnPrize) {
@@ -155,6 +138,7 @@ class Agent extends Entity {
             }
             this.removeFromWorld = true;
         }
+        console.log("after hit:" + this.health);
     }
 
     /**

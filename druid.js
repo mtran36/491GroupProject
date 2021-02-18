@@ -155,7 +155,7 @@ class Druid extends Agent {
 		// Jumping left
 		this.animations[1] = new Animator(
 			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, false);
-			*/
+		*/
 	}
 
 	/** @override */

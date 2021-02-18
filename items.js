@@ -34,7 +34,7 @@ class Items extends Agent {
 
 class Potions extends Items {
     constructor(game, x, y) {
-        super(game, x, y, "./Sprites/potions.png");
+        super(game, x, y - 100, "./Sprites/potions.png");
         this.setDimensions(1, 45, 55);
     }
 
@@ -46,6 +46,8 @@ class Potions extends Items {
         //    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
         this.animations[0] = new Animator(
             this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
+        this.animations[1] = new Animator(
+            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
     }
 
     /** @override */
@@ -54,13 +56,6 @@ class Potions extends Items {
         const TICK = this.game.clockTick;
         this.vel.y += FALL_ACC * TICK;
         this.move(TICK);
-        console.log("update potion");
-
-    }
-
-    /** @override */
-    updateBB() {
-        super.updateBB();
     }
 
     addItemsToDruid(DRUID) {

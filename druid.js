@@ -123,6 +123,11 @@ class Druid extends Agent {
 				this.vel.x = 0;
 			}
 		}
+		if (entity instanceof StandingBreakBlock) {
+			if (collisions.down) {
+				entity.standOn();
+			}
+		}
     }
 
 	/** @override */

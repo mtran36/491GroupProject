@@ -1,7 +1,11 @@
 class Block extends Entity {
 	constructor(game, x, y, width = 1, height = 1, spritesheet) {
 		super(game, x, y, spritesheet);
-		this.update = function () { /* Do nothing. */ };
+	}
+
+	/** @override */
+	update() {
+		// Do nothing
 	}
 
 	/**
@@ -137,11 +141,51 @@ class Ground extends Block {
     }
 }
 
-class BreakBlock extends Block {
+class StandingBreakBlock extends Ground {
 	constructor(game, x, y, width, height) {
-		super(game, x, y, width, height, "");
-		this.setSize(width, height, );
-    }
+		super(game, x, y, width, height);
+		this.crackSprite = ASSET_LOADER.getImageAsset("./Sprites/CrackTexture.png");
+		this.collideTime = 0;
+		this.breakTime = 2;
+		this.vanishedTime = 0;
+		this.respawnTime = 5;
+		this.fakeWorldBB = new BoundingBox(this.x, this.y, 0, 0);
+		this.druidOn = false;
+	}
+
+	update() {
+		if (!this.druidOn) {
+			this.collideTime -= this.game.clockTick;
+			this.collideTime = Math.max(this.collideTime, 0);
+		}
+		this.druidOn = false;
+		if (this.collideTime >= this.breakTime) {
+			this.vanishedTime += this.game.clockTick;
+			this.collideTime = 0.1;
+			this.worldBB = this.fakeWorldBB;
+		} else if (this.vanishedTime >= this.respawnTime) {
+			this.vanishedTime = 0;
+			this.updateBB();
+		} else if (this.vanishedTime > 0) {
+			this.vanishedTime += this.game.clockTick;
+		}
+	}
+
+	standOn() {
+		this.druidOn = true;
+		this.collideTime += this.game.clockTick;
+		this.collideTime = Math.min(this.collideTime, this.breakTime);
+	}
+
+	draw(context) {
+		if (this.vanishedTime === 0) {
+			super.draw(context);
+			context.drawImage(
+				this.crackSprite, 0, 0, 128, 128,
+				this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+				this.size.width * 32, this.size.height * 32);
+		}
+	}
 }
 
 class Mask extends Block {

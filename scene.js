@@ -31,7 +31,12 @@ class Scene {
 			AUDIO_PLAYER.playMusic(level.music);
 		}
 		if (level.background) {
-			document.getElementById("gameWorld").setAttribute('style', 'background: cyan');
+			for (i = 0; i < level.background.length; i++) {
+				let attribute = level.background.attribute;
+				let value = level.background.value;
+				document.getElementById("gameWorld").setAttribute(
+					attribute, value);
+			}
 		}
 		if (level.ground) {
 			for (i = 0; i < level.ground.length; i++) {
@@ -50,7 +55,16 @@ class Scene {
 					PARAMS.TILE_WIDTH * mask.y,
 					mask.width, mask.height));
             }
-        }
+		}
+		if (level.standingBreakBlock) {
+			for (i = 0; i < level.standingBreakBlock.length; i++) {
+				let standingBreakBlock = level.standingBreakBlock[i];
+				this.game.addEntity(new StandingBreakBlock(this.game,
+					PARAMS.TILE_WIDTH * standingBreakBlock.x,
+					PARAMS.TILE_WIDTH * standingBreakBlock.y,
+					standingBreakBlock.width, standingBreakBlock.height));
+			}
+		}
 		if (level.flies) {
 			for (i = 0; i < level.flies.length; i++) {
 				let fly = level.flies[i];

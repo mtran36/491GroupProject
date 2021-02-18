@@ -141,11 +141,14 @@ class Ground extends Block {
     }
 }
 
+/**
+ * Block that when the druid stands on begins breaking.
+ * Will break after a set period of time.
+ * Will respawn after a set period of time.
+ */
 class StandingBreakBlock extends Entity {
 	constructor(game, x, y, width, height, blockType) {
 		super(game, x, y, "./Sprites/crack.png");
-		this.width = width;
-		this.height = height;
 		this.block;
 		switch (blockType) {
 			case 'Ground':
@@ -153,6 +156,8 @@ class StandingBreakBlock extends Entity {
 				break;
 		}
 		this.worldBB = this.block.worldBB;
+		this.width = this.block.scaleDim.x * this.block.size.width;
+		this.height = this.block.scaleDim.y * this.block.size.height;
 		this.collideTime = 0;
 		this.minCrack = 0;
 		this.breakTime = 1.5;
@@ -160,20 +165,25 @@ class StandingBreakBlock extends Entity {
 		this.respawnTime = 3;
 		this.fakeWorldBB = new BoundingBox(this.x, this.y, 0, 0);
 		this.druidOn = false;
-		this.crackSprite = ASSET_LOADER.getImageAsset("./Sprites/crack.png");
 	}
 
+	/**
+	 * Adds the block associated with this breaking block into the entity list.
+	 * Should be called immediately after the constructor.
+	 * Changes blocks draw method so that it will also call the draw method for this block.
+	 */
 	addBlock() {
 		this.game.addEntity(this.block);
 		this.block.oldDraw = this.block.draw;
 		this.block.draw = (context) => {
 			if (this.vanishedTime === 0) {
 				this.block.oldDraw(context);
-				this.drawThis(context);
+				this.drawCrack(context);
 			}
 		}
 	}
 
+	/** @override */
 	update() {
 		if (!this.druidOn) {
 			this.collideTime -= this.game.clockTick;
@@ -181,7 +191,6 @@ class StandingBreakBlock extends Entity {
 		}
 		this.druidOn = false;
 		if (this.collideTime >= this.breakTime) {
-			console.log("tetst");
 			this.vanishedTime += this.game.clockTick;
 			this.collideTime = 0;
 			this.minCrack = 0.25;
@@ -197,28 +206,41 @@ class StandingBreakBlock extends Entity {
 		}
 	}
 
+	/**
+	 * Druid calls this if the druid is standing on this block.
+	 */
 	standOn() {
 		this.druidOn = true;
 		this.collideTime += this.game.clockTick;
 		this.collideTime = Math.min(this.collideTime, this.breakTime);
 	}
 
+	/**
+	 * Empty draw method.
+	 * @param {any} context
+	 */
 	draw(context) {
 
 	}
 
-	drawThis(context) {
-			let crackPercentage = this.collideTime / this.breakTime;
-			crackPercentage = Math.max(this.minCrack, crackPercentage);
-			let sourceWidth = 2000 * crackPercentage;
-			let sourceHeight = 1238 * crackPercentage;
-			let sourcePosX = (2000 - sourceWidth) / 2;
-			let sourcePosY = (1238 - sourceHeight) / 2;
-			let drawWidth = this.block.scaleDim.x * this.block.size.width * crackPercentage;
-			let drawHeight = this.block.scaleDim.y *this.block.size.height * crackPercentage;
-			let drawX = this.pos.x + (this.block.scaleDim.x * this.block.size.width - drawWidth) / 2;
-			let drawY = this.pos.y + (this.block.scaleDim.y * this.block.size.height - drawHeight) / 2;
-			context.drawImage(this.crackSprite, sourcePosX, sourcePosY,
+	/**
+	 * Draws the crack texture.
+	 * Crack texture size is based on the 
+	 * Will be called by the block stored in this.block.
+	 * @param {CanvasRenderingContext2D} context
+	 */
+	drawCrack(context) {
+		let crackPercentage = this.collideTime / this.breakTime;
+		crackPercentage = Math.max(this.minCrack, crackPercentage);
+		let sourceWidth = 2000 * crackPercentage;
+		let sourceHeight = 1238 * crackPercentage;
+		let sourcePosX = (2000 - sourceWidth) / 2;
+		let sourcePosY = (1238 - sourceHeight) / 2;
+		let drawWidth = this.width * crackPercentage;
+		let drawHeight = this.height * crackPercentage;
+		let drawX = this.pos.x + (this.width - drawWidth) / 2;
+		let drawY = this.pos.y + (this.height - drawHeight) / 2;
+		context.drawImage(this.spritesheet, sourcePosX, sourcePosY,
 				sourceWidth, sourceHeight,
 				drawX - this.game.camera.pos.x,
 				drawY - this.game.camera.pos.y,

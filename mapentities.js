@@ -186,17 +186,26 @@ class Minimap extends Entity {
 	};
 
 	draw(context) {
-		let entity;
+		const SCALE = 16;
+		const PIP_SIDE_LEN = 4;
+		let that = this, entity;
+
 		context.save();
 		context.strokeStyle = "black";
-		context.lineWidth = 1;
+		context.lineWidth = 3;
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
-		context.restore();
-		for (entity = 0; entity < this.game.entities.length; entity++) {
-			if (this.game.entities[entity].drawMinimap) {
-				this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+		this.game.entities.forEach(function (entity) {
+			context.fillStyle = entity.mapPipColor;
+			let x = that.pos.x + (entity.pos.x - that.game.camera.pos.x) / SCALE;
+			let y = that.pos.y + (entity.pos.y - that.game.camera.pos.y) / SCALE;
+			if (x > that.pos.x
+				&& y > that.pos.y
+				&& y < that.pos.y + that.width
+				&& x < that.pos.x + that.width) {
+				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
 			}
-		}
+		});
+		context.restore();
 	};
 };
 

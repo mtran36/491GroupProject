@@ -7,6 +7,7 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
+        this.mapPipColor = 'red';
         this.scale = 1;
         this.pos = {
             x: x,
@@ -72,25 +73,6 @@ class Entity {
      */
     makeDefaultBoundingBox() {
         return new BoundingBox(this.pos.x, this.pos.y, this.scaleDim.x, this.scaleDim.y);
-    }
-
-    /**
-     * Default drawing behavior for displaying an entity on the minimap.
-     * @param {CanvasImageSource} context
-     * @param {number} x Horizontal position of minimap.
-     * @param {any} y Vertical position of minimap.
-     */
-    drawMinimap(context, x, y) {
-        const SCALE = 16;
-        const PIP_SIZE = 3;
-
-        context.save();
-        context.fillStyle = "Red";
-        context.fillRect(
-            x + this.pos.x / SCALE,
-            y + this.pos.y / SCALE,
-            PIP_SIZE, PIP_SIZE);
-        context.restore();
     }
 
     /**

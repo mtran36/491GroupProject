@@ -3,8 +3,8 @@
  */
 class Druid extends Agent {
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/druid.png");
-		this.setDimensions(1, 97, 157);
+		super(game, x, y, "./Sprites/druidmerge.png");
+		this.setDimensions(1, 176, 128);
 		this.game.druid = this;
 
 		this.loadAnimations();
@@ -142,10 +142,20 @@ class Druid extends Agent {
 
 	/** @override */
 	loadAnimations() {
+		// Walking right
 		this.animations[0] = new Animator(
-			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, false);
+			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true);
+		// Walking left
 		this.animations[1] = new Animator(
-			this.spritesheet, 740, 0, this.dim.x, this.dim.y, 1, 0.25, 1, false, true, true);
+			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false);
+		/*
+		// Jumping right
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, true);
+		// Jumping left
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, false);
+		*/
 	}
 
 	/** @override */
@@ -214,5 +224,14 @@ class Druid extends Agent {
 			"POTIONS", "teal");
 		if (this.flashing) return;
 		super.draw(context);
+		/*
+		if (this.vel.y > 0 || this.vel)
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick, context,
+			this.pos.x, this.pos.y,
+			this.scale, this.game.camera);
+		this.worldBB.display(this.game);
+		this.agentBB.display(this.game);
+		*/
 	}
 }

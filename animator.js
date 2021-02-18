@@ -22,6 +22,11 @@ class Animator {
      * @param {number} scale
      */
     drawFrame(tick, context, x, y, scale, camera) {
+        if (this.spritesheet === undefined) {
+            console.error(
+                "Entity at x =", x, "y =", y, "scale value =", scale,
+                "passed undefined context to drawFrame");
+        }
         x -= camera.pos.x;
         y -= camera.pos.y;
         // Check if animation is done

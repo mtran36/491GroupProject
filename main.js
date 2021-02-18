@@ -23,7 +23,9 @@ const IMAGE_PATHS = [
 	"./Sprites/tornado.png",
 	"./Sprites/yellowgem.png",
 	"./Sprites/thunder.png",
-	"./Sprites/crack.png"
+	"./Sprites/crack.png",
+	"./Sprites/druidmerge.png",
+	"./Sprites/potions.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },

@@ -145,11 +145,13 @@ class StandingBreakBlock extends Ground {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height);
 		this.collideTime = 0;
-		this.breakTime = 2;
+		this.minCrack = 0;
+		this.breakTime = 1.5;
 		this.vanishedTime = 0;
-		this.respawnTime = 5;
+		this.respawnTime = 3;
 		this.fakeWorldBB = new BoundingBox(this.x, this.y, 0, 0);
 		this.druidOn = false;
+		this.crackSprite = ASSET_LOADER.getImageAsset("./Sprites/crack.png");
 	}
 
 	update() {
@@ -160,7 +162,8 @@ class StandingBreakBlock extends Ground {
 		this.druidOn = false;
 		if (this.collideTime >= this.breakTime) {
 			this.vanishedTime += this.game.clockTick;
-			this.collideTime = 0.1;
+			this.collideTime = 0;
+			this.minCrack = 0.25;
 			this.worldBB = this.fakeWorldBB;
 		} else if (this.vanishedTime >= this.respawnTime) {
 			this.vanishedTime = 0;
@@ -178,7 +181,23 @@ class StandingBreakBlock extends Ground {
 
 	draw(context) {
 		if (this.vanishedTime === 0) {
+			let crackPercentage = this.collideTime / this.breakTime;
+			crackPercentage = Math.max(this.minCrack, crackPercentage);
+			let sourceWidth = 2000 * crackPercentage;
+			let sourceHeight = 1238 * crackPercentage;
+			let sourcePosX = (2000 - sourceWidth) / 2;
+			let sourcePosY = (1238 - sourceHeight) / 2;
+			let drawWidth = this.scaleDim.x * this.size.width * crackPercentage;
+			let drawHeight = this.scaleDim.y *this.size.height * crackPercentage;
+			let drawX = this.pos.x + (this.scaleDim.x * this.size.width - drawWidth) / 2;
+			let drawY = this.pos.y + (this.scaleDim.y * this.size.height - drawHeight) / 2;
+			console.log(crackPercentage, this.collideTime);
 			super.draw(context);
+			context.drawImage(this.crackSprite, sourcePosX, sourcePosY,
+				sourceWidth, sourceHeight,
+				drawX - this.game.camera.pos.x,
+				drawY - this.game.camera.pos.y,
+				drawWidth, drawHeight);
 		}
 	}
 }

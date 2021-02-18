@@ -191,7 +191,6 @@ class StandingBreakBlock extends Ground {
 			let drawHeight = this.scaleDim.y *this.size.height * crackPercentage;
 			let drawX = this.pos.x + (this.scaleDim.x * this.size.width - drawWidth) / 2;
 			let drawY = this.pos.y + (this.scaleDim.y * this.size.height - drawHeight) / 2;
-			console.log(crackPercentage, this.collideTime);
 			super.draw(context);
 			context.drawImage(this.crackSprite, sourcePosX, sourcePosY,
 				sourceWidth, sourceHeight,

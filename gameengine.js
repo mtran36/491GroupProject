@@ -19,6 +19,7 @@ class GameEngine {
         this.C = false;
         this.B = false;
         this.A = false;
+        this.SHIFT = false;
         this.pause = false;
         this.pausePressed = false;
         this.mute = false;
@@ -104,6 +105,10 @@ class GameEngine {
                 case "KeyJ":
                     that.A = true;
                     break;
+                case "ShiftLeft":
+                case "ShiftRight":
+                    that.SHIFT = true;
+                    break;
                 case "KeyM":
                     if (!that.mutePressed) {
                         AUDIO_PLAYER.mute = !AUDIO_PLAYER.mute;
@@ -141,6 +146,10 @@ class GameEngine {
                 case "KeyX":
                 case "KeyJ":
                     that.A = false;
+                    break;
+                case "ShiftLeft":
+                case "ShiftRight":
+                    that.SHIFT = false;
                     break;
                 case "KeyM":
                     that.mutePressed = false;

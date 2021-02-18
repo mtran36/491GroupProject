@@ -16,7 +16,13 @@ const IMAGE_PATHS = [
 	"./Sprites/layer1.png",
 	"./Sprites/layer2.png",
 	"./Sprites/layer3.png",
-	"./Sprites/layer4.png"
+	"./Sprites/layer4.png",
+	"./Sprites/greengem.png",
+	"./Sprites/energyball.png",
+	"./Sprites/bluegem.png",
+	"./Sprites/tornado.png",
+	"./Sprites/yellowgem.png",
+	"./Sprites/thunder.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/TestMusic.mp3", players: 1 },

@@ -89,12 +89,15 @@ class Druid extends Agent {
 
 	/** @override */
 	takeDamage(damage) {
-		if (!PARAMS.DEBUG) {
+		if (!PARAMS.DEBUG && this.invincTime <= 0) {
 			this.health -= damage;
 			if (this.health <= 0) {
 				this.health = 0;
 				this.vel.x = 0;
+				AUDIO_PLAYER.playSound("./Audio/DruidDeath.mp3");
 				this.removeFromWorld = true;
+			} else {
+				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
 		this.invincTime = 1;
@@ -130,6 +133,11 @@ class Druid extends Agent {
 				this.vel.x = 0;
 			}
 		}
+		if (entity instanceof StandingBreakBlock) {
+			if (collisions.down) {
+				entity.standOn();
+			}
+		}
     }
 
 	/** @override */
@@ -157,6 +165,7 @@ class Druid extends Agent {
 		if (!this.isJumping && this.game.B) { 
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
+			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 			this.game.B = false;
 		} else {
 			this.vel.y += FALL_ACC * TICK;

@@ -7,7 +7,8 @@ class AudioPlayer {
         this.indexArr = [];
         this.music = [];
         this.playing = [];
-        this.volume = 0.5;
+        this.musicVolume = 0.5;
+        this.soundVolume = 0.5;
         this.mute = false;
     }
 
@@ -98,17 +99,18 @@ class AudioPlayer {
 
     /**
      * Checks to see if any audio clips have ended. If they have they are removed from the
-     * list they belong to.
+     * list they belong to. Updates audio to current volume slider level.
      */
     update() {
-        this.volume = document.getElementById("volume").value;
+        this.musicVolume = document.getElementById("musicVolume").value;
+        this.soundVolume = document.getElementById("soundVolume").value;
         this.playing.forEach((audio) => {
             if (audio.ended) {
                 this.playing.splice(this.playing.findIndex((a) => {
                     return a === audio;
                 }), 1);
             }
-            audio.volume = this.mute ? 0 : this.volume;
+            audio.volume = this.mute ? 0 : this.soundVolume;
         });
         this.music.forEach((audio) => {
             if (audio.ended) {
@@ -116,7 +118,7 @@ class AudioPlayer {
                     return a === audio;
                 }), 1);
             }
-            audio.volume = this.mute ? 0 : this.volume;
+            audio.volume = this.mute ? 0 : this.musicVolume;
         });
     }
 }

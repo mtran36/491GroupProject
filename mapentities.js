@@ -144,7 +144,6 @@ class Ground extends Block {
 class StandingBreakBlock extends Ground {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height);
-		this.crackSprite = ASSET_LOADER.getImageAsset("./Sprites/CrackTexture.png");
 		this.collideTime = 0;
 		this.breakTime = 2;
 		this.vanishedTime = 0;
@@ -180,10 +179,6 @@ class StandingBreakBlock extends Ground {
 	draw(context) {
 		if (this.vanishedTime === 0) {
 			super.draw(context);
-			context.drawImage(
-				this.crackSprite, 0, 0, 128, 128,
-				this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-				this.size.width * 32, this.size.height * 32);
 		}
 	}
 }

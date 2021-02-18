@@ -240,11 +240,11 @@ class Background extends Entity {
 		this.speed = 0;
 
 		/** Left to the camera */
-		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };
+		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y - 300};
 		/** At the camera position */
-		this.midImagePos = { x: x, y: y };
+		this.midImagePos = { x: x, y: y - 300};
 		/** Right to the camera */
-		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };
+		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y - 300};
 	};
 
 	/** @override */
@@ -266,7 +266,7 @@ class Background extends Entity {
 			this.midImagePos = this.rightImagePos;
 			this.rightImagePos = {
 				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
-				y: this.midImagePos.y
+				y: this.midImagePos.y 
 			};	
 		}else if (this.game.camera.pos.x <= this.leftImagePos.x) {
 			this.rightImagePos = this.midImagePos;
@@ -283,14 +283,14 @@ class Background extends Entity {
 			// leftImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.leftImagePos.x - this.game.camera.pos.x + this.speed, this.leftImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 			// midImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.midImagePos.x - this.game.camera.pos.x + this.speed, this.midImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 			// rightImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.rightImagePos.x - this.game.camera.pos.x + this.speed, this.rightImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 	}
 }

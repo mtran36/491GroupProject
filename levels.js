@@ -47,6 +47,12 @@ var levelOne = {
 		{ x: -2, y: 3 }
 	],
 	powerups: [
-		{ x: 25, y: 5 }
+		{ x: 25, y: 5}
+	],
+	wingElement: [
+		{ x: 21, y: 5}
+	],
+	lightElement: [
+		{ x: 29, y: 5 }
 	]
 }

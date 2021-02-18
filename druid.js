@@ -19,8 +19,8 @@ class Druid extends Agent {
 		this.potionCounter = 0;
 		this.keyCounter = 0;
 
+		this.attackSelection = null;
 		this.attacks = [];
-		this.attacks.push(this.meleeAttack);
 	}
 
 	/**
@@ -153,12 +153,17 @@ class Druid extends Agent {
 			this.isJumping = true;
 		}
 
-		// Calls each attack function to determine if an attack is made
-		let that = this;
-		this.attacks.forEach(function (attack) {
-			attack(that);
-		});
-
+		// check if melee attack is made
+		this.meleeAttack(this);
+		// check if switch attack
+		if (this.game.SHIFT == true && this.attackSelection != null) {
+			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
+			this.game.SHIFT = false;
+        }
+		// check if any special attack if made
+		if (this.attackSelection != null) {
+			this.attacks[this.attackSelection].attack(this);
+        }
 		if (this.game.right) { 
 			this.vel.x = WALK_SPEED;
 		} else if (this.game.left) {
@@ -167,6 +172,7 @@ class Druid extends Agent {
 			this.vel.x = 0;
 		}
 		this.move(TICK);
+
 	}
 
 	drawMinimap(ctx, mmX, mmY) {

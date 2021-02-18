@@ -148,6 +148,7 @@ class Agent extends Entity {
      * @param {number} damage Damage to health as an integer
      */
     takeDamage(damage) {
+        console.log("before hit:" + this.health);
         this.health -= damage;
         if (this.health <= 0) {
             if (this.spawnPrize) {
@@ -155,6 +156,7 @@ class Agent extends Entity {
             }
             this.removeFromWorld = true;
         }
+        console.log("after hit:" + this.health);
     }
 
     /**

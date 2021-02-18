@@ -31,7 +31,7 @@ var levelOne = {
 		{ x: 33, y: 5, width: 3, height: 6 }
 	],
 	standingBreakBlock: [
-		{ x: 15, y: 7, width: 2}
+		{ x: 15, y: 7, width: 2, blockType: 'Ground'}
 	],
 	flies: [
 		{ x: -5, y: 1, prizeRate: 0.2 }

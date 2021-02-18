@@ -141,9 +141,18 @@ class Ground extends Block {
     }
 }
 
-class StandingBreakBlock extends Ground {
-	constructor(game, x, y, width, height) {
-		super(game, x, y, width, height);
+class StandingBreakBlock extends Entity {
+	constructor(game, x, y, width, height, blockType) {
+		super(game, x, y, "./Sprites/crack.png");
+		this.width = width;
+		this.height = height;
+		this.block;
+		switch (blockType) {
+			case 'Ground':
+				this.block = new Ground(game, x, y, width, height);
+				break;
+		}
+		this.worldBB = this.block.worldBB;
 		this.collideTime = 0;
 		this.minCrack = 0;
 		this.breakTime = 1.5;
@@ -154,6 +163,17 @@ class StandingBreakBlock extends Ground {
 		this.crackSprite = ASSET_LOADER.getImageAsset("./Sprites/crack.png");
 	}
 
+	addBlock() {
+		this.game.addEntity(this.block);
+		this.block.oldDraw = this.block.draw;
+		this.block.draw = (context) => {
+			if (this.vanishedTime === 0) {
+				this.block.oldDraw(context);
+				this.drawThis(context);
+			}
+		}
+	}
+
 	update() {
 		if (!this.druidOn) {
 			this.collideTime -= this.game.clockTick;
@@ -161,11 +181,15 @@ class StandingBreakBlock extends Ground {
 		}
 		this.druidOn = false;
 		if (this.collideTime >= this.breakTime) {
+			console.log("tetst");
 			this.vanishedTime += this.game.clockTick;
 			this.collideTime = 0;
 			this.minCrack = 0.25;
-			this.worldBB = this.fakeWorldBB;
+			this.block.removeFromWorld = true;
 		} else if (this.vanishedTime >= this.respawnTime) {
+			this.block.removeFromWorld = false;
+			this.game.entities.splice(this.game.entities.findIndex(
+				(entity) => { entity === this; }), 0, this.block);
 			this.vanishedTime = 0;
 			this.updateBB();
 		} else if (this.vanishedTime > 0) {
@@ -180,24 +204,25 @@ class StandingBreakBlock extends Ground {
 	}
 
 	draw(context) {
-		if (this.vanishedTime === 0) {
+
+	}
+
+	drawThis(context) {
 			let crackPercentage = this.collideTime / this.breakTime;
 			crackPercentage = Math.max(this.minCrack, crackPercentage);
 			let sourceWidth = 2000 * crackPercentage;
 			let sourceHeight = 1238 * crackPercentage;
 			let sourcePosX = (2000 - sourceWidth) / 2;
 			let sourcePosY = (1238 - sourceHeight) / 2;
-			let drawWidth = this.scaleDim.x * this.size.width * crackPercentage;
-			let drawHeight = this.scaleDim.y *this.size.height * crackPercentage;
-			let drawX = this.pos.x + (this.scaleDim.x * this.size.width - drawWidth) / 2;
-			let drawY = this.pos.y + (this.scaleDim.y * this.size.height - drawHeight) / 2;
-			super.draw(context);
+			let drawWidth = this.block.scaleDim.x * this.block.size.width * crackPercentage;
+			let drawHeight = this.block.scaleDim.y *this.block.size.height * crackPercentage;
+			let drawX = this.pos.x + (this.block.scaleDim.x * this.block.size.width - drawWidth) / 2;
+			let drawY = this.pos.y + (this.block.scaleDim.y * this.block.size.height - drawHeight) / 2;
 			context.drawImage(this.crackSprite, sourcePosX, sourcePosY,
 				sourceWidth, sourceHeight,
 				drawX - this.game.camera.pos.x,
 				drawY - this.game.camera.pos.y,
 				drawWidth, drawHeight);
-		}
 	}
 }
 

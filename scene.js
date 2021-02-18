@@ -59,10 +59,13 @@ class Scene {
 		if (level.standingBreakBlock) {
 			for (i = 0; i < level.standingBreakBlock.length; i++) {
 				let standingBreakBlock = level.standingBreakBlock[i];
-				this.game.addEntity(new StandingBreakBlock(this.game,
+				standingBreakBlock = new StandingBreakBlock(this.game,
 					PARAMS.TILE_WIDTH * standingBreakBlock.x,
 					PARAMS.TILE_WIDTH * standingBreakBlock.y,
-					standingBreakBlock.width, standingBreakBlock.height));
+					standingBreakBlock.width, standingBreakBlock.height,
+					standingBreakBlock.blockType);
+				this.game.addEntity(standingBreakBlock);
+				standingBreakBlock.addBlock();
 			}
 		}
 		if (level.flies) {
@@ -143,7 +146,7 @@ class Scene {
 		this.game.druid = new Druid(
 			this.game, x, y)
 		this.game.addEntity(this.game.druid);
-		this.game.addEntity(new Minimap(this.game, 100, 100, 100));
+//		this.game.addEntity(new Minimap(this.game, 100, 100, 100));
 	};
 
 	update() {

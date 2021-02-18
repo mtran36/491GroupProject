@@ -1,7 +1,11 @@
 class Block extends Entity {
 	constructor(game, x, y, width = 1, height = 1, spritesheet) {
 		super(game, x, y, spritesheet);
-		this.update = function () { /* Do nothing. */ };
+	}
+
+	/** @override */
+	update() {
+		// Do nothing
 	}
 
 	/**
@@ -61,7 +65,8 @@ class Ground extends Block {
 				this.pickLook(row, col);
 				context.drawImage(
 					this.spritesheet,
-					this.look.x * this.dim.x, this.look.y * this.dim.y,
+					this.look.x * this.dim.x,
+					this.look.y * this.dim.y,
 					this.dim.x, this.dim.y,
 					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
 					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
@@ -80,45 +85,27 @@ class Ground extends Block {
 	 */
 	pickLook(row, col) {
 		switch (row) {
-			// Pick sprite column
 			case 0:
-				if (this.size.height === 1) {
-					this.look.y = 8;
-				} else {
-					this.look.y = 0;
-				}
 				switch (col) {
 					case 0:
-						this.look.x = 0;
+						this.look.x = this.size.width === 1 ? 6 : 0;
 						break;
 					case this.size.width - 1:
 						this.look.x = 5;
 						break;
 					case 1:
-						if (this.size.width === 3) {
-							this.look.x = 6;
-						} else {
-							this.look.x = 1;
-						}
+						this.look.x = this.size.width === 3 ? 6 : 1;
 						break;
 					case this.size.width - 2:
 						this.look.x = 4;
 						break;
 					default:
-						if (col % 2 === 0) {
-							this.look.x = 2;
-						} else {
-							this.look.x = 3;
-						}
+						this.look.x = col % 2 === 0 ? 2 : 3;
 				}
+				this.look.y = this.size.height === 1 ? 8 : 0;
 				break;
-			// Otherwise pick sprite row
 			case this.size.height - 2:
-				if (this.size.height === 3) {
-					this.look.y = 6;
-				} else {
-					this.look.y = 4;
-				}
+				this.look.y = this.size.height === 3 ? 6 : 4;
 				break;
 			case this.size.height - 1:
 				this.look.y = 5;
@@ -127,21 +114,95 @@ class Ground extends Block {
 				if (row === 1) {
 					this.look.y = 1;
 				} else {
-					if (row % 2 === 0) {
-						this.look.y = 2;
-					} else {
-						this.look.y = 3;
-					}
+					this.look.y = row % 2 === 0 ? 2 : 3;
 				}
 		}
     }
 }
 
-class BreakBlock extends Block {
-	constructor(game, x, y, width, height) {
-		super(game, x, y, width, height, "");
-		this.setSize(width, height, );
-    }
+class StandingBreakBlock extends Entity {
+	constructor(game, x, y, width, height, blockType) {
+		super(game, x, y, "./Sprites/crack.png");
+		this.width = width;
+		this.height = height;
+		this.block;
+		switch (blockType) {
+			case 'Ground':
+				this.block = new Ground(game, x, y, width, height);
+				break;
+		}
+		this.worldBB = this.block.worldBB;
+		this.collideTime = 0;
+		this.minCrack = 0;
+		this.breakTime = 1.5;
+		this.vanishedTime = 0;
+		this.respawnTime = 3;
+		this.fakeWorldBB = new BoundingBox(this.x, this.y, 0, 0);
+		this.druidOn = false;
+		this.crackSprite = ASSET_LOADER.getImageAsset("./Sprites/crack.png");
+	}
+
+	addBlock() {
+		this.game.addEntity(this.block);
+		this.block.oldDraw = this.block.draw;
+		this.block.draw = (context) => {
+			if (this.vanishedTime === 0) {
+				this.block.oldDraw(context);
+				this.drawThis(context);
+			}
+		}
+	}
+
+	update() {
+		if (!this.druidOn) {
+			this.collideTime -= this.game.clockTick;
+			this.collideTime = Math.max(this.collideTime, 0);
+		}
+		this.druidOn = false;
+		if (this.collideTime >= this.breakTime) {
+			console.log("tetst");
+			this.vanishedTime += this.game.clockTick;
+			this.collideTime = 0;
+			this.minCrack = 0.25;
+			this.block.removeFromWorld = true;
+		} else if (this.vanishedTime >= this.respawnTime) {
+			this.block.removeFromWorld = false;
+			this.game.entities.splice(this.game.entities.findIndex(
+				(entity) => { entity === this; }), 0, this.block);
+			this.vanishedTime = 0;
+			this.updateBB();
+		} else if (this.vanishedTime > 0) {
+			this.vanishedTime += this.game.clockTick;
+		}
+	}
+
+	standOn() {
+		this.druidOn = true;
+		this.collideTime += this.game.clockTick;
+		this.collideTime = Math.min(this.collideTime, this.breakTime);
+	}
+
+	draw(context) {
+
+	}
+
+	drawThis(context) {
+			let crackPercentage = this.collideTime / this.breakTime;
+			crackPercentage = Math.max(this.minCrack, crackPercentage);
+			let sourceWidth = 2000 * crackPercentage;
+			let sourceHeight = 1238 * crackPercentage;
+			let sourcePosX = (2000 - sourceWidth) / 2;
+			let sourcePosY = (1238 - sourceHeight) / 2;
+			let drawWidth = this.block.scaleDim.x * this.block.size.width * crackPercentage;
+			let drawHeight = this.block.scaleDim.y *this.block.size.height * crackPercentage;
+			let drawX = this.pos.x + (this.block.scaleDim.x * this.block.size.width - drawWidth) / 2;
+			let drawY = this.pos.y + (this.block.scaleDim.y * this.block.size.height - drawHeight) / 2;
+			context.drawImage(this.crackSprite, sourcePosX, sourcePosY,
+				sourceWidth, sourceHeight,
+				drawX - this.game.camera.pos.x,
+				drawY - this.game.camera.pos.y,
+				drawWidth, drawHeight);
+	}
 }
 
 class Mask extends Block {
@@ -207,20 +268,28 @@ class Minimap extends Entity {
 	};
 
 	draw(context) {
-		let entity;
+		const SCALE = 16;
+		const PIP_SIDE_LEN = 4;
+		let that = this, entity;
+
 		context.save();
 		context.strokeStyle = "black";
-		context.lineWidth = 1;
+		context.lineWidth = 3;
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
-		context.restore();
-		for (entity = 0; entity < this.game.entities.length; entity++) {
-			if (this.game.entities[entity].drawMinimap) {
-				this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+		this.game.entities.forEach(function (entity) {
+			context.fillStyle = entity.mapPipColor;
+			let x = that.pos.x + (entity.pos.x - that.game.camera.pos.x) / SCALE;
+			let y = that.pos.y + (entity.pos.y - that.game.camera.pos.y) / SCALE;
+			if (x > that.pos.x
+				&& y > that.pos.y
+				&& y < that.pos.y + that.width
+				&& x < that.pos.x + that.width) {
+				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
 			}
-		}
+		});
+		context.restore();
 	};
 };
-
 
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 
@@ -240,11 +309,11 @@ class Background extends Entity {
 		this.speed = 0;
 
 		/** Left to the camera */
-		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y };
+		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y - 300};
 		/** At the camera position */
-		this.midImagePos = { x: x, y: y };
+		this.midImagePos = { x: x, y: y - 300};
 		/** Right to the camera */
-		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y };
+		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y - 300};
 	};
 
 	/** @override */
@@ -266,7 +335,7 @@ class Background extends Entity {
 			this.midImagePos = this.rightImagePos;
 			this.rightImagePos = {
 				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
-				y: this.midImagePos.y
+				y: this.midImagePos.y 
 			};	
 		}else if (this.game.camera.pos.x <= this.leftImagePos.x) {
 			this.rightImagePos = this.midImagePos;
@@ -283,14 +352,14 @@ class Background extends Entity {
 			// leftImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.leftImagePos.x - this.game.camera.pos.x + this.speed, this.leftImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 			// midImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.midImagePos.x - this.game.camera.pos.x + this.speed, this.midImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 			// rightImage:
 			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
 				this.rightImagePos.x - this.game.camera.pos.x + this.speed, this.rightImagePos.y,
-				this.dim.x, this.dim.y);
+				this.dim.x, this.dim.y + 300);
 	}
 }

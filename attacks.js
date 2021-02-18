@@ -18,6 +18,7 @@ class SwordAttack extends Agent {
 			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
 		}
 		this.updateBB();
+		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 	}
 
 	/** @override */
@@ -79,26 +80,39 @@ class SwordAttack extends Agent {
 }
 
 class BasicRangedAttack extends Agent {
-	constructor(game, x, y, degree, radius) {
-		super(game, x, y, "./Sprites/ball.png");
-		this.setDimensions(2, radius * 2, radius * 2);
+	constructor(game, x, y, degree, radius, speed, attack, hasAnimation) {
+		super(game, x, y, "./Sprites/energyball.png");
+		this.setDimensions(1, radius * 2, radius * 2);
 
 		var radian = degree * (Math.PI / 180);
-		this.vel.x = Math.round((400 * Math.cos(radian)) * 100) / 100;
-		this.vel.y = Math.round(-(400 * Math.sin(radian)) * 100) / 100;
+		this.vel.x = Math.round((speed * Math.cos(radian)) * 100) / 100;
+		this.vel.y = Math.round(-(speed * Math.sin(radian)) * 100) / 100;
 
-		this.attack = 1;
+		this.attack = attack;
 		this.hit = false
 		this.loadAnimations();
+
+		this.owner = null;
+		if (hasAnimation == false) {
+			this.draw = function () {
+				this.worldBB.display(this.game);
+				this.agentBB.display(this.game);
+			};
+        }
 	}
 
 	/** @override */
 	loadAnimations() {
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 16, 32, 32, 8, 0.05, 0, false, true, false);
+			this.spritesheet, 0, 0, 64, 64, 2, 0.3, 0, false, true, false);
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 16, 32, 32, 8, 0.05, 0, false, true, false);
+			this.spritesheet, 0, 0, 64, 64, 2, 0.3, 0, false, true, false);
 	}
+
+	changeAnimations(leftAnimation, rightAnimation) {
+		this.animations[0] = leftAnimation;
+		this.animations[1] = rightAnimation;
+    }
 
 	/** @override */
 	update() {
@@ -111,8 +125,19 @@ class BasicRangedAttack extends Agent {
 		this.game.entities.forEach(function (entity) {
 			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
 				if (entity instanceof Enemy) {
-					entity.takeDamage(that.attack);
-					that.removeFromWorld = true;
+					if (that.owner instanceof TornadoAttack) {
+						if(!that.owner.damagedEnemies.includes(entity)) {
+							entity.knockup(that);
+							that.owner.addAttackedEnemy(entity);
+							entity.takeDamage(that.attack);
+						}
+					} else {
+						entity.takeDamage(that.attack);
+						that.removeFromWorld = true;
+						if (that.owner instanceof ThunderAttack) {
+							that.owner.freeProjectiles();
+                        }
+                    }
 				}
 			}
 			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
@@ -132,57 +157,45 @@ class BasicRangedAttack extends Agent {
 	}
 }
 
-class SpecialRangedAttack {
-	/**
-	 * @param {any} game: this game
-	 * @param {any} x: x
-	 * @param {any} y: y
-	 * @param {any} direction
-	 * @param {any} radius: radius of the bounding circle
-	 * @param {any} length: number of projectile
-	 * @param {any} attackType: 0 is multi projectile in a line, 1 is vertical multi projectile, 2 is spreaded projectiles
-	 */
-	constructor(game, x, y, degree, radius, length, attackType) {
+class TornadoAttack{
+	constructor(game, x, y, degree) {
 		this.game = game;
 		this.x = x;
 		this.y = y;
-		this.degree = degree % 360;
-		this.radius = radius;
-		this.length = length;
-		this.attackType = attackType;
+		this.degree = degree;
+		this.attack = 0.8;
+		this.speed = 400
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/tornado.png");
 		this.projectiles = [];
 		this.createProjectileList();
 		this.addEntityList();
-
+		this.damagedEnemies = [];
+		this.existTime = 2;
 		this.draw = function () { /* Do nothing. */ };
 	}
 
 	createProjectileList() {
-		if (this.attackType == 0) {
-			var radian = this.degree * (Math.PI / 180);
-			var XDiff = this.radius * 2 * Math.cos(radian);
-			var YDiff = -this.radius * 2 * Math.sin(radian);
+		var RADIUS = 48;
+		for (var i = 0; i < 2; i++) {
+			if (i == 0) {
+				var hasAnimation = true;
+			} else {
+				var hasAnimation = false;
+            }
+			this.projectiles.push(new BasicRangedAttack(
+				this.game, this.x, this.y + i * RADIUS * 2,
+				this.degree, RADIUS, this.speed, this.attack, hasAnimation));
+			this.projectiles[i].force = 600;
+			this.projectiles[i].owner = this;
 
-			for (var i = 0; i < this.length; i++) {
-				this.projectiles.push(new BasicRangedAttack(this.game,
-					this.x + i * XDiff, this.y + i * YDiff,
-					this.degree, this.radius));
+			let leftAnimation = new Animator(
+				this.spritesheet, 0, 20, 96, 192, 3, 0.2, 0, false, true, false);
+			let rightAnimation = new Animator(
+				this.spritesheet, 0, 20, 96, 192, 3, 0.2, 0, false, true, false);
+			if (hasAnimation) {
+				this.projectiles[0].changeAnimations(leftAnimation, rightAnimation);
 			}
-		} else if (this.attackType == 1) {
-			for (var i = 0; i < this.length; i++) {
-				this.projectiles.push(new BasicRangedAttack(this.game,
-					this.x, this.y - i * this.radius * 2,
-					this.degree, this.radius));
-			}
-		} else if (this.attackType == 2) {
-			var degreeDiff = 180 / (this.length - 1);
-			this.degree -= 90;
-			for (var i = 0; i < this.length; i++) {
-				this.projectiles.push(new BasicRangedAttack(this.game,
-					this.x, this.y,
-					this.degree + i * degreeDiff, this.radius));
-			}
-        }
+		}
 	}
 
 	addEntityList() {
@@ -192,19 +205,91 @@ class SpecialRangedAttack {
 		});
 	}
 
+	addAttackedEnemy(enemy) {
+		this.damagedEnemies.push(enemy);
+    }
+
 	update() {
-		if (this.attackType != 2) {
-			for (var i = 0; i < this.projectiles.length; i++) {
-				if (this.projectiles[i].removeFromWorld == true) {
-					this.removeFromWorld = true;
-					for (var j = 0; j < this.projectiles.length; j++) {
-						this.projectiles[j].removeFromWorld = true;
-					}
+		this.existTime -= this.game.clockTick
+		if (this.existTime <= 0) this.removeFromWorld = true;
+
+		for (var i = 0; i < this.projectiles.length; i++) {
+			if (this.removeFromWorld == true || this.projectiles[i].removeFromWorld == true) {
+				this.removeFromWorld = true;
+				for (var j = 0; j < this.projectiles.length; j++) {
+					this.projectiles[j].removeFromWorld = true;
 				}
 			}
-		} else {
-			this.removeFromWorld = true;
-        }
+		}
+    }
+}
+
+class ThunderAttack {
+	constructor(game, x, y, degree) {
+		this.game = game;
+		this.x = x;
+		this.y = y;
+		this.degree = degree;
+		this.attack = 2;
+		this.speed = 700;
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/thunder.png");
+		this.projectiles = [];
+		this.createProjectileList();
+		this.addEntityList();
+		this.existTime = 5;
+		this.draw = function () { /* Do nothing. */ };
+	}
+
+	createProjectileList() {
+		var RADIUS = PARAMS.BLOCKWIDTH / 4;
+		for (var i = 0; i < 4; i++) {
+			if (i == 0) {
+				var hasAnimation = true;
+			} else {
+				var hasAnimation = false;
+			}
+			this.projectiles.push(new BasicRangedAttack(
+				this.game, this.x + i * 2 * RADIUS, this.y,
+				this.degree, RADIUS,
+				this.speed, this.attack, hasAnimation));
+			this.projectiles[i].owner = this;
+
+			let leftAnimation = new Animator(
+				this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, true);
+			let rightAnimation = new Animator(
+				this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, false);
+			if (hasAnimation) {
+				this.projectiles[0].changeAnimations(leftAnimation, rightAnimation);
+			}
+		}
+	}
+
+	addEntityList() {
+		let that = this;
+		this.projectiles.forEach(function (entity) {
+			that.game.addEntity(entity);
+		});
+	}
+
+	freeProjectiles() {
+		for (var i = 0; i < this.projectiles.length; i++) {
+			this.projectiles[i].attack = 0;
+			this.projectiles.removeFromWorld = true;
+		}
+	}
+
+	update() {
+		this.existTime -= this.game.clockTick
+		if (this.existTime <= 0) this.removeFromWorld = true;
+
+		for (var i = 0; i < this.projectiles.length; i++) {
+			if (this.removeFromWorld == true || this.projectiles[i].removeFromWorld == true) {
+				this.removeFromWorld = true;
+				for (var j = 0; j < this.projectiles.length; j++) {
+					this.projectiles[j].removeFromWorld = true;
+				}
+			}
+		}
 	}
 }
 

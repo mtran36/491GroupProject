@@ -1,9 +1,9 @@
 var levelOne = {
-	music: "./Audio/TestMusic.mp3",
-	background: "cyan",
+	music: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3",
+	background: [{attribute: 'style', value: 'background: cyan'}],
 	ground: [
 		// Entrance
-		{ x: -1, y: -1, width: 3, height: 3 },
+		{ x: -1, y: -1, width: 1, height: 2 },
 		{ x: -10, y: 6, width: 22, height: 22 },
 		{ x: 3, y: -9, width: 3, height: 12 },
 		{ x: 32, y: -9, height: 22, width: 9 },
@@ -12,7 +12,6 @@ var levelOne = {
 		{ x: 20, y: 6, height: 6, width: 15 },
 
 		// Shaft platforms
-		{ x: 15, y: 7, width: 2 },
 		{ x: 9, y: 11, width: 6 },
 		{ x: 18, y: 15, width: 2 },
 		{ x: 15, y: 19, width: 2 },
@@ -31,6 +30,9 @@ var levelOne = {
 		{ x: 9, y: 11, width: 2 },
 		{ x: 33, y: 5, width: 3, height: 6 }
 	],
+	standingBreakBlock: [
+		{ x: 15, y: 7, width: 2, blockType: 'Ground'}
+	],
 	flies: [
 		{ x: -5, y: 1, prizeRate: 0.2 }
 	],
@@ -47,6 +49,12 @@ var levelOne = {
 		{ x: -2, y: 3 }
 	],
 	powerups: [
-		{ x: 25, y: 5 }
+		{ x: 25, y: 5}
+	],
+	wingElement: [
+		{ x: 21, y: 5}
+	],
+	lightElement: [
+		{ x: 29, y: 5 }
 	]
 }

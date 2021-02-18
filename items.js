@@ -59,6 +59,13 @@ class Potions extends Items {
     }
 
     addItemsToDruid(DRUID) {
-        DRUID.health += 10;
+        if (DRUID.health === DRUID.maxHealth) {
+            DRUID.potionCounter += 1;
+        } else {
+            DRUID.health += 100;
+            if (DRUID.health >= DRUID.maxHealth) {
+                DRUID.health = DRUID.maxHealth;
+            }
+        }
     }
 }

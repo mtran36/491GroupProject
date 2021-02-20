@@ -114,11 +114,9 @@ class Ground extends Block {
 }
 
 /**
- * Block that when the druid stands on begins breaking.
- * Will break after a set period of time.
- * Will respawn after a set period of time.
+ * Superclass for breakable blocks.
  */
-class StandingBreakBlock extends Entity {
+class BreakBlock extends Entity {
 	constructor(game, x, y, width, height, blockType) {
 		super(game, x, y, "./Sprites/crack.png");
 		this.block;
@@ -128,15 +126,12 @@ class StandingBreakBlock extends Entity {
 				break;
 		}
 		this.worldBB = this.block.worldBB;
-		this.width = this.block.scaleDim.x * this.block.size.width;
-		this.height = this.block.scaleDim.y * this.block.size.height;
-		this.collideTime = 0;
+		this.width = this.block.worldBB.right - this.block.worldBB.left;
+		this.height = this.block.worldBB.bottom - this.block.worldBB.top;
+		this.exists = true;
+		this.collisionAmount = 0;
+		this.breakPoint = 1;
 		this.minCrack = 0;
-		this.breakTime = 1.5;
-		this.vanishedTime = 0;
-		this.respawnTime = 3;
-		this.fakeWorldBB = new BoundingBox(this.x, this.y, 0, 0);
-		this.druidOn = false;
 	}
 
 	/**
@@ -148,60 +143,31 @@ class StandingBreakBlock extends Entity {
 		this.game.addEntity(this.block);
 		this.block.oldDraw = this.block.draw;
 		this.block.draw = (context) => {
-			if (this.vanishedTime === 0) {
+			if (this.exists) {
 				this.block.oldDraw(context);
 				this.drawCrack(context);
 			}
 		}
 	}
 
-	/** @override */
-	update() {
-		if (!this.druidOn) {
-			this.collideTime -= this.game.clockTick;
-			this.collideTime = Math.max(this.collideTime, 0);
-		}
-		this.druidOn = false;
-		if (this.collideTime >= this.breakTime) {
-			this.vanishedTime += this.game.clockTick;
-			this.collideTime = 0;
-			this.minCrack = 0.25;
-			this.block.removeFromWorld = true;
-		} else if (this.vanishedTime >= this.respawnTime) {
-			this.block.removeFromWorld = false;
-			this.game.entities.splice(this.game.entities.findIndex(
-				(entity) => { entity === this; }), 0, this.block);
-			this.vanishedTime = 0;
-		} else if (this.vanishedTime > 0) {
-			this.vanishedTime += this.game.clockTick;
-		}
-	}
-
-	/**
-	 * Druid calls this if the druid is standing on this block.
-	 */
-	standOn() {
-		this.druidOn = true;
-		this.collideTime += this.game.clockTick;
-		this.collideTime = Math.min(this.collideTime, this.breakTime);
-	}
-
-	/**
+	/** @override
+	 * 
 	 * Empty draw method.
 	 * @param {any} context
 	 */
 	draw(context) {
-
+		// Does nothing.
 	}
 
 	/**
 	 * Draws the crack texture.
-	 * Crack texture size is based on the 
+	 * Crack texture size is based on the the amount of time the druid has been standing
+	 * on the block. Crack is drawn on top of the worldBB box of this.block.
 	 * Will be called by the block stored in this.block.
 	 * @param {CanvasRenderingContext2D} context
 	 */
 	drawCrack(context) {
-		let crackPercentage = this.collideTime / this.breakTime;
+		let crackPercentage = this.collisionAmount / this.breakPoint;
 		crackPercentage = Math.max(this.minCrack, crackPercentage);
 		let sourceWidth = 2000 * crackPercentage;
 		let sourceHeight = 1238 * crackPercentage;
@@ -216,6 +182,86 @@ class StandingBreakBlock extends Entity {
 				drawX - this.game.camera.pos.x,
 				drawY - this.game.camera.pos.y,
 				drawWidth, drawHeight);
+	}
+}
+
+/**
+ * Block that breaks over time as the druid stands on it.
+ * Will break after a set period of time.
+ * Will respawn after a set period of time.
+ */
+class StandingBreakBlock extends BreakBlock {
+	constructor(game, x, y, width, height, blockType) {
+		super(game, x, y, width, height, blockType);
+		this.breakPoint = 1.5;
+		this.vanishedTime = 0;
+		this.respawnTime = 3;
+		this.druidOn = false;
+	}
+
+	/** @override */
+	update() {
+		if (!this.druidOn) {
+			this.collisionAmount -= this.game.clockTick;
+			this.collisionAmount = Math.max(this.collisionAmount, 0);
+		}
+		this.druidOn = false;
+		if (this.collisionAmount >= this.breakPoint) {
+			this.collisionAmount = 0;
+			this.minCrack = 0.25;
+			this.block.removeFromWorld = true;
+			this.exists = false;
+		} else if (this.vanishedTime >= this.respawnTime) {
+			this.block.removeFromWorld = false;
+			this.game.entities.splice(this.game.entities.findIndex(
+				(entity) => { entity === this; }), 0, this.block);
+			this.vanishedTime = 0;
+			this.exists = true;
+		} else if (this.vanishedTime > 0) {
+			this.vanishedTime += this.game.clockTick;
+		}
+	}
+
+	/**
+	* Druid entity should call this when standing on a block of this class.
+	*/
+	standOn() {
+		this.druidOn = true;
+		this.collisionAmount += this.game.clockTick;
+		this.collisionAmount = Math.min(this.collisionAmount, this.breakPoint);
+	}
+}
+
+/**
+ * Block that breaks as the player hits it with attacks. 
+ */
+class HitBreakBlock extends BreakBlock {
+	constructor(game, x, y, width, height, blockType) {
+		super(game, x, y, width, height, blockType);
+		this.hitStep = 0.25;
+		this.minCrack = 0.1;
+		this.lingerTime = 0.05;
+	}
+
+	/**
+	 * Breaks the block by an amount equal to the damage number times the hitStep of
+	 * this block.
+	 * For example a damage of 1 and a hitstep of 0.25 will cause the block to increase
+	 * its break by a quarter.
+	 * @param {number} damage
+	 */
+	hitBlock(damage) {
+		this.collisionAmount += damage * this.hitStep;
+	}
+
+	update() {
+		if (this.lingerTime < 0) {
+			this.block.removeFromWorld = true;
+			this.removeFromWorld = true;
+		}
+		if (this.collisionAmount >= this.breakPoint) {
+			this.lingerTime -= this.game.clockTick;
+		}
 	}
 }
 

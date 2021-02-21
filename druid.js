@@ -164,6 +164,12 @@ class Druid extends Agent {
 		const WALK_SPEED = 300;
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
+		this.remainder = this.maxHealth - this.health;
+
+		if (this.potionCounter > 0 && this.remainder > 20) {
+			this.health += 20;
+			this.potionCounter -= 1;
+        }
 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;

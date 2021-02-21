@@ -40,14 +40,14 @@ class Potions extends Items {
 
     /** @override */
     loadAnimations() {
-        //this.animations[0] = new Animator(
-        //    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
-        //this.animations[0] = new Animator(
-        //    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
         this.animations[0] = new Animator(
-            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
+            this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
         this.animations[1] = new Animator(
-            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
+            this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
+        this.animations[2] = new Animator(
+            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
+        //this.animations[1] = new Animator(
+        //    this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
     }
 
     /** @override */
@@ -61,8 +61,11 @@ class Potions extends Items {
     addItemsToDruid(DRUID) {
         if (DRUID.health === DRUID.maxHealth) {
             DRUID.potionCounter += 1;
+            if (DRUID.potionCounter >= DRUID.maxPotions) {
+                DRUID.potionCounter = DRUID.maxPotions;
+            }
         } else {
-            DRUID.health += 100;
+            DRUID.health += 20;
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
             }

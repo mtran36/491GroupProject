@@ -56,5 +56,8 @@ var levelOne = {
 	],
 	lightElement: [
 		{ x: 29, y: 5 }
+	],
+	potions: [
+		{ x: 30, y: 5 } // temporary
 	]
 }

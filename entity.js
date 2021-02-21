@@ -22,7 +22,8 @@ class Entity {
             y: this.dim.y * this.scale
         };
         this.animations = [];
-        this.updateBB();
+        this.worldBB = this.makeDefaultBoundingBox();
+        this.lastWorldBB = this.worldBB;
     }
 
     /** 
@@ -46,14 +47,6 @@ class Entity {
         };
         this.worldBB = this.makeDefaultBoundingBox();
         this.lastWorldBB = this.makeDefaultBoundingBox();
-    }
-
-    /** 
-     * Updates the bounding box to the current position of the entity. 
-     */
-    updateBB() {
-        this.lastWorldBB = this.worldBB;
-        this.worldBB = this.makeDefaultBoundingBox();
     }
 
     /**
@@ -153,7 +146,6 @@ class Agent extends Entity {
         this.pos.y += this.vel.y * tick;
         this.updateBB();
         this.checkCollisions();
-        this.worldBB = this.makeDefaultBoundingBox();
         this.updateFacing();
         this.updateBB();
     }
@@ -275,7 +267,8 @@ class Agent extends Entity {
 
     /** @override */
     updateBB() {
-        super.updateBB();
+        this.lastWorldBB = this.worldBB;
+        this.worldBB = this.makeDefaultBoundingBox();
         this.lastAgentBB = this.agentBB;
         this.agentBB = this.makeDefaultBoundingCircle();
     }

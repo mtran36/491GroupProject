@@ -172,7 +172,6 @@ class StandingBreakBlock extends Entity {
 			this.game.entities.splice(this.game.entities.findIndex(
 				(entity) => { entity === this; }), 0, this.block);
 			this.vanishedTime = 0;
-			this.updateBB();
 		} else if (this.vanishedTime > 0) {
 			this.vanishedTime += this.game.clockTick;
 		}

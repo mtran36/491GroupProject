@@ -38,6 +38,10 @@ class RangedPowerUp extends PowerUp {
 		super(game, x, y, "./Sprites/greengem.png");
 	}
 
+	/**
+	 * Creates a basic ranged attack for druid when called.
+	 * @param {any} DRUID the main character.
+	 */
 	attack(DRUID) {
 		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
@@ -78,6 +82,10 @@ class WindElement extends PowerUp {
 		super(game, x, y, "./Sprites/bluegem.png");
 	}
 
+	/**
+	* Creates a tornado attack for druid when called.
+	* @param {any} DRUID the main character.
+	*/
 	attack(DRUID) {
 		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
@@ -85,12 +93,12 @@ class WindElement extends PowerUp {
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.BLOCKWIDTH,
-					DRUID.pos.y - 40, 180));
+					DRUID.pos.y - PARAMS.BLOCKWIDTH, 180));
 			} else { // shoot right
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - 40, 0));
+					DRUID.pos.y - PARAMS.BLOCKWIDTH, 0));
 			}
 			this.game.A = false;
 			this.cooldown = 1;
@@ -114,6 +122,10 @@ class LightElement extends PowerUp {
 		super(game, x, y, "./Sprites/yellowgem.png");
 	}
 
+	/**
+	* Creates a thunder attack for druid when called.
+	* @param {any} DRUID the main character.
+	*/
 	attack(DRUID) {
 		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {

@@ -2,81 +2,52 @@ class Items extends Agent {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
         this.emerging = false;
+        this.updateBB();
     }
 
     /** @override */
     update() {
-        this.checkCollision();
+        this.checkCollisions();
     }
 
-    //checkCollision() {
-    //    const DRUID = this.game.druid;
-    //    if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-    //        && that !== entity) {
-    //        if (entity instanceof Ground) {
-    //            if (that.vel.y > 0) {
-    //                if (that.lastWorldBB.bottom <= entity.worldBB.top
-    //                    && (that.lastWorldBB.left) < entity.worldBB.right
-    //                    && (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-    //                    that.pos.y = entity.worldBB.top - that.scaleDim.y;
-    //                    that.vel.y = 0;
-    //                }
-    //            }
-    //        }
-    //    }
+    addItemsToDruid(DRUID) {
+        console.warn("Potion not define: ");
+    }
 
-    //    if (this.worldBB.collide(DRUID.worldBB)) {
-    //        this.removeFromWorld = true;
-    //        this.addItemsToDruid(DRUID);
-    //    }
-    //}
+    defineAgentCollisions(entity) {
+        if (entity instanceof Druid) {
+            this.removeFromWorld = true;
+            this.addItemsToDruid(entity);
+        }
+    }
 
-    checkCollision() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB)
-				&& that !== entity) {
-				if (entity instanceof Ground || entity instanceof Door) {
-					if (that.vel.y > 0) {
-						if (that.lastWorldBB.bottom <= entity.worldBB.top
-							&& (that.lastWorldBB.left) < entity.worldBB.right
-							&& (that.lastWorldBB.right) > entity.worldBB.left) { // falling dowm
-							that.pos.y = entity.worldBB.top - that.scaleDim.y;
-							that.vel.y = 0;
-						}
-						// bottom corners to entity's top corners collision
-						if (that.lastWorldBB.bottom > entity.worldBB.top) {
-							if (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left) {
-								that.pos.x = entity.worldBB.left - that.scaleDim.x;
-								that.vel.x = 0;
-							} else if (that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right) {
-								that.pos.x = entity.worldBB.right;
-								that.vel.x = 0;
-							}
-						}
-					}
-				}
-				// Temporary collision detection for key and door
-				if (this.worldBB.collide(DRUID.worldBB)) {
-					this.removeFromWorld = true;
-					this.addItemsToDruid(DRUID);
-				}
-			}
-		});
-	}
+    /** @override */
+    defineWorldCollisions(entity, collisions) {
+        if (entity instanceof Ground) {
+            if (collisions.down) {
+                this.pos.y = entity.worldBB.top - this.scaleDim.y;
+                this.vel.y = 0;
+            }
+        }
+    }
 }
 
 class Potions extends Items {
     constructor(game, x, y) {
-        super(game, x, y, "./Sprites/testpotion.png");
-        //super(game, x, y, spriteSheetName);
-        this.setDimensions(1, 32, 32);
+        super(game, x, y - 100, "./Sprites/potions.png");
+        this.setDimensions(1, 45, 55);
     }
 
     /** @override */
     loadAnimations() {
+        //this.animations[0] = new Animator(
+        //    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
+        //this.animations[0] = new Animator(
+        //    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
         this.animations[0] = new Animator(
-            this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
+        this.animations[1] = new Animator(
+            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
     }
 
     /** @override */
@@ -84,10 +55,17 @@ class Potions extends Items {
         const FALL_ACC = 1500;
         const TICK = this.game.clockTick;
         this.vel.y += FALL_ACC * TICK;
+        this.move(TICK);
     }
 
-    /** @override */
-    updateBB() {
-        super.updateBB();
+    addItemsToDruid(DRUID) {
+        if (DRUID.health === DRUID.maxHealth) {
+            DRUID.potionCounter += 1;
+        } else {
+            DRUID.health += 100;
+            if (DRUID.health >= DRUID.maxHealth) {
+                DRUID.health = DRUID.maxHealth;
+            }
+        }
     }
 }

@@ -1,7 +1,11 @@
 class Block extends Entity {
 	constructor(game, x, y, width = 1, height = 1, spritesheet) {
 		super(game, x, y, spritesheet);
-		this.update = function () { /* Do nothing. */ };
+	}
+
+	/** @override */
+	update() {
+		// Do nothing
 	}
 
 	/**
@@ -61,7 +65,8 @@ class Ground extends Block {
 				this.pickLook(row, col);
 				context.drawImage(
 					this.spritesheet,
-					this.look.x * this.dim.x, this.look.y * this.dim.y,
+					this.look.x * this.dim.x,
+					this.look.y * this.dim.y,
 					this.dim.x, this.dim.y,
 					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
 					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
@@ -80,45 +85,27 @@ class Ground extends Block {
 	 */
 	pickLook(row, col) {
 		switch (row) {
-			// Pick sprite column
 			case 0:
-				if (this.size.height === 1) {
-					this.look.y = 8;
-				} else {
-					this.look.y = 0;
-				}
 				switch (col) {
 					case 0:
-						this.look.x = 0;
+						this.look.x = this.size.width === 1 ? 6 : 0;
 						break;
 					case this.size.width - 1:
 						this.look.x = 5;
 						break;
 					case 1:
-						if (this.size.width === 3) {
-							this.look.x = 6;
-						} else {
-							this.look.x = 1;
-						}
+						this.look.x = this.size.width === 3 ? 6 : 1;
 						break;
 					case this.size.width - 2:
 						this.look.x = 4;
 						break;
 					default:
-						if (col % 2 === 0) {
-							this.look.x = 2;
-						} else {
-							this.look.x = 3;
-						}
+						this.look.x = col % 2 === 0 ? 2 : 3;
 				}
+				this.look.y = this.size.height === 1 ? 8 : 0;
 				break;
-			// Otherwise pick sprite row
 			case this.size.height - 2:
-				if (this.size.height === 3) {
-					this.look.y = 6;
-				} else {
-					this.look.y = 4;
-				}
+				this.look.y = this.size.height === 3 ? 6 : 4;
 				break;
 			case this.size.height - 1:
 				this.look.y = 5;
@@ -127,21 +114,117 @@ class Ground extends Block {
 				if (row === 1) {
 					this.look.y = 1;
 				} else {
-					if (row % 2 === 0) {
-						this.look.y = 2;
-					} else {
-						this.look.y = 3;
-					}
+					this.look.y = row % 2 === 0 ? 2 : 3;
 				}
 		}
     }
 }
 
-class BreakBlock extends Block {
-	constructor(game, x, y, width, height) {
-		super(game, x, y, width, height, "");
-		this.setSize(width, height, );
-    }
+/**
+ * Block that when the druid stands on begins breaking.
+ * Will break after a set period of time.
+ * Will respawn after a set period of time.
+ */
+class StandingBreakBlock extends Entity {
+	constructor(game, x, y, width, height, blockType) {
+		super(game, x, y, "./Sprites/crack.png");
+		this.block;
+		switch (blockType) {
+			case 'Ground':
+				this.block = new Ground(game, x, y, width, height);
+				break;
+		}
+		this.worldBB = this.block.worldBB;
+		this.width = this.block.scaleDim.x * this.block.size.width;
+		this.height = this.block.scaleDim.y * this.block.size.height;
+		this.collideTime = 0;
+		this.minCrack = 0;
+		this.breakTime = 1.5;
+		this.vanishedTime = 0;
+		this.respawnTime = 3;
+		this.fakeWorldBB = new BoundingBox(this.x, this.y, 0, 0);
+		this.druidOn = false;
+	}
+
+	/**
+	 * Adds the block associated with this breaking block into the entity list.
+	 * Should be called immediately after the constructor.
+	 * Changes blocks draw method so that it will also call the draw method for this block.
+	 */
+	addBlock() {
+		this.game.addEntity(this.block);
+		this.block.oldDraw = this.block.draw;
+		this.block.draw = (context) => {
+			if (this.vanishedTime === 0) {
+				this.block.oldDraw(context);
+				this.drawCrack(context);
+			}
+		}
+	}
+
+	/** @override */
+	update() {
+		if (!this.druidOn) {
+			this.collideTime -= this.game.clockTick;
+			this.collideTime = Math.max(this.collideTime, 0);
+		}
+		this.druidOn = false;
+		if (this.collideTime >= this.breakTime) {
+			this.vanishedTime += this.game.clockTick;
+			this.collideTime = 0;
+			this.minCrack = 0.25;
+			this.block.removeFromWorld = true;
+		} else if (this.vanishedTime >= this.respawnTime) {
+			this.block.removeFromWorld = false;
+			this.game.entities.splice(this.game.entities.findIndex(
+				(entity) => { entity === this; }), 0, this.block);
+			this.vanishedTime = 0;
+			this.updateBB();
+		} else if (this.vanishedTime > 0) {
+			this.vanishedTime += this.game.clockTick;
+		}
+	}
+
+	/**
+	 * Druid calls this if the druid is standing on this block.
+	 */
+	standOn() {
+		this.druidOn = true;
+		this.collideTime += this.game.clockTick;
+		this.collideTime = Math.min(this.collideTime, this.breakTime);
+	}
+
+	/**
+	 * Empty draw method.
+	 * @param {any} context
+	 */
+	draw(context) {
+
+	}
+
+	/**
+	 * Draws the crack texture.
+	 * Crack texture size is based on the 
+	 * Will be called by the block stored in this.block.
+	 * @param {CanvasRenderingContext2D} context
+	 */
+	drawCrack(context) {
+		let crackPercentage = this.collideTime / this.breakTime;
+		crackPercentage = Math.max(this.minCrack, crackPercentage);
+		let sourceWidth = 2000 * crackPercentage;
+		let sourceHeight = 1238 * crackPercentage;
+		let sourcePosX = (2000 - sourceWidth) / 2;
+		let sourcePosY = (1238 - sourceHeight) / 2;
+		let drawWidth = this.width * crackPercentage;
+		let drawHeight = this.height * crackPercentage;
+		let drawX = this.pos.x + (this.width - drawWidth) / 2;
+		let drawY = this.pos.y + (this.height - drawHeight) / 2;
+		context.drawImage(this.spritesheet, sourcePosX, sourcePosY,
+				sourceWidth, sourceHeight,
+				drawX - this.game.camera.pos.x,
+				drawY - this.game.camera.pos.y,
+				drawWidth, drawHeight);
+	}
 }
 
 class Mask extends Block {
@@ -207,20 +290,28 @@ class Minimap extends Entity {
 	};
 
 	draw(context) {
-		let entity;
+		const SCALE = 16;
+		const PIP_SIDE_LEN = 4;
+		let that = this, entity;
+
 		context.save();
 		context.strokeStyle = "black";
-		context.lineWidth = 1;
+		context.lineWidth = 3;
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
-		context.restore();
-		for (entity = 0; entity < this.game.entities.length; entity++) {
-			if (this.game.entities[entity].drawMinimap) {
-				this.game.entities[entity].drawMinimap(context, this.pos.x, this.pos.y);
+		this.game.entities.forEach(function (entity) {
+			context.fillStyle = entity.mapPipColor;
+			let x = that.pos.x + (entity.pos.x - that.game.camera.pos.x) / SCALE;
+			let y = that.pos.y + (entity.pos.y - that.game.camera.pos.y) / SCALE;
+			if (x > that.pos.x
+				&& y > that.pos.y
+				&& y < that.pos.y + that.width
+				&& x < that.pos.x + that.width) {
+				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
 			}
-		}
+		});
+		context.restore();
 	};
 };
-
 
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 

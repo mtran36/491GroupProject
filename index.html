@@ -5,7 +5,7 @@
     <title>Hollow Tree Project</title>
     <script type="text/javascript" src="./entity.js"></script>
     <script type="text/javascript" src="./attacks.js"></script>
-    <script type="text/javascript" src="./screen.js"></script>
+    <script type="text/javascript" src="./overlay.js"></script>
     <script type="text/javascript" src="./powerups.js"></script>
     <script type="text/javascript" src="./assetloader.js"></script>
     <script type="text/javascript" src="./audioplayer.js"></script>
@@ -23,10 +23,13 @@
 </head>
 <body>
     <canvas id="gameWorld" tabindex="0" width="1024" height="768" 
-            style="background: cyan; border: 1px solid black"></canvas>
+            style="background: black; border: 1px solid black"></canvas>
     <div>
-        <b>Volume:</b>
-        <input type="range" name="volume" id="volume" min="0" max="1" step="0.001" />
+        <b>Music:</b>
+        <input type="range" id="musicVolume" min="0" max="1" step="0.001" value="0.5" />
+        <br />
+        <b>Sound:</b>
+        <input type="range" id="soundVolume" min="0" max="1" step="0.001" value="0.5" />
         <br />
         <br />
         <input type="checkbox" id="debug"> Debug
@@ -40,6 +43,11 @@
         <i>Jump</i> - Z or K <br />
         <i>Knife</i> - C or L <br />
         <i>Throw</i> - X or J <br />
+        <i>Change Attack</i> - Shift then J <br />
+        <br />
+        <br />
+        Music used is by Abstraction who can be found at
+        <a href="http://www.abstractionmusic.com/">www.abstractionmusic.com</a>
     </div>
 </body>
 </html>

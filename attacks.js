@@ -18,6 +18,7 @@ class SwordAttack extends Agent {
 			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
 		}
 		this.updateBB();
+		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 	}
 
 	/** @override */
@@ -159,8 +160,7 @@ class BasicRangedAttack extends Agent {
 class TornadoAttack{
 	constructor(game, x, y, degree) {
 		this.game = game;
-		this.x = x;
-		this.y = y;
+		this.pos = { x, y };
 		this.degree = degree;
 		this.attack = 0.8;
 		this.speed = 400
@@ -182,7 +182,7 @@ class TornadoAttack{
 				var hasAnimation = false;
             }
 			this.projectiles.push(new BasicRangedAttack(
-				this.game, this.x, this.y + i * RADIUS * 2,
+				this.game, this.pos.x, this.pos.y + i * RADIUS * 2,
 				this.degree, RADIUS, this.speed, this.attack, hasAnimation));
 			this.projectiles[i].force = 600;
 			this.projectiles[i].owner = this;
@@ -226,8 +226,7 @@ class TornadoAttack{
 class ThunderAttack {
 	constructor(game, x, y, degree) {
 		this.game = game;
-		this.x = x;
-		this.y = y;
+		this.pos = { x, y };
 		this.degree = degree;
 		this.attack = 2;
 		this.speed = 700;
@@ -248,7 +247,7 @@ class ThunderAttack {
 				var hasAnimation = false;
 			}
 			this.projectiles.push(new BasicRangedAttack(
-				this.game, this.x + i * 2 * RADIUS, this.y,
+				this.game, this.pos.x + i * 2 * RADIUS, this.pos.y,
 				this.degree, RADIUS,
 				this.speed, this.attack, hasAnimation));
 			this.projectiles[i].owner = this;

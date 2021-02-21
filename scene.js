@@ -3,8 +3,8 @@ class Scene {
 		this.game = game;
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
+		this.draw = function () { /* Do nothing */ };
 
-		//this.minimap = new Minimap(this.game, 260, 100, 740);
 		this.createScreens();
 	};
 
@@ -31,7 +31,12 @@ class Scene {
 			AUDIO_PLAYER.playMusic(level.music);
 		}
 		if (level.background) {
-			document.getElementById("gameWorld").setAttribute('style', 'background: cyan');
+			for (i = 0; i < level.background.length; i++) {
+				let attribute = level.background.attribute;
+				let value = level.background.value;
+				document.getElementById("gameWorld").setAttribute(
+					attribute, value);
+			}
 		}
 		if (level.ground) {
 			for (i = 0; i < level.ground.length; i++) {
@@ -50,7 +55,19 @@ class Scene {
 					PARAMS.TILE_WIDTH * mask.y,
 					mask.width, mask.height));
             }
-        }
+		}
+		if (level.standingBreakBlock) {
+			for (i = 0; i < level.standingBreakBlock.length; i++) {
+				let standingBreakBlock = level.standingBreakBlock[i];
+				standingBreakBlock = new StandingBreakBlock(this.game,
+					PARAMS.TILE_WIDTH * standingBreakBlock.x,
+					PARAMS.TILE_WIDTH * standingBreakBlock.y,
+					standingBreakBlock.width, standingBreakBlock.height,
+					standingBreakBlock.blockType);
+				this.game.addEntity(standingBreakBlock);
+				standingBreakBlock.addBlock();
+			}
+		}
 		if (level.flies) {
 			for (i = 0; i < level.flies.length; i++) {
 				let fly = level.flies[i];
@@ -142,10 +159,9 @@ class Scene {
 					powerup.y * PARAMS.TILE_WIDTH));
 			}
 		}
-		this.game.druid = new Druid(
-			this.game, x, y)
+		this.game.druid = new Druid(this.game, x, y)
 		this.game.addEntity(this.game.druid);
-		this.game.addEntity(new Minimap(this.game, 100, 100, 100));
+		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
 	};
 
 	update() {
@@ -156,9 +172,5 @@ class Scene {
 			this.pos.x = Math.floor(this.pos.x);
 			this.pos.y = Math.floor(this.pos.y);
 		}
-	};
-
-	draw() {
-
 	};
 }

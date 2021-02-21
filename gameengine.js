@@ -34,6 +34,7 @@ class GameEngine {
     init(canvas) {
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
+        this.context.imageSmoothingEnabled = false;
         this.surfaceWidth = this.context.canvas.width;
         this.surfaceHeight = this.context.canvas.height;
         this.startInput();

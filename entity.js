@@ -21,7 +21,10 @@ class Entity {
             x: this.dim.x * this.scale,
             y: this.dim.y * this.scale
         };
+        this.lastPos = { x, y };
         this.animations = [];
+        this.worldBB = this.makeDefaultBoundingBox();
+        this.lastWorldBB = this.makeDefaultBoundingBox();
     }
 
     /** 
@@ -43,15 +46,31 @@ class Entity {
             x: width * this.scale,
             y: height * this.scale
         };
-        this.updateBB();
+        this.worldBB = this.makeDefaultBoundingBox();
+        this.lastWorldBB = this.makeDefaultBoundingBox();
     }
 
     /** 
      * Updates the bounding box to the current position of the entity. 
      */
     updateBB() {
-        this.lastWorldBB = this.worldBB;
-        this.worldBB = this.makeDefaultBoundingBox();
+
+        let xChange = this.pos.x - this.lastPos.x;
+        let yChange = this.pos.y - this.lastPos.y;
+
+        this.lastWorldBB.x = this.worldBB.x;
+        this.lastWorldBB.y = this.worldBB.y;
+        this.lastWorldBB.left = this.worldBB.left;
+        this.lastWorldBB.right = this.worldBB.right;
+        this.lastWorldBB.top = this.worldBB.top;
+        this.lastWorldBB.bottom = this.worldBB.bottom
+
+        this.worldBB.x += xChange;
+        this.worldBB.left += xChange;
+        this.worldBB.right += xChange;
+        this.worldBB.y += yChange;
+        this.worldBB.top += yChange;
+        this.worldBB.bottom += yChange;
     }
 
     /**
@@ -147,11 +166,14 @@ class Agent extends Entity {
      * @param {number} tick Amount of time which has passed since the last tick in ms.
      */
     move(tick) {
+        this.lastPos.x = this.pos.x;
+        this.lastPos.y = this.pos.y;
         this.pos.x += this.vel.x * tick;
         this.pos.y += this.vel.y * tick;
         this.updateBB();
+        this.lastPos.x = this.pos.x;
+        this.lastPos.y = this.pos.y;
         this.checkCollisions();
-        this.worldBB = this.makeDefaultBoundingBox();
         this.updateFacing();
         this.updateBB();
     }
@@ -274,8 +296,11 @@ class Agent extends Entity {
     /** @override */
     updateBB() {
         super.updateBB();
-        this.lastAgentBB = this.agentBB;
-        this.agentBB = this.makeDefaultBoundingCircle();
+        let xChange = this.pos.x - this.lastPos.x;
+        let yChange = this.pos.y - this.lastPos.y;
+
+        this.agentBB.x += xChange;
+        this.agentBB.y += yChange;
     }
 
     /** @override */
@@ -332,6 +357,13 @@ class BoundingBox {
                 this.width, this.height);
             game.context.restore();
         }
+    }
+
+    shift(xChange, yChange) {
+        this.left += xChange;
+        this.right += xChange;
+        this.top += yChange;
+        this.bottom += yChange;
     }
 }
 

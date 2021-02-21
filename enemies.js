@@ -103,6 +103,7 @@ class Fly extends Enemy {
 		this.velMax = { x: 400, y: 400 };
 		this.left = false;
 		this.up = false;
+		this.seesDruid = false;
 		this.accelerate = false;
 	}
 
@@ -118,10 +119,15 @@ class Fly extends Enemy {
 	update() {
 		const DRUID = this.game.druid;
 		if (this.canSee(DRUID)) {
+			if (!this.seesDruid) {
+				AUDIO_PLAYER.playSound("./Audio/FlyBuzz.mp3");
+			}
+			this.seesDruid = true;
 			this.accelerate = true;
 			this.left = this.sight.x > DRUID.agentBB.x;
 			this.up = this.sight.y > DRUID.agentBB.y;
 		} else {
+			this.seesDruid = false;
 			this.accelerate = false;
 		}
 		var velChangeX = this.ACC.x * this.game.clockTick;

@@ -59,6 +59,7 @@ class Potions extends Items {
     }
 
     addItemsToDruid(DRUID) {
+        AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
         if (DRUID.health === DRUID.maxHealth) {
             DRUID.potionCounter += 1;
         } else {

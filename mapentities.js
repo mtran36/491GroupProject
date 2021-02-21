@@ -23,16 +23,9 @@ class Block extends Entity {
 		};
 		// Use algebra to find correct scale value
 		this.setDimensions(PARAMS.TILE_WIDTH / sideLen, sideLen, sideLen);
-    }
-
-	/** @override */
-	updateBB(context) {
-		this.worldBB = new BoundingBox(
-			this.pos.x, this.pos.y,
-			this.size.width * this.scaleDim.x,
-			this.size.height * this.scaleDim.y);
+		this.worldBB = new BoundingBox(this.pos.x, this.pos.y, width * sideLen * this.scale, height * sideLen * this.scale);
 		this.lastWorldBB = this.worldBB;
-	}
+    }
 
 	/** @override */
 	draw(context) {

@@ -299,7 +299,7 @@ class EnemyRangedAttack extends Agent {
 		super(game, x, y, "./Sprites/TestEnemyAttack.png");
 		this.setDimensions(1.5, 16, 16);
 		this.force = 450;
-		this.attack = 25;
+		this.attack = 5;
 		this.startX = x;
 		this.startY = y;
 		this.maxDist = 1200;

@@ -393,6 +393,10 @@ class BoundingBox {
         this.right = this.x + this.width;
         this.bottom = this.y + this.height;
     }
+
+    centerPoint() {
+        return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
+    }
 }
 
 /** 

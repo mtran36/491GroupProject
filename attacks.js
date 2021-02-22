@@ -93,6 +93,7 @@ class BasicRangedAttack extends Agent {
 		this.vel.x = Math.round((speed * Math.cos(radian)) * 100) / 100;
 		this.vel.y = Math.round(-(speed * Math.sin(radian)) * 100) / 100;
 		this.attack = attack;
+		this.force = 1500;
 		this.attackOwner = null;
 
 		if (hasAnimation === false) {
@@ -140,7 +141,7 @@ class BasicRangedAttack extends Agent {
 		if (entity instanceof Enemy) {
 			if (this.attackOwner instanceof TornadoAttack) {
 				if (!this.attackOwner.damagedEnemies.includes(entity)) {
-					entity.knockup(this);
+					entity.knockback(this, Math.pi / 2);
 					this.attackOwner.addAttackedEnemy(entity);
 					entity.takeDamage(this.attack);
 				}

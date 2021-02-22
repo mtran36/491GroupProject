@@ -5,6 +5,8 @@ class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
+		this.worldBB = new BoundingBox(
+			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
 		this.game.druid = this;
 
 		this.loadAnimations();
@@ -19,72 +21,27 @@ class Druid extends Agent {
 		this.potionCounter = 6;
 		this.maxPotions = 10;
 		this.keyCounter = 0;
+		this.xOffset = 45;
+		this.currentOffset = this.xOffset;
 
 		this.attackSelection = null;
 		this.attacks = [];
 	}
 
-	meleeAttack(DRUID) {
-		DRUID.meleeAttackCooldown -= DRUID.game.clockTick;
-		if (DRUID.meleeAttackCooldown <= 0 && DRUID.game.C) {
-			if (DRUID.facing === 0) { // stab left
-				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
-			} else { // stab right
-				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
-			}
-			DRUID.game.C = false;
-			DRUID.meleeAttackCooldown = 1;
-		}
-	}
-
-	/**
-	 * Draws a standard resource bar which can be depleted.
-	 * @param {CanvasImageSource} context Canvas to draw to.
-	 * @param {number} xOffset Horizontal distance from origin.
-	 * @param {number} yOffset Vertical distance from origin.
-	 * @param {number} width Height of the bar.
-	 * @param {number} borderOffset Width of the black border around the bar.
-	 * @param {Object} resource Resource this bar will display, has current and max values.
-	 * @param {String} name Text to be placed on the left side of the bar.
-	 * @param {String} color Color to use for bar fill.
+	/** 
+	 *
 	 */
-	drawBar(context, xOffset, yOffset, width, borderOffset, resource, name, color) {
-		const FONT = "italic bold 16px Castellar"
-		const TEXT_COLOR = "black";
-		const X_TEXT_NUDGE = 10;
-		const X_TEXT_POS_SCALE = 0.65;
-		const Y_TEXT_NUDGE = 2;
-		const Y_TEXT_POS_SCALE = 1.5;
-
-		context.save();
-		// Draw Bars
-		context.fillStyle = "black";
-		context.fillRect(
-			xOffset, yOffset,
-			resource.max * resource.tickWidth + borderOffset,
-			width + borderOffset);
-		context.fillStyle = "white";
-		context.fillRect(
-			xOffset + borderOffset, yOffset + borderOffset,
-			resource.max * resource.tickWidth - borderOffset,
-			width - borderOffset);
-		context.fillStyle = color;
-		context.fillRect(
-			xOffset + borderOffset, yOffset + borderOffset,
-			resource.current * resource.tickWidth - borderOffset,
-			width - borderOffset);
-		// Draw Text
-		context.fillStyle = TEXT_COLOR;
-		context.font = FONT;
-		context.fillText(
-			resource.current + "/" + resource.max + resource.name,
-			(xOffset + resource.max * resource.tickWidth) * X_TEXT_POS_SCALE,
-			yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
-		context.fillText(
-			name,
-			xOffset + X_TEXT_NUDGE,
-			yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
-		context.restore();
+	meleeAttack() {
+		this.meleeAttackCooldown -= this.game.clockTick;
+		if (this.meleeAttackCooldown <= 0 && this.game.C) {
+			if (this.facing === 0) { // stab left
+				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
+			} else { // stab right
+				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
+			}
+			this.game.C = false;
+			this.meleeAttackCooldown = 1;
+		}
 	}
 
 	/** @override */
@@ -146,20 +103,18 @@ class Druid extends Agent {
 
 	/** @override */
 	loadAnimations() {
-		// Walking right
-		this.animations[0] = new Animator(
+		let i;
+		for (i = 0; i < 2; i++) {
+			this.animations.push([]);
+		}
+		this.animations[0][0] = new Animator( // Walking right
 			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true);
-		// Walking left
-		this.animations[1] = new Animator(
+		this.animations[1][0] = new Animator( // Walking left
 			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false);
-		/*
-		// Jumping right
-		this.animations[0] = new Animator(
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, true);
-		// Jumping left
-		this.animations[1] = new Animator(
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, false);
-		*/
+		this.animations[0][1] = new Animator( // Jumping right
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, true);
+		this.animations[1][1] = new Animator( // Jumping left
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, false);
 	}
 
 	/** @override */
@@ -186,7 +141,7 @@ class Druid extends Agent {
 		}
 
 		// check if melee attack is made
-		this.meleeAttack(this);
+		this.meleeAttack();
 		// check if switch attack
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
@@ -208,7 +163,7 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-		this.drawBar(
+		HUD.drawBar(
 			context, 10, 10, 30, 3,
 			{ 
 				current: this.health,
@@ -217,7 +172,7 @@ class Druid extends Agent {
 				tickWidth: 5
 			},
 			"DRUID", this.health / this.maxHealth <= 0.2 ? "red" : "green");
-		this.drawBar(
+		HUD.drawBar(
 			context, 10, 45, 30, 3,
 			{
 				current: this.potionCounter,
@@ -227,15 +182,13 @@ class Druid extends Agent {
 			},
 			"POTIONS", "teal");
 		if (this.flashing) return;
-		super.draw(context);
-		/*
-		if (this.vel.y > 0 || this.vel)
-		this.animations[this.facing].drawFrame(
+		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,
 			this.pos.x, this.pos.y,
-			this.scale, this.game.camera);
+			this.scale, this.game.camera, this.xOffset);
 		this.worldBB.display(this.game);
-		this.agentBB.display(this.game);
-		*/
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
 	}
 }

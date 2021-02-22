@@ -24,15 +24,19 @@ class Enemy extends Agent {
 	 * force vector are then applied to the enemies x and y velocities respectively.
 	 * @param {Agent} attack Agent that has a knockback force value defined.
 	 */
-	knockback(attack) {
-		if (this.agentBB.x - attack.agentBB.x === 0) {
+	knockback(attack, angle) {
+		let thisCenter = this.worldBB.centerPoint();
+		let attackCenter = attack.worldBB.centerPoint();
+		if (thisCenter.x - attackCenter.x === 0) {
 			// If the collision is directly vertical, then the entire force applies to 
 			// the y velocity.
 			this.vel.y = attack.force;
 		} else {
-			let angle = Math.atan2(
-				this.agentBB.y - attack.agentBB.y,
-				this.agentBB.x - attack.agentBB.x);
+			if (!angle) {
+				angle = Math.atan2(
+					thisCenter.y - attackCenter.y,
+					thisCenter.x - attackCenter.x);
+			}
 			this.vel.y = attack.force * Math.sin(angle);
 			this.vel.x = attack.force * Math.cos(angle);
 		}
@@ -57,15 +61,16 @@ class Enemy extends Agent {
 	 * 0-1.
 	 */
 	spawnPrize() {
+		let thisCenter = this.worldBB.centerPoint();
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
 			switch (this.prize) {
 				case "Potion":
 					this.game.addEntity(new Potions(
-						this.game, this.agentBB.x, this.agentBB.y));
+						this.game, thisCenter.x, thisCenter.y));
 					break;
 				case "Key":
 					this.game.addEntity(new Key(
-						this.game, this.agentBB.x, this.agentBB.y));
+						this.game, thisCenter.x, thisCenter.y));
 					break;
 			}
 		}
@@ -76,8 +81,15 @@ class Enemy extends Agent {
 	 * @param {any} DRUID
 	 */
 	canSee(DRUID) {
-		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
-		return this.sight.collide(DRUID.agentBB);
+		let thisCenter = this.worldBB.centerPoint();
+		let result = false;
+		this.sight = new BoundingCircle(thisCenter.x, thisCenter.y, this.sightRange);
+		DRUID.agentBB.forEach((BB) => {
+			if (this.sight.collide(BB)) {
+				result = true;
+			}
+		});
+		return result;
 	}
 
 	/**
@@ -125,15 +137,16 @@ class Fly extends Enemy {
 
 	/** @override */
 	update() {
-		const DRUID = this.game.druid;
-		if (this.canSee(DRUID)) {
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+		if (this.canSee(this.game.druid)) {
 			if (!this.seesDruid) {
 				AUDIO_PLAYER.playSound("./Audio/FlyBuzz.mp3");
 			}
 			this.seesDruid = true;
 			this.accelerate = true;
-			this.left = this.sight.x > DRUID.agentBB.x;
-			this.up = this.sight.y > DRUID.agentBB.y;
+			console.warn("test");
+			this.left = this.sight.x > druidCenter.x;
+			this.up = this.sight.y > druidCenter.y;
 		} else {
 			this.seesDruid = false;
 			this.accelerate = false;
@@ -173,7 +186,7 @@ class Fly extends Enemy {
 		let y = this.worldBB.y;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				y = entity.worldBB.top - this.worldBB.width;
+				y = entity.worldBB.top - this.worldBB.height;
 				if (this.vel.y > 100) {
 					bounce = true;
 				}
@@ -225,6 +238,9 @@ class RangedFly extends Fly {
 	}
 
 	update() {
+		let thisCenter = this.worldBB.centerPoint();
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+
 		if (this.canShoot) {
 			if (this.vel.x > 0) {
 				this.vel.x = Math.max(
@@ -242,9 +258,9 @@ class RangedFly extends Fly {
 			}
 			if (this.vel.x === 0 && this.vel.y === 0) {
 				this.game.addEntity(new EnemyRangedAttack(this.game,
-					this.agentBB.x, this.agentBB.y,
-					this.game.druid.agentBB.x - this.agentBB.x,
-					this.game.druid.agentBB.y - this.agentBB.y));
+					thisCenter.x, thisCenter.y,
+					druidCenter.x - thisCenter.x,
+					druidCenter.y - thisCenter.y));
 				AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
 				this.canShoot = false;
 			}
@@ -431,11 +447,11 @@ class Hopper extends Enemy {
 
 	/** @override */
 	update() {
-		const DRUID = this.game.druid;
+		let druidCenter = this.game.druid.worldBB.centerPoint();
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
-		if (this.canSee(DRUID) && !this.jumping && this.landTime < 0) {
-			this.left = this.agentBB.x > DRUID.agentBB.x;
+		if (this.canSee(this.game.druid) && !this.jumping && this.landTime < 0) {
+			this.left = this.sightRange.x > druidCenter.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 			AUDIO_PLAYER.playSound("./Audio/Hopper.mp3");
@@ -453,7 +469,7 @@ class Hopper extends Enemy {
 		let y = this.worldBB.y;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				y = entity.worldBB.top - this.scaleDim.y;
+				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;
 				this.vel.x = 0;
 				if (this.jumping) {
@@ -470,7 +486,7 @@ class Hopper extends Enemy {
 				this.vel.x = -this.vel.x;
 			}
 			if (collisions.right) {
-				x = entity.worldBB.left - this.scaleDim.x;
+				x = entity.worldBB.left - this.worldBB.width;
 				this.vel.x = -this.vel.x;
 			}
 		}

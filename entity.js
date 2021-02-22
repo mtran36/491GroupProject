@@ -364,6 +364,10 @@ class BoundingBox {
         }
     }
 
+    /**
+     * Copy the stored values of otherBox into this Bounding Box.
+     * @param {BoundingBox} otherBox
+     */
     copy(otherBox) {
         this.x = otherBox.x;
         this.y = otherBox.y;
@@ -375,6 +379,12 @@ class BoundingBox {
         this.bottom = otherBox.bottom;
     }
 
+    /**
+     * Shift the BoundingBox to the new (x, y) position. Update all other stored values
+     * based on this new position;
+     * @param {Number} x
+     * @param {Number} y
+     */
     shift(x, y) {
         this.x = x;
         this.y = y;
@@ -382,6 +392,10 @@ class BoundingBox {
         this.top = this.y;
         this.right = this.x + this.width;
         this.bottom = this.y + this.height;
+    }
+
+    centerPoint() {
+        return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
     }
 }
 
@@ -423,12 +437,21 @@ class BoundingCircle {
         }
     }
 
+/**
+* Copy the stored values of otherCircle into this BoundingCircle.
+* @param {BoundingCircle} otherBox
+*/
     copy(otherCircle) {
         this.x = otherCircle.x;
         this.y = otherCircle.y;
         this.radius = otherCircle.radius;
     }
 
+/**
+* Shift the BoundingCircle to the new (x, y) position.
+* @param {Number} x
+* @param {Number} y
+*/
     shift(x, y) {
         this.x = x;
         this.y = y;

@@ -6,7 +6,6 @@ class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
 		this.defineAgentCollisions = () => { };
-		this.updateBB();
 		this.cooldown = 0;
 	} 
 

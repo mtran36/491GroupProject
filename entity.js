@@ -23,7 +23,7 @@ class Entity {
         };
         this.animations = [];
         this.worldBB = this.makeDefaultBoundingBox();
-        this.lastWorldBB = this.worldBB;
+        this.lastWorldBB = this.makeDefaultBoundingBox();
     }
 
     /** 
@@ -108,6 +108,12 @@ class Agent extends Entity {
         this.loadAnimations();
     }
 
+    setDimensions(scale, width, height) {
+        super.setDimensions(scale, width, height);
+        this.agentBB = this.makeDefaultBoundingCircle();
+        this.lastAgentBB = this.makeDefaultBoundingCircle();
+    }
+
     /** 
      * Updates this agent's facing direction. 
      */
@@ -142,10 +148,23 @@ class Agent extends Entity {
      * @param {number} tick Amount of time which has passed since the last tick in ms.
      */
     move(tick) {
-        this.pos.x += this.vel.x * tick;
-        this.pos.y += this.vel.y * tick;
+        let diffPosX = this.pos.x - this.worldBB.x;
+        let diffPosY = this.pos.y - this.worldBB.y;
+        let diffAgentX = this.agentBB.x - this.worldBB.x;
+        let diffAgentY = this.agentBB.y - this.worldBB.y;
         this.updateBB();
+        this.worldBB.shift(
+            this.worldBB.x += this.vel.x * tick,
+            this.worldBB.y += this.vel.y * tick);
+        this.agentBB.shift(
+            this.worldBB.x + diffAgentX,
+            this.worldBB.y + diffAgentY);
         this.checkCollisions();
+        this.agentBB.shift(
+            this.worldBB.x + diffAgentX,
+            this.worldBB.y + diffAgentY);
+        this.pos.x = this.worldBB.x + diffPosX;
+        this.pos.y = this.worldBB.y + diffPosY;
         this.updateFacing();
         this.updateBB();
     }
@@ -267,10 +286,8 @@ class Agent extends Entity {
 
     /** @override */
     updateBB() {
-        this.lastWorldBB = this.worldBB;
-        this.worldBB = this.makeDefaultBoundingBox();
-        this.lastAgentBB = this.agentBB;
-        this.agentBB = this.makeDefaultBoundingCircle();
+        this.lastWorldBB.copy(this.worldBB);
+        this.lastAgentBB.copy(this.agentBB);
     }
 
     /** @override */
@@ -329,11 +346,24 @@ class BoundingBox {
         }
     }
 
-    shift(xChange, yChange) {
-        this.left += xChange;
-        this.right += xChange;
-        this.top += yChange;
-        this.bottom += yChange;
+    copy(otherBox) {
+        this.x = otherBox.x;
+        this.y = otherBox.y;
+        this.width = otherBox.width;
+        this.height = otherBox.height;
+        this.left = otherBox.left;
+        this.right = otherBox.right;
+        this.top = otherBox.top;
+        this.bottom = otherBox.bottom;
+    }
+
+    shift(x, y) {
+        this.x = x;
+        this.y = y;
+        this.left = this.x;
+        this.top = this.y;
+        this.right = this.x + this.width;
+        this.bottom = this.y + this.height;
     }
 }
 
@@ -373,5 +403,16 @@ class BoundingCircle {
             game.context.stroke();
             game.context.restore();
         }
+    }
+
+    copy(otherCircle) {
+        this.x = otherCircle.x;
+        this.y = otherCircle.y;
+        this.radius = otherCircle.radius;
+    }
+
+    shift(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }

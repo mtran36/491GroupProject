@@ -113,23 +113,26 @@ class Druid extends Agent {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
+
 		if (entity instanceof Ground || entity instanceof Door) {
 			if (collisions.down) {
-				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;
 				this.isJumping = false;
 			}
 			if (collisions.up) {
-				this.pos.y = entity.worldBB.bottom;
+				y = entity.worldBB.bottom;
 				this.vel.y = 0;
 				this.isJumping = true;
 			}
 			if (collisions.right) {
-				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				x = entity.worldBB.left - this.worldBB.width;
 				this.vel.x = 0;
 			}
 			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
+				x = entity.worldBB.right;
 				this.vel.x = 0;
 			}
 		}
@@ -138,6 +141,7 @@ class Druid extends Agent {
 				entity.standOn();
 			}
 		}
+		this.worldBB.shift(x, y);
     }
 
 	/** @override */

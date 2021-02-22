@@ -190,7 +190,5 @@ class Druid extends Agent {
 		this.agentBB.forEach((BB) => {
 			BB.display(this.game);
 		});
-		context.fillStyle = 'red';
-		context.fillRect(100, 100, 100, 100);
 	}
 }

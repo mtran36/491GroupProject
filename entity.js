@@ -149,13 +149,22 @@ class Agent extends Entity {
      */
     move(tick) {
         let i;
-        if (this.agentBB instanceof BoundingCircle) {
-            this.agentBB = [ this.agentBB ];
-        }
         let diffPosX = this.pos.x - this.worldBB.x;
         let diffPosY = this.pos.y - this.worldBB.y;
         let diffAgentX = [];
-        let diffAgentY = []; 
+        let diffAgentY = [];
+        let shiftAgents = () => {
+            let i;
+            for (i = 0; i < this.agentBB.length; i++) {
+                this.agentBB[i].shift(
+                    this.worldBB.x + diffAgentX[i],
+                    this.worldBB.y + diffAgentY[i]);
+            }
+        }
+
+        if (this.agentBB instanceof BoundingCircle) {
+            this.agentBB = [this.agentBB];
+        }
         for (i = 0; i < this.agentBB.length; i++) {
             diffAgentX[i] = this.agentBB[i].x - this.worldBB.x;
             diffAgentY[i] = this.agentBB[i].y - this.worldBB.y;
@@ -164,17 +173,9 @@ class Agent extends Entity {
         this.worldBB.shift(
             this.worldBB.x += this.vel.x * tick,
             this.worldBB.y += this.vel.y * tick);
-        for (i = 0; i < this.agentBB.length; i++) {
-            this.agentBB[i].shift(
-                this.worldBB.x + diffAgentX[i],
-                this.worldBB.y + diffAgentY[i]);
-        }
+        shiftAgents();
         this.checkCollisions();
-        for (i = 0; i < this.agentBB.length; i++) {
-            this.agentBB[i].shift(
-                this.worldBB.x + diffAgentX[i],
-                this.worldBB.y + diffAgentY[i]);
-        }
+        shiftAgents();
         this.pos.x = this.worldBB.x + diffPosX;
         this.pos.y = this.worldBB.y + diffPosY;
         this.updateFacing();
@@ -351,7 +352,6 @@ class BoundingBox {
      * @param {CanvasImageSource} game.context Canvas to draw on.
      */
     display(game) {
-        console.warn("hit");
         if (PARAMS.DEBUG) {
             game.context.save();
             game.context.strokeStyle = 'red';

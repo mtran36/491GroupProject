@@ -3,7 +3,7 @@ class Scene {
 		this.game = game;
 		this.game.camera = this;
 		this.pos = { x: 0, y: 0 };
-		this.draw = function () { /* Do nothing */ };
+		this.draw = () => { /* Do nothing */ };
 
 		this.createScreens();
 	};
@@ -167,8 +167,8 @@ class Scene {
 	update() {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
 		if (this.game.druid) {
-			this.pos.x = this.game.druid.agentBB.x - PARAMS.CANVAS_WIDTH / 2;
-			this.pos.y = this.game.druid.agentBB.y - PARAMS.CANVAS_HEIGHT / 2;
+			this.pos.x = this.game.druid.worldBB.x - PARAMS.CANVAS_WIDTH / 2;
+			this.pos.y = this.game.druid.worldBB.y - PARAMS.CANVAS_HEIGHT / 1.5;
 			this.pos.x = Math.floor(this.pos.x);
 			this.pos.y = Math.floor(this.pos.y);
 		}

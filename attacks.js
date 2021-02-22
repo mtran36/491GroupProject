@@ -6,17 +6,8 @@ class SwordAttack extends Agent {
 		this.attack = 1;
 		this.damagedEnemies = [];
 		this.force = 600;
-		// Walter: copied repositioning from update to fix incorrect draw on first draw cycle.
-		const DRUID = this.game.druid;
-		if (DRUID.facing === 0) { // facing left
-			this.pos.x = DRUID.pos.x - this.scaleDim.x
-				+ (this.duration * 75) + (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		} else { // facing right
-			this.pos.x = DRUID.pos.x + DRUID.scaleDim.x
-				- (this.duration * 75) - (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		}
+
+		this.updateSwordPos();
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 	}
 
@@ -38,18 +29,22 @@ class SwordAttack extends Agent {
 			this.removeFromWorld = true;
 		}
 
-		if (DRUID.facing === 0) { // facing left
-			this.pos.x = DRUID.pos.x - this.scaleDim.x
-				+ (this.duration * 75) + (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		} else { // facing right
-			this.pos.x = DRUID.pos.x + DRUID.scaleDim.x
-				- (this.duration * 75) - (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		}
-
+		this.updateSwordPos();
 		this.move(this.game.clockTick);
 	}
+
+	/** @override */
+	updateSwordPos() {
+		if (this.game.druid.facing === 0) { // facing left
+			this.pos.x = this.game.druid.pos.x - this.scaleDim.x
+				+ (this.duration * 75) + (this.scaleDim.x / 5);
+			this.pos.y = this.game.druid.pos.y + this.game.druid.scaleDim.y / 2;
+		} else { // facing right
+			this.pos.x = this.game.druid.pos.x + this.game.druid.scaleDim.x
+				- (this.duration * 75) - (this.scaleDim.x / 5);
+			this.pos.y = this.game.druid.pos.y + this.game.druid.scaleDim.y / 2;
+		}
+    }
 
 	/** @override */
 	checkCollisions() {
@@ -74,7 +69,9 @@ class SwordAttack extends Agent {
 			this.pos.x, this.pos.y,
 			this.scale, this.game.camera);
 		this.worldBB.display(this.game);
-		this.agentBB.display(this.game);
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
 	}
 }
 

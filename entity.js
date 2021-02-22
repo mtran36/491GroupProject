@@ -108,6 +108,7 @@ class Agent extends Entity {
         this.loadAnimations();
     }
 
+    /** @override */
     setDimensions(scale, width, height) {
         super.setDimensions(scale, width, height);
         this.agentBB = this.makeDefaultBoundingCircle();
@@ -154,7 +155,6 @@ class Agent extends Entity {
         let diffAgentX = [];
         let diffAgentY = [];
         let shiftAgents = () => {
-            let i;
             for (i = 0; i < this.agentBB.length; i++) {
                 this.agentBB[i].shift(
                     this.worldBB.x + diffAgentX[i],

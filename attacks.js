@@ -1,13 +1,15 @@
 class SwordAttack extends Agent {
 	constructor(game, x, y, duration) {
 		super(game, x, y, "./Sprites/sword.png");
+
 		this.setDimensions(2.5, 34, 15);
 		this.duration = 0.5;
 		this.attack = 1;
-		this.damagedEnemies = [];
 		this.force = 600;
+		this.damagedEnemies = [];
+		this.defineWorldCollisions = () => { /* Do nothing */ };
 
-		this.updateSwordPos();
+		this.updatePos();
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 	}
 
@@ -21,20 +23,18 @@ class SwordAttack extends Agent {
 
 	/** @override */
 	update() {
-		const DRUID = this.game.druid;
 		const TICK = this.game.clockTick;
 
 		this.duration -= TICK;
-		if (this.duration < 0) {
+		if (this.duration <= 0) {
 			this.removeFromWorld = true;
 		}
-
-		this.updateSwordPos();
-		this.move(this.game.clockTick);
+		this.updatePos();
+		this.move(TICK);
 	}
 
 	/** @override */
-	updateSwordPos() {
+	updatePos() {
 		if (this.game.druid.facing === 0) { // facing left
 			this.pos.x = this.game.druid.pos.x - this.scaleDim.x
 				+ (this.duration * 75) + (this.scaleDim.x / 5);
@@ -75,31 +75,32 @@ class SwordAttack extends Agent {
  */
 class BasicRangedAttack extends Agent {
 	/**
-	 * @param {any} game the game.
-	 * @param {any} x x-axis coordinate.
-	 * @param {any} y y-axis coordinate.
-	 * @param {any} degree degree the attack is shooting out.
-	 * @param {any} radius the size of the agent bounding box.
-	 * @param {any} speed speed of the attack.
-	 * @param {any} attack attack value.
-	 * @param {any} hasAnimation a boolean to determine if this ranged attack have animation.
+	 * Creates a new ranged attack to be extended.
+	 * @param {GameEngine} game Instance of the game.
+	 * @param {number} x Horizontal coordinate to place attack.
+	 * @param {number} y Vertical coordinate to place attack.
+	 * @param {number} degree Degree the attack is shooting out.
+	 * @param {number} radius Size of the agent bounding box.
+	 * @param {number} speed Speed of the attack.
+	 * @param {number} attack Attack value to be subtracted from target health.
+	 * @param {boolean} hasAnimation Determines if this ranged attack has an animation.
 	 */
 	constructor(game, x, y, degree, radius, speed, attack, hasAnimation) {
 		super(game, x, y, "./Sprites/energyball.png");
 		this.setDimensions(1, radius * 2, radius * 2);
 
-		var radian = degree * (Math.PI / 180);
+		let radian = degree * (Math.PI / 180);
 		this.vel.x = Math.round((speed * Math.cos(radian)) * 100) / 100;
 		this.vel.y = Math.round(-(speed * Math.sin(radian)) * 100) / 100;
-
 		this.attack = attack;
-		this.loadAnimations();
+		this.attackOwner = null;
 
-		this.owner = null;	// owner of the attack
-		if (hasAnimation == false) {
+		if (hasAnimation === false) {
 			this.draw = function () {
 				this.worldBB.display(this.game);
-				this.agentBB.display(this.game);
+				this.agentBB.forEach((BB) => {
+					BB.display(this.game);
+				});
 			};
         }
 	}
@@ -137,29 +138,33 @@ class BasicRangedAttack extends Agent {
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-			if (this.owner instanceof TornadoAttack) {
-				if (!this.owner.damagedEnemies.includes(entity)) {
+			if (this.attackOwner instanceof TornadoAttack) {
+				if (!this.attackOwner.damagedEnemies.includes(entity)) {
 					entity.knockup(this);
-					this.owner.addAttackedEnemy(entity);
+					this.attackOwner.addAttackedEnemy(entity);
 					entity.takeDamage(this.attack);
 				}
 			} else {
 				entity.takeDamage(this.attack);
 				this.removeFromWorld = true;
-				if (this.owner instanceof ThunderAttack) this.owner.freeProjectiles();
+				if (this.attackOwner instanceof ThunderAttack) {
+					this.attackOwner.freeProjectiles();
+				}
             }
 		}
     }
 }
 
-/** A special attack consists of mutiple ranged attack bounding 
- * boxes that would knock up enemy and deal damage. */
-class TornadoAttack{
+/** 
+ * A special attack consists of mutiple ranged attack bounding boxes that would knock up 
+ * enemy and deal damage. 
+ */
+class TornadoAttack {
 	/**
-	 * @param {any} game the game.
-	 * @param {any} x x-axis coordinate.
-	 * @param {any} y y-axis coordinate.
-	 * @param {any} degree degree the attack is shooting out.
+	 * @param {GameEngine} game Instance of the game.
+	 * @param {number} x Horizontal coordinate to place attack.
+	 * @param {number} y Vertical coordinate to place attack.
+	 * @param {number} degree Degree the attack is shooting out.
 	 */
 	constructor(game, x, y, degree) {
 		this.game = game;
@@ -179,7 +184,9 @@ class TornadoAttack{
 		this.draw = function () { /* Do nothing. */ };
 	}
 
-	/** Create a list of ranged attacks for this attack. */
+	/** 
+	 * Create a list of ranged attacks for this attack. 
+	 */
 	createProjectileList() {
 		var RADIUS = 48;
 		for (var i = 0; i < 2; i++) {
@@ -204,7 +211,9 @@ class TornadoAttack{
 		}
 	}
 
-	/** Add a list of ranged attacks to the game. */
+	/** 
+	 * Add a list of ranged attacks to the game. 
+	 */
 	addEntityList() {
 		let that = this;
 		this.projectiles.forEach(function (entity) {
@@ -212,7 +221,9 @@ class TornadoAttack{
 		});
 	}
 
-	/** Add an attacked enemy to the attacked enemy list. */
+	/** 
+	 * Add an attacked enemy to the attacked enemy list. 
+	 */
 	addAttackedEnemy(enemy) {
 		this.damagedEnemies.push(enemy);
     }
@@ -232,15 +243,18 @@ class TornadoAttack{
 		}
     }
 }
-/** A special attack consists of mutiple ranged attack bounding
- * boxes that would deal a one-time damage. */
+
+/** 
+ * A special attack consists of mutiple ranged attack bounding boxes that would deal a
+ * one-time damage. 
+ */
 class ThunderAttack {
 	/**
-	* @param {any} game the game.
-	* @param {any} x x-axis coordinate.
-	* @param {any} y y-axis coordinate.
-	* @param {any} degree degree the attack is shooting out.
-	*/
+	 * @param {GameEngine} game Instance of the game.
+	 * @param {number} x Horizontal coordinate to place attack.
+	 * @param {number} y Vertical coordinate to place attack.
+	 * @param {number} degree Degree the attack is shooting out.
+	 */
 	constructor(game, x, y, degree) {
 		this.game = game;
 		this.pos = { x, y };
@@ -258,15 +272,15 @@ class ThunderAttack {
 		this.draw = function () { /* Do nothing. */ };
 	}
 
-	/** Create a list of ranged attacks for this attack. */
+	/** 
+	 * Create a list of ranged attacks for this attack. 
+	 */
 	createProjectileList() {
-		var RADIUS = PARAMS.BLOCKWIDTH / 4;
-		for (var i = 0; i < 4; i++) {
-			if (i == 0) {
-				var hasAnimation = true;
-			} else {
-				var hasAnimation = false;
-			}
+		const RADIUS = PARAMS.BLOCKWIDTH / 4;
+		let i, hasAnimation;
+
+		for (i = 0; i < 4; i++) {
+			hasAnimation = i === 0;
 			this.projectiles.push(new BasicRangedAttack(
 				this.game, this.pos.x + i * 2 * RADIUS, this.pos.y,
 				this.degree, RADIUS,

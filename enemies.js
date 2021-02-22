@@ -71,11 +71,19 @@ class Enemy extends Agent {
 		}
 	}
 
+	/**
+	 * 
+	 * @param {any} DRUID
+	 */
 	canSee(DRUID) {
 		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
 		return this.sight.collide(DRUID.agentBB);
 	}
 
+	/**
+	 * 
+	 * @param {any} damage
+	 */
 	takeDamage(damage) {
 		super.takeDamage(damage);
 		if (this.removeFromWorld) {

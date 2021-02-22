@@ -43,19 +43,6 @@ class Enemy extends Agent {
 	}
 
 	/**
-	 * Uses an attack agent to knock this enemy up.
-	* @param {Agent} attack Agent that has a knockup force value defined.
-	*/
-	knockup(attack) {
-		if (attack.vel.x > 0) {
-			this.vel.x = attack.force / 2;
-		} else if (attack.vel.x < 0) {
-			this.vel.x = -attack.force / 2;
-        }
-		this.vel.y = -attack.force;
-	}
-
-	/**
 	 * Spawns a prize at this Enemy location if PARAMS.DEBUG is true or on a random
 	 * chance based on this.prizeRate. Prize rate is a standard probablity value in range
 	 * 0-1.
@@ -144,7 +131,6 @@ class Fly extends Enemy {
 			}
 			this.seesDruid = true;
 			this.accelerate = true;
-			console.warn("test");
 			this.left = this.sight.x > druidCenter.x;
 			this.up = this.sight.y > druidCenter.y;
 		} else {
@@ -388,6 +374,23 @@ class FlyBeetle extends Beetle {
 
 	/** @override */
 	update() {
+		if (this.facing === 0) { // Facing left
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
+			}
+		} else { // Facing right
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
+			}
+		}
 		if (this.vel.x > this.velMax.x) {
 			this.vel.x -= this.ACC.x * this.game.clockTick;
 			this.vel.x = Math.max(this.velMax.x, this.vel.x);

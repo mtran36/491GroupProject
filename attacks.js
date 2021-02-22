@@ -93,7 +93,6 @@ class BasicRangedAttack extends Agent {
 		this.vel.x = Math.round((speed * Math.cos(radian)) * 100) / 100;
 		this.vel.y = Math.round(-(speed * Math.sin(radian)) * 100) / 100;
 		this.attack = attack;
-		this.force = 1500;
 		this.attackOwner = null;
 
 		if (hasAnimation === false) {
@@ -141,7 +140,7 @@ class BasicRangedAttack extends Agent {
 		if (entity instanceof Enemy) {
 			if (this.attackOwner instanceof TornadoAttack) {
 				if (!this.attackOwner.damagedEnemies.includes(entity)) {
-					entity.knockback(this, Math.pi / 2);
+					entity.knockback(this, -Math.PI / 2);
 					this.attackOwner.addAttackedEnemy(entity);
 					entity.takeDamage(this.attack);
 				}
@@ -200,7 +199,7 @@ class TornadoAttack {
 				this.game, this.pos.x, this.pos.y + i * RADIUS * 2,
 				this.degree, RADIUS, this.speed, this.attack, hasAnimation));
 			this.projectiles[i].force = 600;
-			this.projectiles[i].owner = this;
+			this.projectiles[i].attackOwner = this;
 
 			let leftAnimation = new Animator(
 				this.spritesheet, 0, 20, 96, 192, 3, 0.2, 0, false, true, false);
@@ -286,7 +285,7 @@ class ThunderAttack {
 				this.game, this.pos.x + i * 2 * RADIUS, this.pos.y,
 				this.degree, RADIUS,
 				this.speed, this.attack, hasAnimation));
-			this.projectiles[i].owner = this;
+			this.projectiles[i].attackOwner = this;
 
 			let leftAnimation = new Animator(
 				this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, true);

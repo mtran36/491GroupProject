@@ -159,7 +159,7 @@ class Scene {
 					powerup.y * PARAMS.TILE_WIDTH));
 			}
 		}
-		this.game.druid = new Druid(this.game, x, y)
+		this.game.druid = new Druid(this.game, x, y);
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
 	};

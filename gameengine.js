@@ -172,8 +172,9 @@ class GameEngine {
      */
     draw() {
         let entity;
+        this.druid.draw(this.context);
         this.context.clearRect(
-            0, 0, this.context.canvas.width, this.context.canvas.height);
+           0, 0, this.context.canvas.width, this.context.canvas.height);
         if (this.screen) {
             this.screen.display(this.context);
         } else {

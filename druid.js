@@ -5,6 +5,8 @@ class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
+		this.worldBB = new BoundingBox(
+			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
 		this.game.druid = this;
 
 		this.loadAnimations();
@@ -42,8 +44,6 @@ class Druid extends Agent {
 		}
 	}
 
-	
-
 	/** @override */
 	takeDamage(damage) {
 		if (!PARAMS.DEBUG && this.invincTime <= 0) {
@@ -70,23 +70,26 @@ class Druid extends Agent {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
+
 		if (entity instanceof Ground || entity instanceof Door) {
 			if (collisions.down) {
-				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;
 				this.isJumping = false;
 			}
 			if (collisions.up) {
-				this.pos.y = entity.worldBB.bottom - this.top;
+				y = entity.worldBB.bottom;
 				this.vel.y = 0;
 				this.isJumping = true;
 			}
 			if (collisions.right) {
-				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				x = entity.worldBB.left - this.worldBB.width;
 				this.vel.x = 0;
 			}
 			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
+				x = entity.worldBB.right;
 				this.vel.x = 0;
 			}
 		}
@@ -95,6 +98,7 @@ class Druid extends Agent {
 				entity.standOn();
 			}
 		}
+		this.worldBB.shift(x, y);
     }
 
 	/** @override */
@@ -112,14 +116,6 @@ class Druid extends Agent {
 		this.animations[1][1] = new Animator( // Jumping left
 			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, false);
 	}
-
-	updateBB() {
-		this.lastAgentBB = this.agentBB;
-		this.lastWorldBB = this.worldBB;
-		this.agentBB = this.makeDefaultBoundingCircle();
-		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23);
-    }
 
 	/** @override */
 	update() {
@@ -191,6 +187,10 @@ class Druid extends Agent {
 			this.pos.x, this.pos.y,
 			this.scale, this.game.camera, this.xOffset);
 		this.worldBB.display(this.game);
-		this.agentBB.display(this.game);
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
+		context.fillStyle = 'red';
+		context.fillRect(100, 100, 100, 100);
 	}
 }

@@ -161,30 +161,32 @@ class Fly extends Enemy {
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		let bounce = false;
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				y = entity.worldBB.top - this.worldBB.width;
 				if (this.vel.y > 100) {
 					bounce = true;
 				}
 				this.vel.y = -this.vel.y;
 			}
 			if (collisions.up) {
-				this.pos.y = entity.worldBB.bottom;
+				y = entity.worldBB.bottom;
 				if (this.vel.y < -100) {
 					bounce = true;
 				}
 				this.vel.y = -this.vel.y;
 			}
 			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
+				x = entity.worldBB.right;
 				if (this.vel.x < -100) {
 					bounce = true;
 				}
 				this.vel.x = -this.vel.x;
 			}
 			if (collisions.right) {
-				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				x = entity.worldBB.left - this.worldBB.width;
 				if (this.vel.x > 100) {
 					bounce = true;
 				}
@@ -194,6 +196,7 @@ class Fly extends Enemy {
 		if (bounce) {
 			AUDIO_PLAYER.playSound("./Audio/EnemyBounce.mp3");
 		}
+		this.worldBB.shift(x, y);
     }
 }
 
@@ -324,21 +327,23 @@ class Beetle extends Enemy{
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;
 			}
 			if (collisions.up) {
-				this.pos.y = entity.worldBB.bottom;
+				y = entity.worldBB.bottom;
 				this.vel.y = 0;
 			}
 			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
+				x = entity.worldBB.right;
 				this.vel.x = -this.vel.x;
 			}
 			if (collisions.right) {
-				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				x = entity.worldBB.left - this.worldBB.width;
 				this.vel.x = -this.vel.x;
 			}
 			if (entity instanceof Ground) {
@@ -348,6 +353,7 @@ class Beetle extends Enemy{
 					? entity.worldBB.right : this.farRight;
 			}
 		}
+		this.worldBB.shift(x, y);
     }
 }
 
@@ -435,9 +441,11 @@ class Hopper extends Enemy {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
-				this.pos.y = entity.worldBB.top - this.scaleDim.y;
+				y = entity.worldBB.top - this.scaleDim.y;
 				this.vel.y = 0;
 				this.vel.x = 0;
 				if (this.jumping) {
@@ -446,18 +454,19 @@ class Hopper extends Enemy {
 				this.jumping = false;
 			}
 			if (collisions.up) {
-				this.pos.y = entity.worldBB.bottom;
+				y = entity.worldBB.bottom;
 				this.vel.y = 0;
 			}
 			if (collisions.left) {
-				this.pos.x = entity.worldBB.right;
+				x = entity.worldBB.right;
 				this.vel.x = -this.vel.x;
 			}
 			if (collisions.right) {
-				this.pos.x = entity.worldBB.left - this.scaleDim.x;
+				x = entity.worldBB.left - this.scaleDim.x;
 				this.vel.x = -this.vel.x;
 			}
 		}
+		this.worldBB.shift(x, y);
 	}
 
 	static construct(game, params) {

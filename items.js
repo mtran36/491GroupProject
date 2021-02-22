@@ -11,7 +11,7 @@ class Items extends Agent {
     }
 
     addItemsToDruid(DRUID) {
-        console.warn("Potion not define: ");
+        console.warn("Item not define: ");
     }
 
     defineAgentCollisions(entity) {
@@ -40,14 +40,14 @@ class Potions extends Items {
 
     /** @override */
     loadAnimations() {
+        //this.animations[0] = new Animator(
+        //    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
+        //this.animations[0] = new Animator(
+        //    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
         this.animations[0] = new Animator(
-            this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
-        this.animations[1] = new Animator(
-            this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
-        this.animations[2] = new Animator(
             this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
-        //this.animations[1] = new Animator(
-        //    this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
+        this.animations[1] = new Animator(
+            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
     }
 
     /** @override */
@@ -71,4 +71,29 @@ class Potions extends Items {
             }
         }
     }
+}
+
+class Key extends Items {
+    constructor(game, x, y) {
+        super(game, x, y - 100, "./Sprites/key.png");
+    };
+
+    update() {
+        const FALL_ACC = 1500;
+        const TICK = this.game.clockTick;
+        this.vel.y += FALL_ACC * TICK;
+        this.move(TICK);
+    }
+
+    addItemsToDruid(DRUID) {
+        DRUID.keyCounter += 1;
+    }
+
+    /** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 128, 128,
+			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.dim.x, this.dim.y);
+		this.worldBB.display(this.game);
+	}
 }

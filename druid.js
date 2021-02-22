@@ -109,6 +109,12 @@ class Druid extends Agent {
 		if (entity instanceof Enemy && this.invincTime <= 0) {
 			this.takeDamage(entity.attack);
 		}
+		if (entity instanceof Door) {
+			if (this.keyCounter > 0) {
+				entity.removeFromWorld = true;
+				this.keyCounter -= 1;
+            }
+        }
 	}
 
 	/** @override */
@@ -169,7 +175,7 @@ class Druid extends Agent {
 		if (this.potionCounter > 0 && this.remainder > 20) {
 			this.health += 20;
 			this.potionCounter -= 1;
-        }
+		}
 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;
@@ -228,8 +234,17 @@ class Druid extends Agent {
 				tickWidth: 40
 			},
 			"POTIONS", "teal");
+
+		context.fillStyle = "black";
+		context.font = "italic bold 16px Castellar";
+		context.fillText(
+			"Key: " + this.keyCounter,
+			10, 100);
+		context.restore();
+
 		if (this.flashing) return;
 		super.draw(context);
+
 		/*
 		if (this.vel.y > 0 || this.vel)
 		this.animations[this.facing].drawFrame(

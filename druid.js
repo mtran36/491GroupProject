@@ -24,16 +24,19 @@ class Druid extends Agent {
 		this.attacks = [];
 	}
 
-	meleeAttack(DRUID) {
-		DRUID.meleeAttackCooldown -= DRUID.game.clockTick;
-		if (DRUID.meleeAttackCooldown <= 0 && DRUID.game.C) {
-			if (DRUID.facing === 0) { // stab left
-				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
+	/** 
+	 *
+	 */
+	meleeAttack() {
+		this.meleeAttackCooldown -= this.game.clockTick;
+		if (this.meleeAttackCooldown <= 0 && this.game.C) {
+			if (this.facing === 0) { // stab left
+				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
 			} else { // stab right
-				DRUID.game.addEntity(new SwordAttack(DRUID.game, 0, 0, DRUID.facing));
+				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
 			}
-			DRUID.game.C = false;
-			DRUID.meleeAttackCooldown = 1;
+			this.game.C = false;
+			this.meleeAttackCooldown = 1;
 		}
 	}
 
@@ -142,20 +145,23 @@ class Druid extends Agent {
 
 	/** @override */
 	loadAnimations() {
+		let i;
+		for (i = 0; i < 2; i++) {
+			this.animations.push([]);
+        }
+
 		// Walking right
-		this.animations[0] = new Animator(
+		this.animations[0][0] = new Animator(
 			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true);
 		// Walking left
-		this.animations[1] = new Animator(
+		this.animations[1][0] = new Animator(
 			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false);
-		/*
 		// Jumping right
-		this.animations[0] = new Animator(
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, true);
+		this.animations[0][1] = new Animator(
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, true);
 		// Jumping left
-		this.animations[1] = new Animator(
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.25, 1, false, true, false);
-		*/
+		this.animations[1][1] = new Animator(
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, false);
 	}
 
 	/** @override */
@@ -182,7 +188,7 @@ class Druid extends Agent {
 		}
 
 		// check if melee attack is made
-		this.meleeAttack(this);
+		this.meleeAttack();
 		// check if switch attack
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
@@ -223,15 +229,11 @@ class Druid extends Agent {
 			},
 			"POTIONS", "teal");
 		if (this.flashing) return;
-		super.draw(context);
-		/*
-		if (this.vel.y > 0 || this.vel)
-		this.animations[this.facing].drawFrame(
+		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,
 			this.pos.x, this.pos.y,
 			this.scale, this.game.camera);
 		this.worldBB.display(this.game);
 		this.agentBB.display(this.game);
-		*/
 	}
 }

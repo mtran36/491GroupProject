@@ -5,8 +5,7 @@ class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
-		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
+		this.setBoundingShapes();
 		this.game.druid = this;
 
 		this.loadAnimations();
@@ -27,6 +26,24 @@ class Druid extends Agent {
 		this.attackSelection = null;
 		this.attacks = [];
 	}
+
+	setBoundingShapes() {
+		this.worldBB = new BoundingBox(
+			this.pos.x + 65, this.pos.y + 23,
+			this.scaleDim.x - 120, this.scaleDim.y - 23)
+		const WIDTH = this.worldBB.right - this.worldBB.left;
+		const HEIGHT = this.worldBB.bottom - this.worldBB.top;
+		const SEPERATION = 25;
+		this.agentBB = [
+			new BoundingCircle(
+				this.worldBB.x + WIDTH / 2,
+				this.worldBB.y + HEIGHT / 2 - SEPERATION,
+				WIDTH / 2),
+			new BoundingCircle(this.worldBB.x + WIDTH / 2,
+				this.worldBB.y + HEIGHT / 2 + SEPERATION,
+				WIDTH / 2)
+		];
+    }
 
 	/** 
 	 *

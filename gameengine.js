@@ -190,8 +190,7 @@ class GameEngine {
      * camera and removes entities from the world if they are set to be removed. 
      */
     update() {
-        let entitiesCount = this.entities.length;
-        let i;
+        let entitiesCount = this.entities.length, i;
         for (i = 0; i < entitiesCount; i++) {
             var entity = this.entities[i];
             if (!entity.removeFromWorld) {

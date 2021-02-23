@@ -46,18 +46,21 @@ class RangedPowerUp extends PowerUp {
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
+				console.log("got in here")
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH,
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
 					DRUID.pos.y + DRUID.scaleDim.y / 2,
-					180, 32, 600, 1, true));
+					180, PARAMS.TILE_WIDTH / 2,
+					600, 1, true));
 			} else { // shoot right
 				// basic ranged attack:
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
 					DRUID.pos.y + DRUID.scaleDim.y / 2,
-					0, 32, 600, 1, true));
+					0, PARAMS.TILE_WIDTH / 2,
+					600, 1, true));
 			}
 			this.game.A = false;
 			this.cooldown = 1;
@@ -91,13 +94,13 @@ class WindElement extends PowerUp {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH,
-					DRUID.pos.y - PARAMS.BLOCKWIDTH, 180));
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
+					DRUID.pos.y - PARAMS.TILE_WIDTH, 0));
 			} else { // shoot right
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - PARAMS.BLOCKWIDTH, 0));
+					DRUID.pos.y - PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
 			this.cooldown = 1;
@@ -131,13 +134,13 @@ class LightElement extends PowerUp {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH * 2,
-					DRUID.pos.y + PARAMS.BLOCKWIDTH, 180));
+					DRUID.pos.x - PARAMS.TILE_WIDTH * 2,
+					DRUID.pos.y + PARAMS.TILE_WIDTH, 0));
 			} else { // shoot right
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + PARAMS.BLOCKWIDTH, 0));
+					DRUID.pos.y + PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
 			this.cooldown = 2;

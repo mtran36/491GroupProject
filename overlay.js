@@ -143,4 +143,45 @@ class HUD {
             yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
         context.restore();
     }
+
+    /**
+     * Draw a HUD for powerups that shows which ability the player is using and whether 
+     * the ability is on cooldown.
+     * @param {CanvasImageSource} context Canvas to draw to.
+     * @param {number} xOffset Horizontal distance from origin.
+     * @param {number} yOffset Vertical distance from origin.
+     * @param {Array} powerups List of powerups.
+     * @param {number} attackSelection Druid's attack selection.
+     */
+    static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection) {
+        const HEIGHT = 48;
+        const WIDTH = 192;
+        // draw the interface
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
+            0, 0, WIDTH, HEIGHT,
+            xOffset, yOffset,
+            WIDTH * 1.5, HEIGHT);
+        // draw text
+        context.fillStyle = "black";
+        context.font = "italic bold 14px Castellar";
+        context.fillText("POWERUPS:", xOffset + 20, yOffset + 29);
+        context.restore;
+        // draw each of the powerups in the interface
+        for (var i = 0; i < powerups.length; i++) {
+            const imageX = xOffset + 105 + 32 * i;
+            const imageY = yOffset + 12;
+            if (powerups[i].cooldown > 0) { // if the powerup is on cooldown
+                context.drawImage(powerups[i].cooldownSpritesheet, 0, 0, 64, 64,
+                    imageX, imageY, 24, 24);
+            } else {                        // not on cooldown
+                context.drawImage(powerups[i].spritesheet, 0, 0, 64, 64,
+                    imageX, imageY, 24, 24);
+            }
+            // draw power selection
+            if (i == attackSelection) {
+                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select.png"), 0, 0, 32, 32,
+                    imageX - 1, imageY - 1, 26, 26);
+            }
+        }
+    }
 }

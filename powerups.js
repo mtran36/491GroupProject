@@ -5,6 +5,7 @@
 class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
+		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
 		this.defineAgentCollisions = () => { };
 		this.cooldown = 0;
 	} 
@@ -22,10 +23,15 @@ class PowerUp extends Agent {
 			if (this.game.druid.attackSelection == null) {
 				this.game.druid.attackSelection = 0;
 			} else {
-				this.game.druid.attackSelection++;
+				this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
             }
 		}
 	}
+
+	/** Update the coodown of this powerup. */
+	updateCooldown() {
+		this.cooldown -= this.game.clockTick;
+    }
 }
 
 /**
@@ -42,27 +48,29 @@ class RangedPowerUp extends PowerUp {
 	 * @param {any} DRUID the main character.
 	 */
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
+				console.log("got in here")
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH,
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
 					DRUID.pos.y + DRUID.scaleDim.y / 2,
-					180, 32, 600, 1, true));
+					180, PARAMS.TILE_WIDTH / 2,
+					600, 1, true));
 			} else { // shoot right
 				// basic ranged attack:
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
 					DRUID.pos.y + DRUID.scaleDim.y / 2,
-					0, 32, 600, 1, true));
+					0, PARAMS.TILE_WIDTH / 2,
+					600, 1, true));
 			}
 			this.game.A = false;
 			this.cooldown = 1;
-			}
 		}
+	}
 
 	/** @override */
 	draw(context) {
@@ -86,21 +94,20 @@ class WindElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH,
-					DRUID.pos.y - PARAMS.BLOCKWIDTH, 180));
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
+					DRUID.pos.y - PARAMS.TILE_WIDTH, 0));
 			} else { // shoot right
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - PARAMS.BLOCKWIDTH, 0));
+					DRUID.pos.y - PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 1;
+			this.cooldown = 2;
 		}
 	}
 
@@ -126,21 +133,20 @@ class LightElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH * 2,
-					DRUID.pos.y + PARAMS.BLOCKWIDTH, 180));
+					DRUID.pos.x - PARAMS.TILE_WIDTH * 2,
+					DRUID.pos.y + PARAMS.TILE_WIDTH, 0));
 			} else { // shoot right
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + PARAMS.BLOCKWIDTH, 0));
+					DRUID.pos.y + PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 2;
+			this.cooldown = 3;
 		}
 	}
 

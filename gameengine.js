@@ -98,8 +98,7 @@ class GameEngine {
                 case "KeyL":
                     that.C = true;
                     break;
-                case "KeyZ":
-                case "KeyK":
+                case "Space":
                     that.B = true;
                     break;
                 case "KeyX":
@@ -140,8 +139,7 @@ class GameEngine {
                 case "KeyL":
                     that.C = false;
                     break;
-                case "KeyZ":
-                case "KeyK":
+                case "Space":
                     that.B = false;
                     break;
                 case "KeyX":

@@ -8,6 +8,7 @@ class Druid extends Agent {
 		this.setBoundingShapes();
 		this.game.druid = this;
 
+		this.storedAnimations = null;
 		this.loadAnimations();
 		this.isJumping = false;
 		this.health = 100;
@@ -46,7 +47,7 @@ class Druid extends Agent {
     }
 
 	/** 
-	 *
+	 * 
 	 */
 	meleeAttack() {
 		this.meleeAttackCooldown -= this.game.clockTick;
@@ -124,14 +125,28 @@ class Druid extends Agent {
 		for (i = 0; i < 2; i++) {
 			this.animations.push([]);
 		}
-		this.animations[0][0] = new Animator( // Walking right
-			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true);
-		this.animations[1][0] = new Animator( // Walking left
-			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false);
-		this.animations[0][1] = new Animator( // Jumping right
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, true);
-		this.animations[1][1] = new Animator( // Jumping left
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, false);
+		this.storedAnimations = {
+			standingRight: new Animator(
+				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, true),
+			standingLeft: new Animator(
+				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, false),
+			walkingRight: new Animator(
+				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true),
+			walkingLeft: new Animator(
+				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false),
+			jumpingRight: new Animator(
+				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, true),
+			jumpingLeft: new Animator(
+				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, false),
+			airHangRight: new Animator(
+				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, true),
+			airHangLeft: new Animator(
+				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, false),
+		};
+		this.animations[0][0] = this.storedAnimations.walkingRight;
+		this.animations[1][0] = this.storedAnimations.walkingLeft;
+		this.animations[0][1] = this.storedAnimations.jumpingRight;
+		this.animations[1][1] = this.storedAnimations.jumpingLeft;
 	}
 
 	/** @override */
@@ -141,39 +156,56 @@ class Druid extends Agent {
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
 
+		// Check if player is moving
+		if (this.game.right) {
+			this.animations[0][0] = this.storedAnimations.walkingRight;
+			this.animations[1][0] = this.storedAnimations.walkingLeft;
+			this.vel.x = WALK_SPEED;
+		}
+		if (this.game.left) {
+			this.animations[0][0] = this.storedAnimations.walkingRight;
+			this.animations[1][0] = this.storedAnimations.walkingLeft;
+			this.vel.x = -WALK_SPEED;
+		}
+		if (!this.game.left && !this.game.right) {
+			this.animations[0][0] = this.storedAnimations.standingRight;
+			this.animations[1][0] = this.storedAnimations.standingLeft;
+			this.vel.x = 0;
+		}
+		// Damage flashing 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;
 			this.flashing = !this.flashing;
 		} else {
 			this.flashing = false;
 		}
-
-		if (!this.isJumping && this.game.B) { 
+		// Jump handling
+		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
-			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 			this.game.B = false;
+			this.animations[0][1] = this.storedAnimations.jumpingRight;
+			this.animations[1][1] = this.storedAnimations.jumpingLeft;
+			this.animations[0][1].restart();
+			this.animations[1][1].restart();
+			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 		} else {
+			if (this.animations[0][1].isDone() || this.animations[1][1].isDone) {
+				this.animations[0][1] = this.storedAnimations.airHangRight;
+				this.animations[1][1] = this.storedAnimations.airHangLeft;
+			}
+			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
-		}
-
-		// check if melee attack is made
-		this.meleeAttack();
-		// check if switch attack
+		}		
+		// Check if player is switching weapons
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
         }
-		// check if any special attack if made
+		// Check if player is attacking
+		this.meleeAttack();
 		if (this.attackSelection != null) {
 			this.attacks[this.attackSelection].attack(this);
-        }
-		if (this.game.right) { 
-			this.vel.x = WALK_SPEED;
-		} else if (this.game.left) {
-			this.vel.x = -WALK_SPEED;
-		} else {
-			this.vel.x = 0;
 		}
 		this.move(TICK);
 	}

@@ -1,7 +1,6 @@
 class Block extends Entity {
 	constructor(game, x, y, width = 1, height = 1, spritesheet) {
 		super(game, x, y, spritesheet);
-		this.update = () => { /* Do nothing */ };
 	}
 
 	/**
@@ -19,7 +18,10 @@ class Block extends Entity {
 		};
 		// Use algebra to find correct scale value
 		this.setDimensions(PARAMS.TILE_WIDTH / sideLen, sideLen, sideLen);
-		this.worldBB = new BoundingBox(this.pos.x, this.pos.y, width * sideLen * this.scale, height * sideLen * this.scale);
+		this.worldBB = new BoundingBox(
+			this.pos.x, this.pos.y,
+			width * sideLen * this.scale,
+			height * sideLen * this.scale);
 		this.lastWorldBB = this.worldBB;
     }
 
@@ -37,14 +39,36 @@ class Block extends Entity {
 		}
 		this.worldBB.display(this.game);
 	}
+
+	/** @override */
+	update() {
+		// Do nothing
+    }
 }
 
 class Ground extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");
 		this.setSize(width, height, 32);
+		this.setBoundingBox();
+		
 		this.look = { x: 0, y: 0 };
 	};
+
+	setBoundingBox() {
+		if (this.size.height > 1) {
+			this.worldBB = new BoundingBox(
+				this.pos.x + PARAMS.TILE_WIDTH - 15,
+				this.pos.y,
+				this.size.width * PARAMS.TILE_WIDTH - PARAMS.TILE_WIDTH - 35,
+				this.size.height * PARAMS.TILE_WIDTH - PARAMS.TILE_WIDTH + 15);
+		} else if (this.size.height = 1) {
+			this.worldBB = new BoundingBox(
+				this.pos.x + 10, this.pos.y,
+				this.size.width * PARAMS.TILE_WIDTH - 20,
+				this.size.height * PARAMS.TILE_WIDTH - 20);
+        }
+    }
 
 	/** @override */
 	draw(context) {
@@ -128,8 +152,12 @@ class BreakBlock extends Entity {
 		this.collisionAmount = 0;
 		this.breakPoint = 1;
 		this.minCrack = 0;
-		this.draw = () => { /* Do nothing */ };
 	}
+
+	/** @override */
+	draw(context) {
+		
+    }
 
 	/**
 	 * Adds the block associated with this breaking block into the entity list.
@@ -195,6 +223,7 @@ class StandingBreakBlock extends BreakBlock {
 		}
 		this.druidOn = false;
 		if (this.collisionAmount >= this.breakPoint) {
+			this.vanishedTime += this.game.clockTick;
 			this.collisionAmount = 0;
 			this.minCrack = 0.25;
 			this.block.removeFromWorld = true;

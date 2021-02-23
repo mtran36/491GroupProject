@@ -33,6 +33,7 @@ var levelOne = {
 	standingBreakBlock: [
 		{ x: 15, y: 7, width: 2, blockType: 'Ground'}
 	],
+	/*
 	flies: [
 		{ x: -5, y: 1, prizeRate: 0.2 }
 	],
@@ -48,6 +49,7 @@ var levelOne = {
 	hopper: [
 		{ x: -2, y: 3 }
 	],
+	*/
 	powerups: [
 		{ x: 25, y: 5}
 	],

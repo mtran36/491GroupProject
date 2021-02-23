@@ -5,10 +5,10 @@ class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
-		this.setBoundingShapes();
+		this.worldBB = new BoundingBox(
+			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
 		this.game.druid = this;
 
-		this.storedAnimations = null;
 		this.loadAnimations();
 		this.isJumping = false;
 		this.health = 100;
@@ -28,35 +28,15 @@ class Druid extends Agent {
 		this.attacks = [];
 	}
 
-	setBoundingShapes() {
-		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23,
-			this.scaleDim.x - 120, this.scaleDim.y - 23)
-		const WIDTH = this.worldBB.right - this.worldBB.left;
-		const HEIGHT = this.worldBB.bottom - this.worldBB.top;
-		const SEPERATION = 25;
-		this.agentBB = [
-			new BoundingCircle(
-				this.worldBB.x + WIDTH / 2,
-				this.worldBB.y + HEIGHT / 2 - SEPERATION,
-				WIDTH / 2),
-			new BoundingCircle(this.worldBB.x + WIDTH / 2,
-				this.worldBB.y + HEIGHT / 2 + SEPERATION,
-				WIDTH / 2)
-		];
-    }
-
 	/** 
-	 * 
+	 *
 	 */
 	meleeAttack() {
 		this.meleeAttackCooldown -= this.game.clockTick;
+		let druidCenter = this.worldBB.centerPoint();
 		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			if (this.facing === 0) { // stab left
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			} else { // stab right
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			}
+			// stab
+			this.game.addEntity(new SwordAttack(this.game, druidCenter.x, druidCenter.y, this.facing));
 			this.game.C = false;
 			this.meleeAttackCooldown = 1;
 		}
@@ -125,28 +105,14 @@ class Druid extends Agent {
 		for (i = 0; i < 2; i++) {
 			this.animations.push([]);
 		}
-		this.storedAnimations = {
-			standingRight: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, true),
-			standingLeft: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, false),
-			walkingRight: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true),
-			walkingLeft: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false),
-			jumpingRight: new Animator(
-				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, true),
-			jumpingLeft: new Animator(
-				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, false),
-			airHangRight: new Animator(
-				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, true),
-			airHangLeft: new Animator(
-				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, false),
-		};
-		this.animations[0][0] = this.storedAnimations.walkingRight;
-		this.animations[1][0] = this.storedAnimations.walkingLeft;
-		this.animations[0][1] = this.storedAnimations.jumpingRight;
-		this.animations[1][1] = this.storedAnimations.jumpingLeft;
+		this.animations[0][0] = new Animator( // Walking right
+			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true);
+		this.animations[1][0] = new Animator( // Walking left
+			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false);
+		this.animations[0][1] = new Animator( // Jumping right
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, true);
+		this.animations[1][1] = new Animator( // Jumping left
+			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, false);
 	}
 
 	/** @override */
@@ -156,56 +122,39 @@ class Druid extends Agent {
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
 
-		// Check if player is moving
-		if (this.game.right) {
-			this.animations[0][0] = this.storedAnimations.walkingRight;
-			this.animations[1][0] = this.storedAnimations.walkingLeft;
-			this.vel.x = WALK_SPEED;
-		}
-		if (this.game.left) {
-			this.animations[0][0] = this.storedAnimations.walkingRight;
-			this.animations[1][0] = this.storedAnimations.walkingLeft;
-			this.vel.x = -WALK_SPEED;
-		}
-		if (!this.game.left && !this.game.right) {
-			this.animations[0][0] = this.storedAnimations.standingRight;
-			this.animations[1][0] = this.storedAnimations.standingLeft;
-			this.vel.x = 0;
-		}
-		// Damage flashing 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;
 			this.flashing = !this.flashing;
 		} else {
 			this.flashing = false;
 		}
-		// Jump handling
-		if (!this.isJumping && this.game.B) {
+
+		if (!this.isJumping && this.game.B) { 
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
-			this.game.B = false;
-			this.animations[0][1] = this.storedAnimations.jumpingRight;
-			this.animations[1][1] = this.storedAnimations.jumpingLeft;
-			this.animations[0][1].restart();
-			this.animations[1][1].restart();
 			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
+			this.game.B = false;
 		} else {
-			if (this.animations[0][1].isDone() || this.animations[1][1].isDone) {
-				this.animations[0][1] = this.storedAnimations.airHangRight;
-				this.animations[1][1] = this.storedAnimations.airHangLeft;
-			}
-			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
-		}		
-		// Check if player is switching weapons
+		}
+
+		// check if melee attack is made
+		this.meleeAttack();
+		// check if switch attack
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
         }
-		// Check if player is attacking
-		this.meleeAttack();
+		// check if any special attack if made
 		if (this.attackSelection != null) {
 			this.attacks[this.attackSelection].attack(this);
+        }
+		if (this.game.right) { 
+			this.vel.x = WALK_SPEED;
+		} else if (this.game.left) {
+			this.vel.x = -WALK_SPEED;
+		} else {
+			this.vel.x = 0;
 		}
 		this.move(TICK);
 	}

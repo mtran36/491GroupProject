@@ -191,8 +191,8 @@ class BreakBlock extends Entity {
 		let sourcePosY = (1238 - sourceHeight) / 2;
 		let drawWidth = this.worldBB.width * crackPercentage;
 		let drawHeight = this.worldBB.height * crackPercentage;
-		let drawX = this.pos.x + (this.worldBB.width - drawWidth) / 2;
-		let drawY = this.pos.y + (this.worldBB.height - drawHeight) / 2;
+		let drawX = this.worldBB.x + (this.worldBB.width - drawWidth) / 2;
+		let drawY = this.worldBB.y + (this.worldBB.height - drawHeight) / 2;
 		context.drawImage(this.spritesheet, sourcePosX, sourcePosY,
 				sourceWidth, sourceHeight,
 				drawX - this.game.camera.pos.x,

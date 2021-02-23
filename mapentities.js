@@ -207,6 +207,7 @@ class StandingBreakBlock extends BreakBlock {
 		}
 		this.druidOn = false;
 		if (this.collisionAmount >= this.breakPoint) {
+			this.vanishedTime += this.game.clockTick;
 			this.collisionAmount = 0;
 			this.minCrack = 0.25;
 			this.block.removeFromWorld = true;

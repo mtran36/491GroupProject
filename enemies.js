@@ -454,7 +454,7 @@ class Hopper extends Enemy {
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
 		if (this.canSee(this.game.druid) && !this.jumping && this.landTime < 0) {
-			this.left = this.sightRange.x > druidCenter.x;
+			this.left = this.sight.x > druidCenter.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
 			AUDIO_PLAYER.playSound("./Audio/Hopper.mp3");

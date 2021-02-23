@@ -38,10 +38,12 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/EnemyDamage.mp3", players: 4 },
 	{ path: "./Audio/Hopper.mp3", players: 4 },
 	{ path: "./Audio/EnemyProjectile.mp3", players: 4 },
-	{ path: "./Audio/EnemyBounce.mp3", players: 4 }
+	{ path: "./Audio/EnemyBounce.mp3", players: 4 },
+	{ path: "./Audio/FlyBuzz.mp3", players: 2 }
 ]
 
 // ENTRY POINT
+window.addEventListener('scroll', noScroll);
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
 });

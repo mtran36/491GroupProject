@@ -21,7 +21,7 @@ class Animator {
      * left corner of the source image.
      * @param {number} scale
      */
-    drawFrame(tick, context, x, y, scale, camera) {
+    drawFrame(tick, context, x, y, scale, camera, xOffset = 0, yOffset = 0) {
         if (this.spritesheet === undefined) {
             console.error(
                 "Entity at x =", x, "y =", y, "scale value =", scale,
@@ -48,7 +48,7 @@ class Animator {
         context.drawImage(this.spritesheet,
             this.xStart + frame * (this.width + this.framePadding), this.yStart,
             this.width, this.height,
-            x, y,
+            x + xOffset, y + yOffset,
             this.width * scale,
             this.height * scale); 
         // Restore canvas context to previous settings.
@@ -65,8 +65,17 @@ class Animator {
         return Math.floor(this.elapsedTime / this.frameDuration);
     };
 
-    /** Returns whether or not this animation has completed. */
+    /** 
+     * Returns whether or not this animation has completed. 
+     */
     isDone() {
         return (this.elapsedTime >= this.totalTime);
     };
+
+    /** 
+     * Restarts this animation. 
+     */
+    restart() {
+        this.elapsedTime = 0;
+    }
 };

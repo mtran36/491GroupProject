@@ -2,12 +2,6 @@ class Items extends Agent {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
         this.emerging = false;
-        this.updateBB();
-    }
-
-    /** @override */
-    update() {
-        this.checkCollisions();
     }
 
     addItemsToDruid(DRUID) {
@@ -23,12 +17,15 @@ class Items extends Agent {
 
     /** @override */
     defineWorldCollisions(entity, collisions) {
+        let x = this.worldBB.x;
+        let y = this.worldBB.y;
         if (entity instanceof Ground) {
             if (collisions.down) {
-                this.pos.y = entity.worldBB.top - this.scaleDim.y;
+                y = entity.worldBB.top - this.worldBB.height;
                 this.vel.y = 0;
             }
         }
+        this.worldBB.shift(x, y);
     }
 }
 
@@ -59,6 +56,7 @@ class Potions extends Items {
     }
 
     addItemsToDruid(DRUID) {
+        AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
         if (DRUID.health === DRUID.maxHealth) {
             DRUID.potionCounter += 1;
         } else {

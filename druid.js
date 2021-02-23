@@ -205,6 +205,10 @@ class Druid extends Agent {
 		// Check if player is attacking
 		this.meleeAttack();
 		if (this.attackSelection != null) {
+			// update cooldown of all attacks
+			for (var i = 0; i < this.attacks.length; i++) {
+				this.attacks[i].updateCooldown();
+            }
 			this.attacks[this.attackSelection].attack(this);
 		}
 		this.move(TICK);
@@ -230,6 +234,11 @@ class Druid extends Agent {
 				tickWidth: 40
 			},
 			"POTIONS", "teal");
+		// powerups UI
+		HUD.drawPowerupUI(context,
+			PARAMS.CANVAS_WIDTH - 288, PARAMS.CANVAS_HEIGHT - 48,
+			this.attacks, this.attackSelection);
+
 		if (this.flashing) return;
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,

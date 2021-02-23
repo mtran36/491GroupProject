@@ -5,6 +5,7 @@
 class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
+		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
 		this.defineAgentCollisions = () => { };
 		this.cooldown = 0;
 	} 
@@ -26,6 +27,11 @@ class PowerUp extends Agent {
             }
 		}
 	}
+
+	/** Update the coodown of this powerup. */
+	updateCooldown() {
+		this.cooldown -= this.game.clockTick;
+    }
 }
 
 /**
@@ -42,7 +48,6 @@ class RangedPowerUp extends PowerUp {
 	 * @param {any} DRUID the main character.
 	 */
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
@@ -64,8 +69,8 @@ class RangedPowerUp extends PowerUp {
 			}
 			this.game.A = false;
 			this.cooldown = 1;
-			}
 		}
+	}
 
 	/** @override */
 	draw(context) {
@@ -89,7 +94,6 @@ class WindElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new TornadoAttack(
@@ -103,7 +107,7 @@ class WindElement extends PowerUp {
 					DRUID.pos.y - PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 1;
+			this.cooldown = 2;
 		}
 	}
 
@@ -129,7 +133,6 @@ class LightElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new ThunderAttack(
@@ -143,7 +146,7 @@ class LightElement extends PowerUp {
 					DRUID.pos.y + PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 2;
+			this.cooldown = 3;
 		}
 	}
 

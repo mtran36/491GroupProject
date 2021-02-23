@@ -33,12 +33,10 @@ class Druid extends Agent {
 	 */
 	meleeAttack() {
 		this.meleeAttackCooldown -= this.game.clockTick;
+		let druidCenter = this.worldBB.centerPoint();
 		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			if (this.facing === 0) { // stab left
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			} else { // stab right
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			}
+			// stab
+			this.game.addEntity(new SwordAttack(this.game, druidCenter.x, druidCenter.y, this.facing));
 			this.game.C = false;
 			this.meleeAttackCooldown = 1;
 		}

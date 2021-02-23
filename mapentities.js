@@ -3,11 +3,6 @@ class Block extends Entity {
 		super(game, x, y, spritesheet);
 	}
 
-	/** @override */
-	update() {
-		// Do nothing
-	}
-
 	/**
 	 * Automatically sets the size of the tile to be equal to the tile width parameter 
 	 * (you don't have to scale the block to the correct size). Use instead of setDimensions
@@ -23,7 +18,10 @@ class Block extends Entity {
 		};
 		// Use algebra to find correct scale value
 		this.setDimensions(PARAMS.TILE_WIDTH / sideLen, sideLen, sideLen);
-		this.worldBB = new BoundingBox(this.pos.x, this.pos.y, width * sideLen * this.scale, height * sideLen * this.scale);
+		this.worldBB = new BoundingBox(
+			this.pos.x, this.pos.y,
+			width * sideLen * this.scale,
+			height * sideLen * this.scale);
 		this.lastWorldBB = this.worldBB;
     }
 
@@ -41,14 +39,36 @@ class Block extends Entity {
 		}
 		this.worldBB.display(this.game);
 	}
+
+	/** @override */
+	update() {
+		// Do nothing
+    }
 }
 
 class Ground extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");
 		this.setSize(width, height, 32);
+		this.setBoundingBox();
+		
 		this.look = { x: 0, y: 0 };
 	};
+
+	setBoundingBox() {
+		if (this.size.height > 1) {
+			this.worldBB = new BoundingBox(
+				this.pos.x + PARAMS.TILE_WIDTH - 15,
+				this.pos.y,
+				this.size.width * PARAMS.TILE_WIDTH - PARAMS.TILE_WIDTH - 35,
+				this.size.height * PARAMS.TILE_WIDTH - PARAMS.TILE_WIDTH + 15);
+		} else if (this.size.height = 1) {
+			this.worldBB = new BoundingBox(
+				this.pos.x + 10, this.pos.y,
+				this.size.width * PARAMS.TILE_WIDTH - 20,
+				this.size.height * PARAMS.TILE_WIDTH - 20);
+        }
+    }
 
 	/** @override */
 	draw(context) {
@@ -134,6 +154,11 @@ class BreakBlock extends Entity {
 		this.minCrack = 0;
 	}
 
+	/** @override */
+	draw(context) {
+		
+    }
+
 	/**
 	 * Adds the block associated with this breaking block into the entity list.
 	 * Should be called immediately after the constructor.
@@ -148,15 +173,6 @@ class BreakBlock extends Entity {
 				this.drawCrack(context);
 			}
 		}
-	}
-
-	/** @override
-	 * 
-	 * Empty draw method.
-	 * @param {any} context
-	 */
-	draw(context) {
-		// Does nothing.
 	}
 
 	/**
@@ -325,26 +341,26 @@ class Minimap extends Entity {
 	constructor(game, x, y, width) {
 		super(game, x, y);
 		this.width = width;
-		this.update = function () {  };
+		this.update = () => { /* Do nothing */ };
 	};
 
 	draw(context) {
 		const SCALE = 16;
 		const PIP_SIDE_LEN = 4;
-		let that = this, entity;
+		let that = this;
 
 		context.save();
 		context.strokeStyle = "black";
 		context.lineWidth = 3;
 		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
-		this.game.entities.forEach(function (entity) {
+		this.game.entities.forEach((entity) => {
 			context.fillStyle = entity.mapPipColor;
-			let x = that.pos.x + (entity.pos.x - that.game.camera.pos.x) / SCALE;
-			let y = that.pos.y + (entity.pos.y - that.game.camera.pos.y) / SCALE;
-			if (x > that.pos.x
-				&& y > that.pos.y
-				&& y < that.pos.y + that.width
-				&& x < that.pos.x + that.width) {
+			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE;
+			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE;
+			if (x > this.pos.x
+				&& y > this.pos.y
+				&& y < this.pos.y + that.width
+				&& x < this.pos.x + that.width) {
 				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
 			}
 		});
@@ -361,14 +377,13 @@ class Background extends Entity {
 		super(game, x, y, spriteSheetName);
 		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
 
+		this.speed = 0;
 		/** Picture width (different backgrounds might have different ratios) */
 		this.spriteWidth = spriteWidth;
 		/** Picture length (different backgrounds might have different ratios) */
 		this.spriteLength = spriteHeight;
 		/** Background scrolling speed (different layers need different speeds) */
 		this.speedRate = speedRate;
-		this.speed = 0;
-
 		/** Left to the camera */
 		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y - 300};
 		/** At the camera position */

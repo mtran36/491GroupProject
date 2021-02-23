@@ -43,6 +43,7 @@ const AUDIO_PATHS = [
 ]
 
 // ENTRY POINT
+window.addEventListener('scroll', noScroll);
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
 });

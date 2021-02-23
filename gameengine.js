@@ -98,8 +98,7 @@ class GameEngine {
                 case "KeyL":
                     that.C = true;
                     break;
-                case "KeyZ":
-                case "KeyK":
+                case "Space":
                     that.B = true;
                     break;
                 case "KeyX":
@@ -140,8 +139,7 @@ class GameEngine {
                 case "KeyL":
                     that.C = false;
                     break;
-                case "KeyZ":
-                case "KeyK":
+                case "Space":
                     that.B = false;
                     break;
                 case "KeyX":
@@ -190,8 +188,7 @@ class GameEngine {
      * camera and removes entities from the world if they are set to be removed. 
      */
     update() {
-        let entitiesCount = this.entities.length;
-        let i;
+        let entitiesCount = this.entities.length, i;
         for (i = 0; i < entitiesCount; i++) {
             var entity = this.entities[i];
             if (!entity.removeFromWorld) {

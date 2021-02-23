@@ -65,8 +65,17 @@ class Animator {
         return Math.floor(this.elapsedTime / this.frameDuration);
     };
 
-    /** Returns whether or not this animation has completed. */
+    /** 
+     * Returns whether or not this animation has completed. 
+     */
     isDone() {
         return (this.elapsedTime >= this.totalTime);
     };
+
+    /** 
+     * Restarts this animation. 
+     */
+    restart() {
+        this.elapsedTime = 0;
+    }
 };

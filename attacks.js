@@ -1,16 +1,29 @@
 class SwordAttack extends Agent {
-	constructor(game, x, y, duration) {
-		super(game, x, y, "./Sprites/sword.png");
+	constructor(game, x, y, facing) {
+		super(game, x, y - 30, "./Sprites/sword.png");
 
+		this.facing = facing;
 		this.setDimensions(2.5, 34, 15);
 		this.duration = 0.5;
+		this.currentTime = 0;
+		this.vel = { x: 75, y: 0 };
 		this.attack = 1;
 		this.force = 600;
 		this.damagedEnemies = [];
 		this.defineWorldCollisions = () => { /* Do nothing */ };
 
-		this.updatePos();
+		this.agentBB = [
+			new BoundingCircle(
+				this.pos.x + this.scaleDim.x * 1 / 6,
+				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2),
+			new BoundingCircle(
+				this.pos.x + this.scaleDim.x / 2,
+				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2),
+			new BoundingCircle(
+				this.pos.x + this.scaleDim.x * 5 / 6,
+				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2)];
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
+		this.updatePos();
 	}
 
 	/** @override */
@@ -25,6 +38,8 @@ class SwordAttack extends Agent {
 	update() {
 		const TICK = this.game.clockTick;
 
+		this.currentTime += TICK;
+		this.vel.y = this.game.druid.vel.y;
 		this.duration -= TICK;
 		if (this.duration <= 0) {
 			this.removeFromWorld = true;
@@ -35,15 +50,28 @@ class SwordAttack extends Agent {
 
 	/** @override */
 	updatePos() {
-		if (this.game.druid.facing === 0) { // facing left
-			this.pos.x = this.game.druid.pos.x - this.scaleDim.x
-				+ (this.duration * 75) + (this.scaleDim.x / 5);
-			this.pos.y = this.game.druid.pos.y + this.game.druid.scaleDim.y / 2;
-		} else { // facing right
-			this.pos.x = this.game.druid.pos.x + this.game.druid.scaleDim.x
-				- (this.duration * 75) - (this.scaleDim.x / 5);
-			this.pos.y = this.game.druid.pos.y + this.game.druid.scaleDim.y / 2;
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+		this.facing = this.game.druid.facing;
+		if (this.facing === 0) {
+			this.pos.x = druidCenter.x - this.currentTime * this.vel.x - this.scaleDim.x;
+			this.worldBB.shift(druidCenter.x - this.currentTime * this.vel.x - this.worldBB.width,
+				druidCenter.y - 30);
+			for (let i = 0; i < this.agentBB.length; i++) {
+				this.agentBB[i].shift(
+					druidCenter.x - this.currentTime * this.vel.x - this.scaleDim.x * (2 * i + 1) / 6,
+					this.pos.y + this.scaleDim.y / 2);
+			}
+		} else {
+			this.pos.x = druidCenter.x + this.currentTime * this.vel.x;
+			this.worldBB.shift(druidCenter.x + this.currentTime * this.vel.x,
+				druidCenter.y - 30);
+			for (let i = 0; i < this.agentBB.length; i++) {
+				this.agentBB[i].shift(
+					druidCenter.x + this.currentTime * this.vel.x + this.scaleDim.x * (2 * i + 1) / 6,
+					this.pos.y + this.scaleDim.y / 2);
+			}
 		}
+		this.pos.y = this.worldBB.y;
     }
 
 	/** @override */

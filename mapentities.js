@@ -46,6 +46,13 @@ class Block extends Entity {
     }
 }
 
+class Mesh extends Block {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height);
+		this.setSize(width, height, 1);
+    }
+}
+
 class Ground extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");

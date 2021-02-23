@@ -43,7 +43,10 @@ const AUDIO_PATHS = [
 ]
 
 // ENTRY POINT
-window.addEventListener('scroll', noScroll);
+window.onkeydown = function (e) {
+	// Stop spacebar from scrolling screen
+	return !(e.keyCode == 32);
+};
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
 });

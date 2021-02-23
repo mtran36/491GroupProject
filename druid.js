@@ -23,7 +23,6 @@ class Druid extends Agent {
 		this.keyCounter = 0;
 		this.xOffset = 45;
 		this.currentOffset = this.xOffset;
-
 		this.attackSelection = null;
 		this.attacks = [];
 	}
@@ -126,22 +125,30 @@ class Druid extends Agent {
 			this.animations.push([]);
 		}
 		this.storedAnimations = {
-			standingRight: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, true),
-			standingLeft: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, false),
-			walkingRight: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true),
-			walkingLeft: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false),
-			jumpingRight: new Animator(
-				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, true),
-			jumpingLeft: new Animator(
-				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, false),
-			airHangRight: new Animator(
-				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, true),
-			airHangLeft: new Animator(
-				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, false),
+			standingRight: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				3, 0.7, 0, true, true, true, true),
+			standingLeft: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				3, 0.7, 0, true, true, false, true),
+			walkingRight: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				8, 0.1, 0, true, true, true),
+			walkingLeft: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				8, 0.1, 0, true, true, false),
+			jumpingRight: new Animator(this.spritesheet,
+				0, 128, this.dim.x, this.dim.y,
+				6, 0.3, 0, false, false, true),
+			jumpingLeft: new Animator(this.spritesheet,
+				0, 128, this.dim.x, this.dim.y,
+				6, 0.3, 0, false, false, false),
+			airHangRight: new Animator(this.spritesheet,
+				this.dim.x * 4, 128, this.dim.x, this.dim.y,
+				1, 1, 0, false, true, true),
+			airHangLeft: new Animator(this.spritesheet,
+				this.dim.x * 4, 128, this.dim.x, this.dim.y,
+				1, 1, 0, false, true, false),
 		};
 		this.animations[0][0] = this.storedAnimations.walkingRight;
 		this.animations[1][0] = this.storedAnimations.walkingLeft;

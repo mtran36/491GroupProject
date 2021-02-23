@@ -56,6 +56,15 @@ class Scene {
 					mask.width, mask.height));
             }
 		}
+		if (level.mesh) {
+			for (i = 0; i < level.mesh.length; i++) {
+				let mesh = level.mesh[i];
+				this.game.addEntity(new Mesh(this.game,
+					PARAMS.TILE_WIDTH * mesh.x,
+					PARAMS.TILE_WIDTH * mesh.y,
+					mesh.width, mesh.height));
+			}
+		}
 		if (level.standingBreakBlock) {
 			for (i = 0; i < level.standingBreakBlock.length; i++) {
 				let standingBreakBlock = level.standingBreakBlock[i];
@@ -159,7 +168,7 @@ class Scene {
 					powerup.y * PARAMS.TILE_WIDTH));
 			}
 		}
-		this.game.druid = new Druid(this.game, x, y);
+		this.game.druid = new Druid(this.game, x - 6000, y + 2);
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
 	};
@@ -168,7 +177,7 @@ class Scene {
 		PARAMS.DEBUG = document.getElementById("debug").checked;
 		if (this.game.druid) {
 			this.pos.x = this.game.druid.worldBB.x - PARAMS.CANVAS_WIDTH / 2;
-			this.pos.y = this.game.druid.worldBB.y - PARAMS.CANVAS_HEIGHT / 1.5;
+			this.pos.y = this.game.druid.worldBB.y - PARAMS.CANVAS_HEIGHT / 1.75;
 			this.pos.x = Math.floor(this.pos.x);
 			this.pos.y = Math.floor(this.pos.y);
 		}

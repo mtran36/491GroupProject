@@ -23,7 +23,7 @@ class PowerUp extends Agent {
 			if (this.game.druid.attackSelection == null) {
 				this.game.druid.attackSelection = 0;
 			} else {
-				this.game.druid.attackSelection++;
+				this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
             }
 		}
 	}

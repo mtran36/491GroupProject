@@ -37,9 +37,9 @@ var levelOne = {
 		{ x: -99, y: 2, width: 3, height: 1 },
 		{ x: -155, y: -15, width: 30, height: 20 }
 	],
-	mesh: [
-		{ x: -100, y: 0, width: 1, height: 1 }
-	],
+	// mesh: [
+	//	{ x: -100, y: 0, width: 1, height: 1 }
+	//],
 	standingBreakBlock: [
 		{ x: 15, y: 7, width: 2, blockType: 'Ground'}
 	],

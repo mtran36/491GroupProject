@@ -510,26 +510,6 @@ class HitBreakBlock extends BreakBlock {
 	}
 }
 
-class Key extends Entity {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/key.png");
-	};
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 128, 128,
-			this.pos.x - this.game.camera.pos.x,
-			this.pos.y - this.game.camera.pos.y,
-			this.dim.x, this.dim.y);
-		this.worldBB.display(this.game);
-	}
-
-	/** @override */
-	update(context) {
-		// Do nothing
-	}
-}
-
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");

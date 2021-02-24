@@ -130,5 +130,14 @@ var levelOne = {
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
 		{ x: 29, y: 5 }
+	],
+	keys: [
+		{ x: 0, y: 0 } // temporary
+	],
+	potions: [
+		{ x: 30, y: 5 } // temporary
+	],
+	doors: [
+		{ x: 10, y: 3 } // temporary
 	]
 }

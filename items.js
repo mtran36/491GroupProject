@@ -5,7 +5,7 @@ class Items extends Agent {
     }
 
     addItemsToDruid(DRUID) {
-        console.warn("Potion not define: ");
+        console.warn("Item not define: ");
     }
 
     defineAgentCollisions(entity) {
@@ -60,15 +60,44 @@ class Potion extends Items {
         AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
         if (DRUID.health === DRUID.maxHealth) {
             DRUID.potionCounter += 1;
+            if (DRUID.potionCounter >= DRUID.maxPotions) {
+                DRUID.potionCounter = DRUID.maxPotions;
+            }
         } else {
-            DRUID.health += 100;
+            DRUID.health += 20;
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
             }
         }
     }
+}
+
+class Key extends Items {
+    constructor(game, x, y) {
+        super(game, x, y - 100, "./Sprites/key.png");
+    };
 
     static construct(game, params) {
-        return new Potion(game, params.x, params.y)
+        game.addEntity(new Potion(game, params.x, params.y));
     }
+
+    update() {
+        const FALL_ACC = 1500;
+        const TICK = this.game.clockTick;
+        this.vel.y += FALL_ACC * TICK;
+        this.move(TICK);
+    }
+
+    addItemsToDruid(DRUID) {
+        DRUID.keyCounter += 1;
+    }
+
+    /** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 128, 128,
+            this.pos.x - this.game.camera.pos.x,
+            this.pos.y - this.game.camera.pos.y,
+			this.dim.x, this.dim.y);
+		this.worldBB.display(this.game);
+	}
 }

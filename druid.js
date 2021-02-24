@@ -83,6 +83,12 @@ class Druid extends Agent {
 		if (entity instanceof Enemy && this.invincTime <= 0) {
 			this.takeDamage(entity.attack);
 		}
+		if (entity instanceof Door) {
+			if (this.keyCounter > 0) {
+				entity.removeFromWorld = true;
+				this.keyCounter -= 1;
+            }
+        }
 	}
 
 	/** @override */
@@ -162,7 +168,7 @@ class Druid extends Agent {
 		const WALK_SPEED = 300;
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
-		let i;
+		let i, remainder = this.maxHealth - this.health;
 
 		// Check if player is moving
 		if (this.game.right) {
@@ -179,6 +185,11 @@ class Druid extends Agent {
 			this.animations[0][0] = this.storedAnimations.standingRight;
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
+		}
+		// Update potion counter
+		if (this.potionCounter > 0 && this.remainder > 20) {
+			this.health += 20;
+			this.potionCounter -= 1;
 		}
 		// Damage flashing 
 		if (this.invincTime > 0) {
@@ -241,6 +252,13 @@ class Druid extends Agent {
 				tickWidth: 40
 			},
 			"POTIONS", "teal");
+
+		context.fillStyle = "black";
+		context.font = "italic bold 16px Castellar";
+		context.fillText(
+			"Key: " + this.keyCounter,
+			10, 100);
+		context.restore();
 		// powerups UI
 		HUD.drawPowerupUI(context,
 			PARAMS.CANVAS_WIDTH - 288, PARAMS.CANVAS_HEIGHT - 48,

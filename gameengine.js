@@ -99,6 +99,7 @@ class GameEngine {
                     that.C = true;
                     break;
                 case "Space":
+                case "KeyZ":
                     that.B = true;
                     break;
                 case "KeyX":
@@ -114,6 +115,14 @@ class GameEngine {
                         AUDIO_PLAYER.mute = !AUDIO_PLAYER.mute;
                         that.mutePressed = true;
                     }
+                    break;
+                case "KeyI":
+                    that.screen = that.camera.winScreen;
+                    AUDIO_PLAYER.stopAll();
+                    break;
+                case "KeyR":
+                    that.camera.loadLevel(
+                        levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
                     break;
             }
         });
@@ -140,6 +149,7 @@ class GameEngine {
                     that.C = false;
                     break;
                 case "Space":
+                case "KeyZ":
                     that.B = false;
                     break;
                 case "KeyX":

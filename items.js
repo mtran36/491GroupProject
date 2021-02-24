@@ -29,7 +29,7 @@ class Items extends Agent {
     }
 }
 
-class Potions extends Items {
+class Potion extends Items {
     constructor(game, x, y) {
         super(game, x, y - 100, "./Sprites/potions.png");
         this.setDimensions(1, 45, 55);
@@ -51,6 +51,7 @@ class Potions extends Items {
     update() {
         const FALL_ACC = 1500;
         const TICK = this.game.clockTick;
+
         this.vel.y += FALL_ACC * TICK;
         this.move(TICK);
     }
@@ -65,5 +66,9 @@ class Potions extends Items {
                 DRUID.health = DRUID.maxHealth;
             }
         }
+    }
+
+    static construct(game, params) {
+        return new Potion(game, params.x, params.y)
     }
 }

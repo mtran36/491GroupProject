@@ -162,6 +162,7 @@ class Druid extends Agent {
 		const WALK_SPEED = 300;
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
+		let i;
 
 		// Check if player is moving
 		if (this.game.right) {
@@ -212,8 +213,7 @@ class Druid extends Agent {
 		// Check if player is attacking
 		this.meleeAttack();
 		if (this.attackSelection != null) {
-			// update cooldown of all attacks
-			for (var i = 0; i < this.attacks.length; i++) {
+			for (i = 0; i < this.attacks.length; i++) {
 				this.attacks[i].updateCooldown();
             }
 			this.attacks[this.attackSelection].attack(this);

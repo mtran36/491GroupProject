@@ -2,7 +2,7 @@ const GAME_ENGINE = new GameEngine();
 const ASSET_LOADER = new AssetLoader();
 const AUDIO_PLAYER = new AudioPlayer();
 const IMAGE_PATHS = [
-	"./Sprites/TestFly.png",
+	"./Sprites/Fly.png",
 	"./Sprites/TestBeetle.png",
 	"./Sprites/TestHopper.png",
 	"./Sprites/druid.png",

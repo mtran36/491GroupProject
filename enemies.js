@@ -99,7 +99,7 @@ class Enemy extends Agent {
  */
 class Fly extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestFly.png", prize, prizeRate);
+		super(game, x, y, "./Sprites/Fly.png", prize, prizeRate);
 		this.setDimensions(1, 32, 32);
 		// Override default values
 		this.ACC = { x: 700, y: 700 };
@@ -112,6 +112,7 @@ class Fly extends Enemy {
 		this.up = false;
 		this.seesDruid = false;
 		this.accelerate = false;
+		this.xOffset = 5;
 	}
 
 	static construct(game, params) {
@@ -124,9 +125,9 @@ class Fly extends Enemy {
 	/** @override */
 	loadAnimations() {
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+			this.spritesheet, 0, 0, 32, 32, 8, 0.083, 0, false, true, false);
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+			this.spritesheet, 0, 0, 32, 32, 8, 0.083, 0, false, true, true);
 	}
 
 	/** @override */
@@ -168,6 +169,11 @@ class Fly extends Enemy {
 			} else {
 				this.vel.y = Math.min(0, this.vel.y + velChangeY);
 			}
+		}
+		if (this.left) {
+			this.xOffset = 5;
+		} else {
+			this.xOffset = -5;
 		}
 		this.move(this.game.clockTick);
 	}
@@ -211,6 +217,17 @@ class Fly extends Enemy {
 			AUDIO_PLAYER.playSound("./Audio/EnemyBounce.mp3");
 		}
 		this.worldBB.shift(x, y);
+	}
+
+	draw(context) {
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick, context,
+			this.pos.x, this.pos.y,
+			this.scale, this.game.camera, this.xOffset);
+		this.worldBB.display(this.game);
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
 	}
 }
 

@@ -22,6 +22,8 @@ class Entity {
             y: this.dim.y * this.scale
         };
         this.animations = [];
+        this.worldBB = this.makeDefaultBoundingBox();
+        this.lastWorldBB = this.makeDefaultBoundingBox();
     }
 
     /** 
@@ -43,15 +45,8 @@ class Entity {
             x: width * this.scale,
             y: height * this.scale
         };
-        this.updateBB();
-    }
-
-    /** 
-     * Updates the bounding box to the current position of the entity. 
-     */
-    updateBB() {
-        this.lastWorldBB = this.worldBB;
         this.worldBB = this.makeDefaultBoundingBox();
+        this.lastWorldBB = this.makeDefaultBoundingBox();
     }
 
     /**
@@ -109,8 +104,15 @@ class Agent extends Entity {
         
         this.facing = 0; // Left = 0, Right = 1
         this.agentBB = this.makeDefaultBoundingCircle();
-        this.lastAgentBB = this.agentBB;
+        this.lastAgentBB = this.makeDefaultBoundingCircle();
         this.loadAnimations();
+    }
+
+    /** @override */
+    setDimensions(scale, width, height) {
+        super.setDimensions(scale, width, height);
+        this.agentBB = this.makeDefaultBoundingCircle();
+        this.lastAgentBB = this.makeDefaultBoundingCircle();
     }
 
     /** 
@@ -130,7 +132,6 @@ class Agent extends Entity {
      * @param {number} damage Damage to health as an integer
      */
     takeDamage(damage) {
-        console.log("before hit:" + this.health);
         this.health -= damage;
         if (this.health <= 0) {
             if (this.spawnPrize) {
@@ -138,7 +139,6 @@ class Agent extends Entity {
             }
             this.removeFromWorld = true;
         }
-        console.log("after hit:" + this.health);
     }
 
     /**
@@ -147,11 +147,35 @@ class Agent extends Entity {
      * @param {number} tick Amount of time which has passed since the last tick in ms.
      */
     move(tick) {
-        this.pos.x += this.vel.x * tick;
-        this.pos.y += this.vel.y * tick;
+        let i;
+        let diffPosX = this.pos.x - this.worldBB.x;
+        let diffPosY = this.pos.y - this.worldBB.y;
+        let diffAgentX = [];
+        let diffAgentY = [];
+        let shiftAgents = () => {
+            for (i = 0; i < this.agentBB.length; i++) {
+                this.agentBB[i].shift(
+                    this.worldBB.x + diffAgentX[i],
+                    this.worldBB.y + diffAgentY[i]);
+            }
+        }
+
+        if (this.agentBB instanceof BoundingCircle) {
+            this.agentBB = [this.agentBB];
+        }
+        for (i = 0; i < this.agentBB.length; i++) {
+            diffAgentX[i] = this.agentBB[i].x - this.worldBB.x;
+            diffAgentY[i] = this.agentBB[i].y - this.worldBB.y;
+        }
         this.updateBB();
+        this.worldBB.shift(
+            this.worldBB.x += this.vel.x * tick,
+            this.worldBB.y += this.vel.y * tick);
+        shiftAgents();
         this.checkCollisions();
-        this.worldBB = this.makeDefaultBoundingBox();
+        shiftAgents();
+        this.pos.x = this.worldBB.x + diffPosX;
+        this.pos.y = this.worldBB.y + diffPosY;
         this.updateFacing();
         this.updateBB();
     }
@@ -160,10 +184,10 @@ class Agent extends Entity {
      * Returns a default bounding circle for agents. 
      */
     makeDefaultBoundingCircle() {
-        return new BoundingCircle(
+        return [ new BoundingCircle(
             this.pos.x + this.scaleDim.x / 2,
             this.pos.y + this.scaleDim.y / 2,
-            Math.min(this.scaleDim.x, this.scaleDim.y) / 2);
+            Math.min(this.scaleDim.x, this.scaleDim.y) / 2) ];
     }
 
     /**
@@ -223,17 +247,21 @@ class Agent extends Entity {
      */
     checkCollisions() {
         let that = this;
-        this.game.entities.forEach(function (entity) {
+        this.game.entities.forEach((entity) => {
+            if (that === entity) return;
             // Check agent collisions
-            if (entity.agentBB
-                && that.agentBB.collide(entity.agentBB)
-                && that != entity) {
-                that.defineAgentCollisions(entity);
+            if (entity.agentBB) {
+                that.agentBB.forEach((agentBB) => {
+                    entity.agentBB.forEach((entityBB) => {
+                        if (agentBB.collide(entityBB)) {
+                            that.defineAgentCollisions(entity);
+                        }
+                    });
+                });
             }
             // Check world collisions
             if (entity.worldBB
-                && that.worldBB.collide(entity.worldBB)
-                && that != entity) {
+                && that.worldBB.collide(entity.worldBB)) {
                 let collisions = that.worldCollisions(entity);
                 that.defineWorldCollisions(entity, collisions);
             }
@@ -268,14 +296,14 @@ class Agent extends Entity {
             this.pos.x, this.pos.y,
             this.scale, this.game.camera);
         this.worldBB.display(this.game);
-        this.agentBB.display(this.game);
+        this.agentBB.forEach((BB) => {
+            BB.display(this.game);
+        });
     }
 
     /** @override */
     updateBB() {
-        super.updateBB();
-        this.lastAgentBB = this.agentBB;
-        this.agentBB = this.makeDefaultBoundingCircle();
+        this.lastWorldBB.copy(this.worldBB);
     }
 
     /** @override */
@@ -333,6 +361,40 @@ class BoundingBox {
             game.context.restore();
         }
     }
+
+    /**
+     * Copy the stored values of otherBox into this Bounding Box.
+     * @param {BoundingBox} otherBox
+     */
+    copy(otherBox) {
+        this.x = otherBox.x;
+        this.y = otherBox.y;
+        this.width = otherBox.width;
+        this.height = otherBox.height;
+        this.left = otherBox.left;
+        this.right = otherBox.right;
+        this.top = otherBox.top;
+        this.bottom = otherBox.bottom;
+    }
+
+    /**
+     * Shift the BoundingBox to the new (x, y) position. Update all other stored values
+     * based on this new position;
+     * @param {Number} x
+     * @param {Number} y
+     */
+    shift(x, y) {
+        this.x = x;
+        this.y = y;
+        this.left = this.x;
+        this.top = this.y;
+        this.right = this.x + this.width;
+        this.bottom = this.y + this.height;
+    }
+
+    centerPoint() {
+        return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
+    }
 }
 
 /** 
@@ -371,5 +433,25 @@ class BoundingCircle {
             game.context.stroke();
             game.context.restore();
         }
+    }
+
+/**
+* Copy the stored values of otherCircle into this BoundingCircle.
+* @param {BoundingCircle} otherBox
+*/
+    copy(otherCircle) {
+        this.x = otherCircle.x;
+        this.y = otherCircle.y;
+        this.radius = otherCircle.radius;
+    }
+
+/**
+* Shift the BoundingCircle to the new (x, y) position.
+* @param {Number} x
+* @param {Number} y
+*/
+    shift(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }

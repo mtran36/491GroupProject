@@ -2,12 +2,6 @@ class Items extends Agent {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
         this.emerging = false;
-        this.updateBB();
-    }
-
-    /** @override */
-    update() {
-        this.checkCollisions();
     }
 
     addItemsToDruid(DRUID) {
@@ -23,16 +17,19 @@ class Items extends Agent {
 
     /** @override */
     defineWorldCollisions(entity, collisions) {
+        let x = this.worldBB.x;
+        let y = this.worldBB.y;
         if (entity instanceof Ground) {
             if (collisions.down) {
-                this.pos.y = entity.worldBB.top - this.scaleDim.y;
+                y = entity.worldBB.top - this.worldBB.height;
                 this.vel.y = 0;
             }
         }
+        this.worldBB.shift(x, y);
     }
 }
 
-class Potions extends Items {
+class Potion extends Items {
     constructor(game, x, y) {
         super(game, x, y - 100, "./Sprites/potions.png");
         this.setDimensions(1, 45, 55);
@@ -54,11 +51,13 @@ class Potions extends Items {
     update() {
         const FALL_ACC = 1500;
         const TICK = this.game.clockTick;
+
         this.vel.y += FALL_ACC * TICK;
         this.move(TICK);
     }
 
     addItemsToDruid(DRUID) {
+        AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
         if (DRUID.health === DRUID.maxHealth) {
             DRUID.potionCounter += 1;
             if (DRUID.potionCounter >= DRUID.maxPotions) {
@@ -78,6 +77,10 @@ class Key extends Items {
         super(game, x, y - 100, "./Sprites/key.png");
     };
 
+    static construct(game, params) {
+        game.addEntity(new Potion(game, params.x, params.y));
+    }
+
     update() {
         const FALL_ACC = 1500;
         const TICK = this.game.clockTick;
@@ -92,7 +95,8 @@ class Key extends Items {
     /** @override */
 	draw(context) {
 		context.drawImage(this.spritesheet, 0, 0, 128, 128,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+            this.pos.x - this.game.camera.pos.x,
+            this.pos.y - this.game.camera.pos.y,
 			this.dim.x, this.dim.y);
 		this.worldBB.display(this.game);
 	}

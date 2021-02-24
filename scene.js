@@ -19,14 +19,13 @@ class Scene {
 		let entry, construct, entityArr;
 		document.getElementById("gameWorld").setAttribute('style', 'background: black');
 		// Add all entities from level data
-		for (entry in level) {
+		for ([entry, entityArr] of Object.entries(level)) {
 			console.log("Loading", entry);
-			construct = level[entry][0];
-			level[entry].splice(0, 1);
-			level[entry].forEach((params) => {
+			construct = entityArr.shift();
+			entityArr.forEach((params) => {
 				construct(this.game, params);
 			});
-			level[entry].splice(0, 0, construct);
+			entityArr.splice(0, 0, construct);
 		}
 
 		this.game.druid = new Druid(this.game, x, y);

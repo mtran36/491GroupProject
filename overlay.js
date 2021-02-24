@@ -67,7 +67,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.camera.loadLevel(
-                levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+                levelOne, PARAMS.TILE_WIDTH * 5.5 - 6500, PARAMS.TILE_WIDTH - 200);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
@@ -75,7 +75,7 @@ class StartScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(
-                    levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+                    levelOne, PARAMS.TILE_WIDTH * 5.5 - 6500, PARAMS.TILE_WIDTH - 200);
                 this.game.screen = null;
             }
         });

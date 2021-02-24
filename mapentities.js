@@ -23,7 +23,7 @@ class Block extends Entity {
 			width * sideLen * this.scale,
 			height * sideLen * this.scale);
 		this.lastWorldBB = this.worldBB;
-    }
+	}
 
 	/** @override */
 	draw(context) {
@@ -43,7 +43,163 @@ class Block extends Entity {
 	/** @override */
 	update() {
 		// Do nothing
+	}
+}
+
+class Tree extends Block {
+	constructor(game, x, y, width = 3, height = 8, xOffset = 0, yOffset = 0) {
+		super(game, x, y, width, height, "./Sprites/tree.png");
+		Object.assign(this, { xOffset, yOffset });
+		this.setSize(width, height, 59);
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Tree(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height));
+	}
+
+	/** @override */
+	draw(context) {
+		let col, row;
+		for (col = this.xOffset; col < this.size.width + this.xOffset; col++) {
+			for (row = this.yOffset; row < this.size.height + this.yOffset; row++) {
+				context.drawImage(this.spritesheet,
+					col * this.dim.x, row * this.dim.y, this.dim.x, this.dim.y,
+					this.pos.x + col * this.scaleDim.x -
+						this.game.camera.pos.x - this.xOffset * PARAMS.TILE_WIDTH,
+					this.pos.y + row * this.scaleDim.y -
+						this.game.camera.pos.y - this.yOffset * PARAMS.TILE_WIDTH,
+					this.scaleDim.x, this.scaleDim.y);
+			}
+		}
+		this.worldBB.display(this.game);
+	}
+}
+
+class TreeTrunk extends Tree {
+	constructor(game, x, y, height = 6) {
+		super(game, x, y, 3, height, 3, 0);
+	}
+
+	static construct(game, params) {
+		game.addEntity(new TreeTrunk(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height));
     }
+}
+
+class Branch extends Tree {
+	constructor(game, x, y, type = 0, isDark = 0) {
+		super(game, x, y);
+		Object.assign(this, { type, isDark });
+
+		this.pickLook();
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Branch(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.type, params.isDark));
+	}
+
+	pickLook() {
+		switch (this.type) {
+			case 0:
+				this.size.height = 2;
+				this.size.width = 1;
+				this.xOffset = 6;
+				this.yOffset = 0;
+				break;
+			case 1:
+				this.size.height = 2;
+				this.size.width = 1;
+				this.xOffset = 7;
+				this.yOffset = 0;
+				break;
+			case 2:
+				this.size.height = 2;
+				this.size.width = 1;
+				this.xOffset = 8;
+				this.yOffset = 0;
+				break;
+			case 3:
+				this.size.height = 1;
+				this.size.width = 2;
+				this.xOffset = 7;
+				this.yOffset = 2;
+				break;
+			case 4:
+				this.size.height = 3;
+				this.size.width = 1;
+				this.xOffset = 9;
+				this.yOffset = 0;
+				break;
+			case 5:
+				this.size.height = 2;
+				this.size.width = 2;
+				this.xOffset = 10;
+				this.yOffset = 0;
+				break;
+		}
+		if (!this.isDark) {
+			this.yOffset += 3;
+        }
+	}
+}
+
+class Leaves extends Tree {
+	constructor(game, x, y, type = 0) {
+		super(game, x, y);
+
+		this.type = type;
+		this.pickLook();
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Leaves(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.type));
+	}
+
+	pickLook() {
+		switch (this.type) {
+			case 0:
+				this.size.width = 4;
+				this.size.height = 2;
+				this.xOffset = 3;
+				this.yOffset = 6;
+				break;
+			case 1:
+				this.size.width = 4;
+				this.size.height = 2;
+				this.xOffset = 3;
+				this.yOffset = 8;
+				break;
+			case 2:
+				this.size.width = 2;
+				this.size.height = 2;
+				this.xOffset = 7;
+				this.yOffset = 6;
+				break;
+			case 3:
+				this.size.width = 2;
+				this.size.height = 2;
+				this.xOffset = 7;
+				this.yOffset = 8;
+				break;
+			case 4:
+				this.size.width = 2;
+				this.size.height = 2;
+				this.xOffset = 9;
+				this.yOffset = 6;
+				break;
+        }
+	}
 }
 
 class Ground extends Block {
@@ -54,6 +210,13 @@ class Ground extends Block {
 		
 		this.look = { x: 0, y: 0 };
 	};
+
+	static construct(game, params) {
+		game.addEntity(new Ground(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height));
+	}
 
 	setBoundingBox() {
 		if (this.size.height > 1) {
@@ -67,8 +230,8 @@ class Ground extends Block {
 				this.pos.x + 10, this.pos.y,
 				this.size.width * PARAMS.TILE_WIDTH - 20,
 				this.size.height * PARAMS.TILE_WIDTH - 20);
-        }
-    }
+		}
+	}
 
 	/** @override */
 	draw(context) {
@@ -130,7 +293,60 @@ class Ground extends Block {
 					this.look.y = row % 2 === 0 ? 2 : 3;
 				}
 		}
+	}
+}
+
+class Mask extends Block {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height, "./Sprites/ground.png");
+		this.setSize(width, height, 32);
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Mask(game,
+			PARAMS.TILE_WIDTH * params.x,
+			PARAMS.TILE_WIDTH * params.y,
+			params.width, params.height));
+	}
+
+	/** @override */
+	draw(context) {
+		let col, row;
+		for (col = 0; col < this.size.width; col++) {
+			for (row = 0; row < this.size.height; row++) {
+				context.drawImage(
+					this.spritesheet, 64, 32, this.dim.x, this.dim.y,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
+					this.scaleDim.y, this.scaleDim.y);
+			}
+		}
+		this.worldBB.display(this.game);
+	}
+}
+
+class Mesh extends Ground {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height);
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/transparency.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Mesh(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height));
+	}
+
+	/** @override */
+	setBoundingBox() {
+		// Do nothing
     }
+
+	/** @override */
+	pickLook(row, col) {
+		// Do nothing
+	}
 }
 
 /**
@@ -153,11 +369,6 @@ class BreakBlock extends Entity {
 		this.breakPoint = 1;
 		this.minCrack = 0;
 	}
-
-	/** @override */
-	draw(context) {
-		
-    }
 
 	/**
 	 * Adds the block associated with this breaking block into the entity list.
@@ -199,6 +410,11 @@ class BreakBlock extends Entity {
 				drawY - this.game.camera.pos.y,
 				drawWidth, drawHeight);
 	}
+
+	/** @override */
+	draw(context) {
+		// Do nothing
+	}
 }
 
 /**
@@ -213,6 +429,15 @@ class StandingBreakBlock extends BreakBlock {
 		this.vanishedTime = 0;
 		this.respawnTime = 3;
 		this.druidOn = false;
+	}
+
+	/**
+	* Druid entity should call this when standing on a block of this class.
+	*/
+	standOn() {
+		this.druidOn = true;
+		this.collisionAmount += this.game.clockTick;
+		this.collisionAmount = Math.min(this.collisionAmount, this.breakPoint);
 	}
 
 	/** @override */
@@ -230,8 +455,9 @@ class StandingBreakBlock extends BreakBlock {
 			this.exists = false;
 		} else if (this.vanishedTime >= this.respawnTime) {
 			this.block.removeFromWorld = false;
-			this.game.entities.splice(this.game.entities.findIndex(
-				(entity) => { entity === this; }), 0, this.block);
+			this.game.entities.splice(this.game.entities.findIndex((entity) => {
+				entity === this;
+			}), 0, this.block);
 			this.vanishedTime = 0;
 			this.exists = true;
 		} else if (this.vanishedTime > 0) {
@@ -239,14 +465,15 @@ class StandingBreakBlock extends BreakBlock {
 		}
 	}
 
-	/**
-	* Druid entity should call this when standing on a block of this class.
-	*/
-	standOn() {
-		this.druidOn = true;
-		this.collisionAmount += this.game.clockTick;
-		this.collisionAmount = Math.min(this.collisionAmount, this.breakPoint);
-	}
+	static construct(game, params) {
+		let standingBreakBlock = new StandingBreakBlock(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height,
+			params.blockType);
+		game.addEntity(standingBreakBlock);
+		standingBreakBlock.addBlock();
+    }
 }
 
 /**
@@ -271,6 +498,7 @@ class HitBreakBlock extends BreakBlock {
 		this.collisionAmount += damage * this.hitStep;
 	}
 
+	/** @override */
 	update() {
 		if (this.lingerTime < 0) {
 			this.block.removeFromWorld = true;
@@ -282,49 +510,11 @@ class HitBreakBlock extends BreakBlock {
 	}
 }
 
-class Mask extends Block {
-	constructor(game, x, y, width, height) {
-		super(game, x, y, width, height, "./Sprites/ground.png");
-		this.setSize(width, height, 32);
-	}
-
-	/** @override */
-	draw(context) {
-		let col, row;
-		for (col = 0; col < this.size.width; col++) {
-			for (row = 0; row < this.size.height; row++) {
-				context.drawImage(
-					this.spritesheet, 64, 32, this.dim.x, this.dim.y,
-					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x,
-					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y,
-					this.scaleDim.y, this.scaleDim.y);
-			}
-		}
-		this.worldBB.display(this.game);
-    }
-}
-
-class Key extends Entity {
-	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/key.png");
-		this.update = function () { };
-	};
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 128, 128,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.dim.x, this.dim.y);
-		this.worldBB.display(this.game);
-	}
-}
-
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");
 		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 3);
 		this.updateBB();
-		this.update = function () { /* Do nothing. */ };
 	};
 
 	/** @override */
@@ -335,13 +525,17 @@ class Door extends Entity {
 			this.dim.x, this.dim.y);
 		this.worldBB.display(this.game);
 	}
+
+	/** @override */
+	update(context) {
+		// Do nothing
+	}
 }
 
 class Minimap extends Entity {
 	constructor(game, x, y, width) {
 		super(game, x, y);
 		this.width = width;
-		this.update = () => { /* Do nothing */ };
 	};
 
 	draw(context) {
@@ -366,6 +560,11 @@ class Minimap extends Entity {
 		});
 		context.restore();
 	};
+
+	/** @override */
+	update(context) {
+		// Do nothing
+	}
 };
 
 /**
@@ -373,10 +572,10 @@ class Minimap extends Entity {
  * scrolling effect, we use three images leftImage, midImage, rightImage.
  */
 class Background extends Entity {
-	constructor(game, x, y, spriteSheetName, spriteWidth, spriteHeight, speedRate) {
-		super(game, x, y, spriteSheetName);
+	constructor(game, spriteSheetName, spriteWidth, spriteHeight, speedRate) {
+		super(game, game.camera.pos.x, game.camera.pos.y, spriteSheetName);
 		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
-
+		
 		this.speed = 0;
 		/** Picture width (different backgrounds might have different ratios) */
 		this.spriteWidth = spriteWidth;
@@ -385,12 +584,28 @@ class Background extends Entity {
 		/** Background scrolling speed (different layers need different speeds) */
 		this.speedRate = speedRate;
 		/** Left to the camera */
-		this.leftImagePos = { x: this.pos.x - PARAMS.CANVAS_WIDTH, y: y - 300};
+		this.leftImagePos = {
+			x: this.pos.x - PARAMS.CANVAS_WIDTH,
+			y: this.game.camera.pos.y - 300
+		};
 		/** At the camera position */
-		this.midImagePos = { x: x, y: y - 300};
+		this.midImagePos = {
+			x: this.game.camera.pos.x,
+			y: this.game.camera.pos.y - 300
+		};
 		/** Right to the camera */
-		this.rightImagePos = { x: this.pos.x + PARAMS.CANVAS_WIDTH, y: y - 300};
+		this.rightImagePos = {
+			x: this.pos.x + PARAMS.CANVAS_WIDTH,
+			y: this.game.camera.pos.y - 300
+		};
 	};
+
+	static construct(game, params) {
+		game.addEntity(new Background(game,
+			params.spriteSheetName,
+			params.spriteWidth, params.spriteHeight,
+			params.speedRate));
+	}
 
 	/** @override */
 	update() {
@@ -413,29 +628,35 @@ class Background extends Entity {
 				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
 				y: this.midImagePos.y 
 			};	
-		}else if (this.game.camera.pos.x <= this.leftImagePos.x) {
+		} else if (this.game.camera.pos.x <= this.leftImagePos.x) {
 			this.rightImagePos = this.midImagePos;
 			this.midImagePos = this.leftImagePos;
 			this.leftImagePos = {
 				x: this.midImagePos.x - PARAMS.CANVAS_WIDTH,
 				y: this.midImagePos.y
 			};	
-        }
-    }
+		}
+	}
 
 	/** @override */
 	draw(context) {
-			// leftImage:
-			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
-				this.leftImagePos.x - this.game.camera.pos.x + this.speed, this.leftImagePos.y,
-				this.dim.x, this.dim.y + 300);
-			// midImage:
-			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
-				this.midImagePos.x - this.game.camera.pos.x + this.speed, this.midImagePos.y,
-				this.dim.x, this.dim.y + 300);
-			// rightImage:
-			context.drawImage(this.spritesheet, 0, 0, this.spriteWidth, this.spriteLength,
-				this.rightImagePos.x - this.game.camera.pos.x + this.speed, this.rightImagePos.y,
-				this.dim.x, this.dim.y + 300);
+		// leftImage:
+		context.drawImage(this.spritesheet, 0, 0,
+			this.spriteWidth, this.spriteLength,
+			this.leftImagePos.x - this.game.camera.pos.x + this.speed, 
+			this.leftImagePos.y,
+			this.dim.x, this.dim.y + 300);
+		// midImage:
+		context.drawImage(this.spritesheet, 0, 0,
+			this.spriteWidth, this.spriteLength,
+			this.midImagePos.x - this.game.camera.pos.x + this.speed,
+			this.midImagePos.y,
+			this.dim.x, this.dim.y + 300);
+		// rightImage:
+		context.drawImage(this.spritesheet, 0, 0,
+			this.spriteWidth, this.spriteLength,
+			this.rightImagePos.x - this.game.camera.pos.x + this.speed,
+			this.rightImagePos.y,
+			this.dim.x, this.dim.y + 300);
 	}
 }

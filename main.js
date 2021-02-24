@@ -18,14 +18,19 @@ const IMAGE_PATHS = [
 	"./Sprites/layer3.png",
 	"./Sprites/layer4.png",
 	"./Sprites/greengem.png",
-	"./Sprites/energyball.png",
 	"./Sprites/bluegem.png",
-	"./Sprites/tornado.png",
 	"./Sprites/yellowgem.png",
+	"./Sprites/greygem.png",
+	"./Sprites/energyball.png",
+	"./Sprites/tornado.png",
 	"./Sprites/thunder.png",
 	"./Sprites/crack.png",
 	"./Sprites/druidmerge.png",
-	"./Sprites/potions.png"
+	"./Sprites/potions.png",
+	"./Sprites/powerupsUI.png",
+	"./Sprites/select.png",
+	"./Sprites/transparency.png",
+	"./Sprites/tree.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
@@ -43,7 +48,10 @@ const AUDIO_PATHS = [
 ]
 
 // ENTRY POINT
-window.addEventListener('scroll', noScroll);
+window.onkeydown = function (e) {
+	// Stop spacebar from scrolling screen
+	return !(e.keyCode == 32);
+};
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
 });

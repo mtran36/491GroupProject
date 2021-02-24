@@ -5,9 +5,14 @@
 class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
-		this.defineAgentCollisions = () => { };
+		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
 		this.cooldown = 0;
 	} 
+
+	/** Update the coodown of this powerup. */
+	updateCooldown() {
+		this.cooldown -= this.game.clockTick;
+	}
 
 	/** @override */
 	update() {
@@ -22,19 +27,41 @@ class PowerUp extends Agent {
 			if (this.game.druid.attackSelection == null) {
 				this.game.druid.attackSelection = 0;
 			} else {
-				this.game.druid.attackSelection++;
+				this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
             }
 		}
 	}
+
+	/** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 64, 64,
+			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.scaleDim.x, this.scaleDim.y);
+	}
+
+	/** @override */
+	defineAgentCollisions() {
+		// Do nothing
+	}
+
+	/** @override */
+	loadAnimations() {
+		// Do nothing
+    }
 }
 
 /**
  * Adds the basic ranged attack function to the druids list of attacks.
  */
 class RangedPowerUp extends PowerUp {
-
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/greengem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new RangedPowerUp(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -42,33 +69,28 @@ class RangedPowerUp extends PowerUp {
 	 * @param {any} DRUID the main character.
 	 */
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
+				console.log("got in here")
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH,
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
 					DRUID.pos.y + DRUID.scaleDim.y / 2,
-					180, 32, 600, 1, true));
+					180, PARAMS.TILE_WIDTH / 2,
+					600, 1, true));
 			} else { // shoot right
 				// basic ranged attack:
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
 					DRUID.pos.y + DRUID.scaleDim.y / 2,
-					0, 32, 600, 1, true));
+					0, PARAMS.TILE_WIDTH / 2,
+					600, 1, true));
 			}
 			this.game.A = false;
 			this.cooldown = 1;
-			}
 		}
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 64, 64,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.scaleDim.x, this.scaleDim.y);
 	}
 }
 
@@ -76,9 +98,14 @@ class RangedPowerUp extends PowerUp {
  * Adds the wind element power up to druid's attack
  */
 class WindElement extends PowerUp {
-
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/bluegem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new WindElement(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -86,29 +113,21 @@ class WindElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH,
-					DRUID.pos.y - PARAMS.BLOCKWIDTH, 180));
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
+					DRUID.pos.y - PARAMS.TILE_WIDTH, 0));
 			} else { // shoot right
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - PARAMS.BLOCKWIDTH, 0));
+					DRUID.pos.y - PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 1;
+			this.cooldown = 2;
 		}
-	}
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 64, 64,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.scaleDim.x, this.scaleDim.y);
 	}
 }
 
@@ -116,9 +135,14 @@ class WindElement extends PowerUp {
  * Adds the light element power up to druid's attack
  */
 class LightElement extends PowerUp {
-
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/yellowgem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new LightElement(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -126,28 +150,20 @@ class LightElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		this.cooldown -= this.game.clockTick;
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
-					DRUID.pos.x - PARAMS.BLOCKWIDTH * 2,
-					DRUID.pos.y + PARAMS.BLOCKWIDTH, 180));
+					DRUID.pos.x - PARAMS.TILE_WIDTH * 2,
+					DRUID.pos.y + PARAMS.TILE_WIDTH, 0));
 			} else { // shoot right
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + PARAMS.BLOCKWIDTH, 0));
+					DRUID.pos.y + PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 2;
+			this.cooldown = 3;
 		}
-	}
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 64, 64,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.scaleDim.x, this.scaleDim.y);
 	}
 }

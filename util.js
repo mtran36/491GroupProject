@@ -20,14 +20,6 @@ function hsl(h, s, l) {
 }
 
 /** 
- * Scrolls the window to the top of the screen. Used in the behavior of the event listener that
- * prevents scrolling.
- */
-function noScroll() {
-    window.scrollTo(0, 0);
-}
-
-/** 
  * Creates an alias for requestAnimationFrame for backwards compatibility. 
  */
 window.requestAnimFrame = (function () {

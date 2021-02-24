@@ -23,7 +23,6 @@ class Druid extends Agent {
 		this.keyCounter = 0;
 		this.xOffset = 45;
 		this.currentOffset = this.xOffset;
-
 		this.attackSelection = null;
 		this.attacks = [];
 	}
@@ -64,6 +63,12 @@ class Druid extends Agent {
 		if (entity instanceof Enemy && this.invincTime <= 0) {
 			this.takeDamage(entity.attack);
 		}
+		if (entity instanceof Door) {
+			if (this.keyCounter > 0) {
+				entity.removeFromWorld = true;
+				this.keyCounter -= 1;
+            }
+        }
 	}
 
 	/** @override */
@@ -105,14 +110,36 @@ class Druid extends Agent {
 		for (i = 0; i < 2; i++) {
 			this.animations.push([]);
 		}
-		this.animations[0][0] = new Animator( // Walking right
-			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true);
-		this.animations[1][0] = new Animator( // Walking left
-			this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false);
-		this.animations[0][1] = new Animator( // Jumping right
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, true);
-		this.animations[1][1] = new Animator( // Jumping left
-			this.spritesheet, 0, 128, this.dim.x, this.dim.y, 7, 0.1, 0, false, true, false);
+		this.storedAnimations = {
+			standingRight: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				3, 0.7, 0, true, true, true, true),
+			standingLeft: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				3, 0.7, 0, true, true, false, true),
+			walkingRight: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				8, 0.1, 0, true, true, true),
+			walkingLeft: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				8, 0.1, 0, true, true, false),
+			jumpingRight: new Animator(this.spritesheet,
+				0, 128, this.dim.x, this.dim.y,
+				6, 0.3, 0, false, false, true),
+			jumpingLeft: new Animator(this.spritesheet,
+				0, 128, this.dim.x, this.dim.y,
+				6, 0.3, 0, false, false, false),
+			airHangRight: new Animator(this.spritesheet,
+				this.dim.x * 4, 128, this.dim.x, this.dim.y,
+				1, 1, 0, false, true, true),
+			airHangLeft: new Animator(this.spritesheet,
+				this.dim.x * 4, 128, this.dim.x, this.dim.y,
+				1, 1, 0, false, true, false),
+		};
+		this.animations[0][0] = this.storedAnimations.walkingRight;
+		this.animations[1][0] = this.storedAnimations.walkingLeft;
+		this.animations[0][1] = this.storedAnimations.jumpingRight;
+		this.animations[1][1] = this.storedAnimations.jumpingLeft;
 	}
 
 	/** @override */
@@ -121,7 +148,30 @@ class Druid extends Agent {
 		const WALK_SPEED = 300;
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
+		let i, remainder = this.maxHealth - this.health;
 
+		// Check if player is moving
+		if (this.game.right) {
+			this.animations[0][0] = this.storedAnimations.walkingRight;
+			this.animations[1][0] = this.storedAnimations.walkingLeft;
+			this.vel.x = WALK_SPEED;
+		}
+		if (this.game.left) {
+			this.animations[0][0] = this.storedAnimations.walkingRight;
+			this.animations[1][0] = this.storedAnimations.walkingLeft;
+			this.vel.x = -WALK_SPEED;
+		}
+		if (!this.game.left && !this.game.right) {
+			this.animations[0][0] = this.storedAnimations.standingRight;
+			this.animations[1][0] = this.storedAnimations.standingLeft;
+			this.vel.x = 0;
+		}
+		// Update potion counter
+		if (this.potionCounter > 0 && this.remainder > 20) {
+			this.health += 20;
+			this.potionCounter -= 1;
+		}
+		// Damage flashing 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;
 			this.flashing = !this.flashing;
@@ -147,6 +197,9 @@ class Druid extends Agent {
         }
 		// check if any special attack if made
 		if (this.attackSelection != null) {
+			for (i = 0; i < this.attacks.length; i++) {
+				this.attacks[i].updateCooldown();
+            }
 			this.attacks[this.attackSelection].attack(this);
         }
 		if (this.game.right) { 
@@ -179,6 +232,18 @@ class Druid extends Agent {
 				tickWidth: 40
 			},
 			"POTIONS", "teal");
+
+		context.fillStyle = "black";
+		context.font = "italic bold 16px Castellar";
+		context.fillText(
+			"Key: " + this.keyCounter,
+			10, 100);
+		context.restore();
+		// powerups UI
+		HUD.drawPowerupUI(context,
+			PARAMS.CANVAS_WIDTH - 288, PARAMS.CANVAS_HEIGHT - 48,
+			this.attacks, this.attackSelection);
+
 		if (this.flashing) return;
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,

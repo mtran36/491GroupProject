@@ -52,7 +52,7 @@ class Enemy extends Agent {
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
 			switch (this.prize) {
 				case "Potion":
-					this.game.addEntity(new Potions(
+					this.game.addEntity(new Potion(
 						this.game, thisCenter.x, thisCenter.y));
 					break;
 				case "Key":
@@ -112,6 +112,13 @@ class Fly extends Enemy {
 		this.up = false;
 		this.seesDruid = false;
 		this.accelerate = false;
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Fly(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
 	}
 
 	/** @override */
@@ -204,7 +211,7 @@ class Fly extends Enemy {
 			AUDIO_PLAYER.playSound("./Audio/EnemyBounce.mp3");
 		}
 		this.worldBB.shift(x, y);
-    }
+	}
 }
 
 /**
@@ -223,6 +230,14 @@ class RangedFly extends Fly {
 		this.canShoot = false;
 	}
 
+	static construct(game, params) {
+		game.addEntity(new RangedFly(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
+	}
+
+	/** @override */
 	update() {
 		let thisCenter = this.worldBB.centerPoint();
 		let druidCenter = this.game.druid.worldBB.centerPoint();
@@ -297,7 +312,14 @@ class Beetle extends Enemy{
 			this.vel.x = -this.vel.x;
 			this.facing = 0;
 		}
-    }
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Beetle(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
+	}
 
 	/** @override */
 	loadAnimations() {
@@ -364,12 +386,19 @@ class Beetle extends Enemy{
 			}
 		}
 		this.worldBB.shift(x, y);
-    }
+	}
 }
 
 class FlyBeetle extends Beetle {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
+	}
+
+	static construct(game, params) {
+		game.addEntity(new FlyBeetle(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
 	}
 
 	/** @override */
@@ -407,9 +436,6 @@ class FlyBeetle extends Beetle {
 		}
 		this.move(this.game.clockTick);
 	}
-
-
-
 }
 
 /**
@@ -432,6 +458,13 @@ class Hopper extends Enemy {
 		this.landTime = this.landLag;
 		this.jumping = false;
 		this.loadAnimations();
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Hopper(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
 	}
 
 	/** @override */
@@ -494,13 +527,5 @@ class Hopper extends Enemy {
 			}
 		}
 		this.worldBB.shift(x, y);
-	}
-
-	static construct(game, params) {
-		return new Hopper(
-			game, params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH,
-			params.prize,
-			params.prizeRate);
 	}
 }

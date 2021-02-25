@@ -128,7 +128,7 @@ var levelOne = {
 	],
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
-		{ x: -122, y: -3, prizeRate: 1, prize: 'PotionMid' }
+		{ x: -110, y: -5, prizeRate: 1, prize: 'PotionMid' }
 	],
 	flyBeetles: [
 		(game, params) => FlyBeetle.construct(game, params),
@@ -136,7 +136,7 @@ var levelOne = {
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),
-		{ x: -122, y: -3 }
+		{ x: -122, y: -5 }
 	],
 
 	powerups: [

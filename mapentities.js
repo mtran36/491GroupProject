@@ -541,7 +541,6 @@ class Minimap extends Entity {
 	draw(context) {
 		const SCALE = 16;
 		const PIP_SIDE_LEN = 4;
-		let that = this;
 
 		context.save();
 		context.strokeStyle = "black";
@@ -553,8 +552,8 @@ class Minimap extends Entity {
 			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE;
 			if (x > this.pos.x
 				&& y > this.pos.y
-				&& y < this.pos.y + that.width
-				&& x < this.pos.x + that.width) {
+				&& y < this.pos.y + this.width
+				&& x < this.pos.x + this.width) {
 				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
 			}
 		});

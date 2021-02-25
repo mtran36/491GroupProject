@@ -68,10 +68,10 @@ var levelOne = {
 		{ x: 55, y: 13, height: 4 },
 
 		{ x: -55, y: -9, width: 3, height: 13 },
-		{ x: -53, y: 2, width: 2 },
-		{ x: -49, y: 0, width: 2 },
-		{ x: -53, y: -3, width: 2 },
-		{ x: -49, y: -6, width: 2 },
+		{ x: -54, y: 2, width: 3 },
+		{ x: -50, y: 0, width: 3 },
+		{ x: -54, y: -3, width: 3 },
+		{ x: -50, y: -6, width: 3 },
 	],
 	tree: [
 		(game, params) => Tree.construct(game, params),
@@ -128,11 +128,11 @@ var levelOne = {
 	],
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
-		{ x: -122, y: -3, prizeRate: 1 }
+		{ x: -122, y: -3, prizeRate: 1, prize: 'PotionMid' }
 	],
 	flyBeetles: [
 		(game, params) => FlyBeetle.construct(game, params),
-		{ x: -92, y: 5, prizeRate: 1 }
+		{ x: -92, y: 5, prizeRate: 1, prize: 'PotionHigh' }
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),

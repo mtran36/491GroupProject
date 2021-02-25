@@ -30,21 +30,35 @@ class Items extends Agent {
 }
 
 class Potion extends Items {
-    constructor(game, x, y) {
+    constructor(game, x, y, type = 0) {
         super(game, x, y - 100, "./Sprites/potions.png");
         this.setDimensions(1, 45, 55);
+        this.type = type;
+        this.loadAnimations();
     }
 
     /** @override */
     loadAnimations() {
-        //this.animations[0] = new Animator(
-        //    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false); // level 1 potion
-        //this.animations[0] = new Animator(
-        //    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false); // level 2 potion
-        this.animations[0] = new Animator(
-            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); // level 3 potion
-        this.animations[1] = new Animator(
-            this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false); 
+        switch (this.type) {
+            case 0:
+                this.animations[0] = new Animator(
+                    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false);
+                this.animations[1] = new Animator(
+                    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false);
+                break;
+            case 1:
+                this.animations[0] = new Animator(
+                    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false);
+                this.animations[1] = new Animator(
+                    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false);
+                break;
+            case 2:
+                this.animations[0] = new Animator(
+                    this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false);
+                this.animations[1] = new Animator(
+                    this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false);
+                break;
+        }
     }
 
     /** @override */
@@ -64,7 +78,17 @@ class Potion extends Items {
                 DRUID.potionCounter = DRUID.maxPotions;
             }
         } else {
-            DRUID.health += 20;
+            switch (this.type) {
+                case 0:
+                    DRUID.health += 20;
+                    break;
+                case 1:
+                    DRUID.health += 50;
+                    break;
+                case 2:
+                    DRUID.health += 100;
+                    break;
+            }
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
             }

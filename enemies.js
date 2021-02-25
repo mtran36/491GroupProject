@@ -64,11 +64,19 @@ class Enemy extends Agent {
 		let thisCenter = this.worldBB.centerPoint();
 		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
 			switch (this.prize) {
-				case "Potion":
+				case 'Potion':
 					this.game.addEntity(new Potion(
-						this.game, thisCenter.x, thisCenter.y));
+						this.game, thisCenter.x, thisCenter.y, 0));
 					break;
-				case "Key":
+				case 'PotionMid':
+					this.game.addEntity(new Potion(
+						this.game, thisCenter.x, thisCenter.y, 1));
+					break;
+				case 'PotionHigh':
+					this.game.addEntity(new Potion(
+						this.game, thisCenter.x, thisCenter.y, 2));
+					break;
+				case 'Key':
 					this.game.addEntity(new Key(
 						this.game, thisCenter.x, thisCenter.y));
 					break;

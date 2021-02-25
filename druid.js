@@ -179,12 +179,23 @@ class Druid extends Agent {
 			this.flashing = false;
 		}
 
-		if (!this.isJumping && this.game.B) { 
+		// Jump handling
+		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
 			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 			this.game.B = false;
+			this.animations[0][1] = this.storedAnimations.jumpingRight;
+			this.animations[1][1] = this.storedAnimations.jumpingLeft;
+			this.animations[0][1].restart();
+			this.animations[1][1].restart();
+			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 		} else {
+			if (this.animations[0][1].isDone() || this.animations[1][1].isDone) {
+				this.animations[0][1] = this.storedAnimations.airHangRight;
+				this.animations[1][1] = this.storedAnimations.airHangLeft;
+			}
+			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
 		}
 

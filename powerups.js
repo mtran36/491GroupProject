@@ -72,7 +72,6 @@ class RangedPowerUp extends PowerUp {
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
-				console.log("got in here")
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.TILE_WIDTH,

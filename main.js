@@ -3,8 +3,10 @@ const ASSET_LOADER = new AssetLoader();
 const AUDIO_PLAYER = new AudioPlayer();
 const IMAGE_PATHS = [
 	"./Sprites/Fly.png",
-	"./Sprites/TestBeetle.png",
-	"./Sprites/TestHopper.png",
+	"./Sprites/Snail.png",
+	"./Sprites/Bee.png",
+	"./Sprites/HopperStart.png",
+	"./Sprites/HopperJump.png",
 	"./Sprites/druid.png",
 	"./Sprites/ground.png",
 	"./Sprites/ball.png",

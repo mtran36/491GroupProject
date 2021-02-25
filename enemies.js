@@ -301,8 +301,8 @@ class RangedFly extends Fly {
  */
 class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestBeetle.png", prize, prizeRate);
-		this.setDimensions(2, 32, 32);
+		super(game, x, y, "./Sprites/Snail.png", prize, prizeRate);
+		this.setDimensions(2, 32, 24);
 		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
@@ -341,9 +341,9 @@ class Beetle extends Enemy{
 	/** @override */
 	loadAnimations() {
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, true);
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, false);
 	}
 
 	/** @override */
@@ -409,6 +409,17 @@ class Beetle extends Enemy{
 class FlyBeetle extends Beetle {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
+		this.setDimensions(0.8, 84, 98)
+		this.loadAnimations();
+	}
+
+	/** @override */
+	loadAnimations() {
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/Bee.png");
+		this.animations[1] = new Animator(
+			this.spritesheet, 32, 26, 84, 98, 4, 0.1, 67, false, true, true);
+		this.animations[0] = new Animator(
+			this.spritesheet, 32, 26, 84, 98, 4, 0.1, 67, false, true, false);
 	}
 
 	static construct(game, params) {
@@ -461,8 +472,8 @@ class FlyBeetle extends Beetle {
  */
 class Hopper extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestHopper.png", prize, prizeRate);
-		this.setDimensions(2, 32, 32);
+		super(game, x, y, "./Sprites/HopperStart.png", prize, prizeRate);
+		this.setDimensions(0.4, 148, 100);
 		// Override default values
 		this.ACC = { y: 2000 };
 		this.attack = 7;
@@ -475,6 +486,15 @@ class Hopper extends Enemy {
 		this.landTime = this.landLag;
 		this.jumping = false;
 		this.loadAnimations();
+
+		this.agentBB = [new BoundingCircle(
+			this.pos.x + this.scaleDim.x / 4,
+			this.pos.y + this.scaleDim.y / 2,
+			this.scaleDim.y / 2),
+			new BoundingCircle(
+				this.pos.x + 3 * this.scaleDim.x / 4,
+				this.pos.y + this.scaleDim.y / 2,
+				this.scaleDim.y / 2)]
 	}
 
 	static construct(game, params) {
@@ -486,10 +506,22 @@ class Hopper extends Enemy {
 
 	/** @override */
 	loadAnimations() {
-		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
-		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperStart.png");
+		this.idle = [];
+		this.idle[1] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, true);
+		this.idle[0] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, false);
+
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperJump.png");
+		this.jump = [];
+		this.jump[1] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, true);
+		this.jump[0] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, false);
+
+		this.animations[0] = this.idle[0];
+		this.animations[1] = this.idle[1];
 	}
 
 	/** @override */
@@ -507,6 +539,8 @@ class Hopper extends Enemy {
 			this.left = this.sight.x > druidCenter.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
+			this.animations[0] = this.jump[0];
+			this.animations[1] = this.jump[1];
 			AUDIO_PLAYER.playSound("./Audio/Hopper.mp3");
 		}
 		if (this.jumping) {
@@ -529,6 +563,8 @@ class Hopper extends Enemy {
 					this.landTime = this.landLag;
 				}
 				this.jumping = false;
+				this.animations[0] = this.idle[0];
+				this.animations[1] = this.idle[1];
 			}
 			if (collisions.up) {
 				y = entity.worldBB.bottom;

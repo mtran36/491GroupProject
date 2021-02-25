@@ -43,19 +43,13 @@ class Potion extends Items {
             case 0:
                 this.animations[0] = new Animator(
                     this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false);
-                this.animations[1] = new Animator(
-                    this.spritesheet, 5, 0, 35, 60, 1, 1, 0, false, true, false);
                 break;
             case 1:
                 this.animations[0] = new Animator(
                     this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false);
-                this.animations[1] = new Animator(
-                    this.spritesheet, 50, 0, 40, 60, 1, 1, 0, false, true, false);
                 break;
             case 2:
                 this.animations[0] = new Animator(
-                    this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false);
-                this.animations[1] = new Animator(
                     this.spritesheet, 90, 0, 45, 60, 1, 1, 0, false, true, false);
                 break;
         }

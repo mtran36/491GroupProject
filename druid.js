@@ -167,7 +167,7 @@ class Druid extends Agent {
 			this.vel.x = 0;
 		}
 		// Update potion counter
-		if (this.potionCounter > 0 && this.remainder > 20) {
+		if (this.potionCounter > 0 && remainder > 20) {
 			this.health += 20;
 			this.potionCounter -= 1;
 		}

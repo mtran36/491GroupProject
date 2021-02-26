@@ -104,7 +104,7 @@ class WindElement extends PowerUp {
 	static construct(game, params) {
 		game.addEntity(new WindElement(game,
 			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH));
+			params.y * PARAMS.TILE_WIDTH - 10));
 	}
 
 	/**

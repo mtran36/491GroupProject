@@ -109,7 +109,7 @@ class WinScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
-                this.game.screen = this.game.camera.StartScreen;
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         })
     }

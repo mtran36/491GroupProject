@@ -2,9 +2,11 @@ const GAME_ENGINE = new GameEngine();
 const ASSET_LOADER = new AssetLoader();
 const AUDIO_PLAYER = new AudioPlayer();
 const IMAGE_PATHS = [
-	"./Sprites/TestFly.png",
-	"./Sprites/TestBeetle.png",
-	"./Sprites/TestHopper.png",
+	"./Sprites/Fly.png",
+	"./Sprites/Snail.png",
+	"./Sprites/Bee.png",
+	"./Sprites/HopperStart.png",
+	"./Sprites/HopperJump.png",
 	"./Sprites/druid.png",
 	"./Sprites/ground.png",
 	"./Sprites/ball.png",
@@ -18,14 +20,19 @@ const IMAGE_PATHS = [
 	"./Sprites/layer3.png",
 	"./Sprites/layer4.png",
 	"./Sprites/greengem.png",
-	"./Sprites/energyball.png",
 	"./Sprites/bluegem.png",
-	"./Sprites/tornado.png",
 	"./Sprites/yellowgem.png",
+	"./Sprites/greygem.png",
+	"./Sprites/energyball.png",
+	"./Sprites/tornado.png",
 	"./Sprites/thunder.png",
 	"./Sprites/crack.png",
 	"./Sprites/druidmerge.png",
-	"./Sprites/potions.png"
+	"./Sprites/potions.png",
+	"./Sprites/powerupsUI.png",
+	"./Sprites/select.png",
+	"./Sprites/transparency.png",
+	"./Sprites/tree.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
@@ -38,10 +45,15 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/EnemyDamage.mp3", players: 4 },
 	{ path: "./Audio/Hopper.mp3", players: 4 },
 	{ path: "./Audio/EnemyProjectile.mp3", players: 4 },
-	{ path: "./Audio/EnemyBounce.mp3", players: 4 }
+	{ path: "./Audio/EnemyBounce.mp3", players: 4 },
+	{ path: "./Audio/FlyBuzz.mp3", players: 2 }
 ]
 
 // ENTRY POINT
+window.onkeydown = function (e) {
+	// Stop spacebar from scrolling screen
+	return !(e.keyCode == 32);
+};
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
 });

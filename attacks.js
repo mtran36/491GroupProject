@@ -1,24 +1,29 @@
 class SwordAttack extends Agent {
-	constructor(game, x, y, duration) {
-		super(game, x, y, "./Sprites/sword.png");
+	constructor(game, x, y, facing) {
+		super(game, x, y - 30, "./Sprites/sword.png");
 		this.setDimensions(2.5, 34, 15);
+
+		this.facing = facing;
 		this.duration = 0.5;
+		this.currentTime = 0;
+		this.vel = { x: 75, y: 0 };
 		this.attack = 1;
-		this.damagedEnemies = [];
 		this.force = 600;
-		// Walter: copied repositioning from update to fix incorrect draw on first draw cycle.
-		const DRUID = this.game.druid;
-		if (DRUID.facing === 0) { // facing left
-			this.pos.x = DRUID.pos.x - this.scaleDim.x
-				+ (this.duration * 75) + (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		} else { // facing right
-			this.pos.x = DRUID.pos.x + DRUID.scaleDim.x
-				- (this.duration * 75) - (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		}
-		this.updateBB();
+		this.damagedEnemies = [];
+		this.agentBB = [
+			new BoundingCircle(
+				this.pos.x + this.scaleDim.x * 1 / 6,
+				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2),
+			new BoundingCircle(
+				this.pos.x + this.scaleDim.x / 2,
+				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2),
+			new BoundingCircle(
+				this.pos.x + this.scaleDim.x * 5 / 6,
+				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2)];
+		
+		this.updatePos();
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
+		this.updatePos();
 	}
 
 	/** @override */
@@ -31,42 +36,61 @@ class SwordAttack extends Agent {
 
 	/** @override */
 	update() {
-		const DRUID = this.game.druid;
 		const TICK = this.game.clockTick;
 
+		this.currentTime += TICK;
+		this.vel.y = this.game.druid.vel.y;
 		this.duration -= TICK;
-		if (this.duration < 0) {
+		if (this.duration <= 0) {
 			this.removeFromWorld = true;
 		}
-
-		if (DRUID.facing === 0) { // facing left
-			this.pos.x = DRUID.pos.x - this.scaleDim.x
-				+ (this.duration * 75) + (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		} else { // facing right
-			this.pos.x = DRUID.pos.x + DRUID.scaleDim.x
-				- (this.duration * 75) - (this.scaleDim.x / 5);
-			this.pos.y = DRUID.pos.y + DRUID.scaleDim.y / 2;
-		}
-
-		this.move(this.game.clockTick);
+		this.updatePos();
+		this.move(TICK);
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
-				if (entity instanceof Enemy) {
-					if (!that.damagedEnemies.includes(entity)) {
-						entity.takeDamage(that.attack);
-						that.damagedEnemies.push(entity);
-					}
-					entity.knockback(that);
-				}
+	updatePos() {
+		let i, swordPos = this.currentTime * this.vel.x;
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+
+		this.facing = this.game.druid.facing;
+		if (this.facing === 0) {
+			this.pos.x = druidCenter.x - swordPos - this.scaleDim.x;
+			this.worldBB.shift(druidCenter.x - swordPos - this.worldBB.width,
+				druidCenter.y - 30);
+			for (i = 0; i < this.agentBB.length; i++) {
+				this.agentBB[i].shift(
+					druidCenter.x - swordPos - this.scaleDim.x * (2 * i + 1) / 6,
+					this.pos.y + this.scaleDim.y / 2);
 			}
-		});
+		} else {
+			this.pos.x = druidCenter.x + swordPos;
+			this.worldBB.shift(druidCenter.x + swordPos,
+				druidCenter.y - 30);
+			for (i = 0; i < this.agentBB.length; i++) {
+				this.agentBB[i].shift(
+					druidCenter.x + swordPos + this.scaleDim.x * (2 * i + 1) / 6,
+					this.pos.y + this.scaleDim.y / 2);
+			}
+		}
+		this.pos.y = this.worldBB.y;
 	}
+
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy) {
+			if (!this.damagedEnemies.includes(entity)) {
+				entity.takeDamage(this.attack);
+				this.damagedEnemies.push(entity);
+			}
+			entity.knockback(this);
+		}
+	}
+
+	/** @override */
+	defineWorldCollisions() {
+		// Do nothing
+    }
 
 	/** @override */
 	draw(context) {
@@ -75,30 +99,45 @@ class SwordAttack extends Agent {
 			this.pos.x, this.pos.y,
 			this.scale, this.game.camera);
 		this.worldBB.display(this.game);
-		this.agentBB.display(this.game);
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
 	}
 }
 
+/**
+ * Basic Ranged attack with changable shooting angel, speed, attack, and animation.
+ */
 class BasicRangedAttack extends Agent {
+	/**
+	 * Creates a new ranged attack to be extended.
+	 * @param {GameEngine} game Instance of the game.
+	 * @param {number} x Horizontal coordinate to place attack.
+	 * @param {number} y Vertical coordinate to place attack.
+	 * @param {number} degree Degree the attack is shooting out.
+	 * @param {number} radius Size of the agent bounding box.
+	 * @param {number} speed Speed of the attack.
+	 * @param {number} attack Attack value to be subtracted from target health.
+	 * @param {boolean} hasAnimation Determines if this ranged attack has an animation.
+	 */
 	constructor(game, x, y, degree, radius, speed, attack, hasAnimation) {
 		super(game, x, y, "./Sprites/energyball.png");
 		this.setDimensions(1, radius * 2, radius * 2);
 
-		var radian = degree * (Math.PI / 180);
+		let radian = degree * (Math.PI / 180);
 		this.vel.x = Math.round((speed * Math.cos(radian)) * 100) / 100;
 		this.vel.y = Math.round(-(speed * Math.sin(radian)) * 100) / 100;
-
 		this.attack = attack;
-		this.hit = false
-		this.loadAnimations();
+		this.force = 1500;
 
-		this.owner = null;
-		if (hasAnimation == false) {
+		if (hasAnimation === false) {
 			this.draw = function () {
 				this.worldBB.display(this.game);
-				this.agentBB.display(this.game);
+				this.agentBB.forEach((BB) => {
+					BB.display(this.game);
+				});
 			};
-        }
+		}
 	}
 
 	/** @override */
@@ -109,10 +148,15 @@ class BasicRangedAttack extends Agent {
 			this.spritesheet, 0, 0, 64, 64, 2, 0.3, 0, false, true, false);
 	}
 
+	/**
+	 * Change default animation of the ranged attack.
+	 * @param {any} leftAnimation animation going left.
+	 * @param {any} rightAnimation animation going right.
+	 */
 	changeAnimations(leftAnimation, rightAnimation) {
 		this.animations[0] = leftAnimation;
 		this.animations[1] = rightAnimation;
-    }
+	}
 
 	/** @override */
 	update() {
@@ -120,174 +164,157 @@ class BasicRangedAttack extends Agent {
 	}
 
 	/** @override */
-	checkCollisions() {
-		let that = this;
-		this.game.entities.forEach(function (entity) {
-			if (entity.agentBB && that.agentBB.collide(entity.agentBB) && that !== entity) {
-				if (entity instanceof Enemy) {
-					if (that.owner instanceof TornadoAttack) {
-						if(!that.owner.damagedEnemies.includes(entity)) {
-							entity.knockup(that);
-							that.owner.addAttackedEnemy(entity);
-							entity.takeDamage(that.attack);
-						}
-					} else {
-						entity.takeDamage(that.attack);
-						that.removeFromWorld = true;
-						if (that.owner instanceof ThunderAttack) {
-							that.owner.freeProjectiles();
-                        }
-                    }
-				}
-			}
-			if (entity.worldBB && that.worldBB.collide(entity.worldBB) && that !== entity) {
-				if (entity instanceof Ground) {
-					// touching a entity on side way
-					if ((that.vel.x < 0 && that.lastWorldBB.left < entity.worldBB.right)
-						|| (that.vel.x > 0 && that.lastWorldBB.right > entity.worldBB.left)) {
-						that.removeFromWorld = true;
-					}
-					if ((that.vel.y < 0 && that.lastWorldBB.top < entity.worldBB.bottom)
-						|| (that.vel.y > 0 && that.lastWorldBB.bottom > entity.worldBB.top)) {
-						that.removeFromWorld = true;
-					}
-				}
-			}
-		});
-	}
-}
-
-class TornadoAttack{
-	constructor(game, x, y, degree) {
-		this.game = game;
-		this.pos = { x, y };
-		this.degree = degree;
-		this.attack = 0.8;
-		this.speed = 400
-		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/tornado.png");
-		this.projectiles = [];
-		this.createProjectileList();
-		this.addEntityList();
-		this.damagedEnemies = [];
-		this.existTime = 2;
-		this.draw = function () { /* Do nothing. */ };
-	}
-
-	createProjectileList() {
-		var RADIUS = 48;
-		for (var i = 0; i < 2; i++) {
-			if (i == 0) {
-				var hasAnimation = true;
-			} else {
-				var hasAnimation = false;
-            }
-			this.projectiles.push(new BasicRangedAttack(
-				this.game, this.pos.x, this.pos.y + i * RADIUS * 2,
-				this.degree, RADIUS, this.speed, this.attack, hasAnimation));
-			this.projectiles[i].force = 600;
-			this.projectiles[i].owner = this;
-
-			let leftAnimation = new Animator(
-				this.spritesheet, 0, 20, 96, 192, 3, 0.2, 0, false, true, false);
-			let rightAnimation = new Animator(
-				this.spritesheet, 0, 20, 96, 192, 3, 0.2, 0, false, true, false);
-			if (hasAnimation) {
-				this.projectiles[0].changeAnimations(leftAnimation, rightAnimation);
-			}
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground) {
+			this.removeFromWorld = true;
 		}
 	}
 
-	addEntityList() {
-		let that = this;
-		this.projectiles.forEach(function (entity) {
-			that.game.addEntity(entity);
-		});
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy) {
+			entity.takeDamage(this.attack);
+			this.removeFromWorld = true;
+		}
+	}
+}
+
+/** 
+ * A special attack consists of mutiple ranged attack bounding boxes that would knock up 
+ * enemy and deal damage. 
+ */
+class TornadoAttack extends Agent {
+	/**
+	 * @param {GameEngine} game Instance of the game.
+	 * @param {number} x Horizontal coordinate to place attack.
+	 * @param {number} y Vertical coordinate to place attack.
+	 * @param {number} degree Degree the attack is shooting out.
+	 */
+	constructor(game, x, y, facing) {
+		super(game, x, y, "./Sprites/tornado.png");
+		this.setDimensions(1, 96, 192);
+
+		let RADIUS = this.dim.x / 2;
+		this.facing = facing;
+		this.vel.x = facing === 0 ? -400 : 400;
+		this.attack = 0.8;	// attack value
+		this.existTime = 2;	// how long the attack would last
+		this.force = 600;
+		this.agentBB = [
+			new BoundingCircle(
+				this.pos.x + RADIUS,
+				this.pos.y + RADIUS, RADIUS),
+			new BoundingCircle(
+				this.pos.x + RADIUS,
+				this.pos.y + RADIUS * 3, RADIUS)];
+		this.damagedEnemies = [];
 	}
 
+	/** @override */
+	loadAnimations() {
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 20, 96, 192, 3, 0.15, 0, false, true, false);
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 20, 96, 192, 3, 0.15, 0, false, true, false);
+	}
+
+	/** 
+	 * Add an attacked enemy to the attacked enemy list. 
+	 */
 	addAttackedEnemy(enemy) {
 		this.damagedEnemies.push(enemy);
-    }
+	}
 
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground) {
+			this.removeFromWorld = true;
+		}
+	}
+
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
+			entity.takeDamage(this.attack);
+			this.damagedEnemies.push(entity);
+			entity.knockback(this, -Math.PI / 2);
+		}
+	}
+
+	/** @override */
 	update() {
 		this.existTime -= this.game.clockTick
 		if (this.existTime <= 0) this.removeFromWorld = true;
-
-		for (var i = 0; i < this.projectiles.length; i++) {
-			if (this.removeFromWorld == true || this.projectiles[i].removeFromWorld == true) {
-				this.removeFromWorld = true;
-				for (var j = 0; j < this.projectiles.length; j++) {
-					this.projectiles[j].removeFromWorld = true;
-				}
-			}
-		}
-    }
+		this.move(this.game.clockTick);
+	}
 }
 
-class ThunderAttack {
-	constructor(game, x, y, degree) {
-		this.game = game;
-		this.pos = { x, y };
-		this.degree = degree;
-		this.attack = 2;
-		this.speed = 700;
-		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/thunder.png");
-		this.projectiles = [];
-		this.createProjectileList();
-		this.addEntityList();
-		this.existTime = 5;
-		this.draw = function () { /* Do nothing. */ };
+/** 
+ * A special attack consists of mutiple ranged attack bounding boxes that would deal a
+ * one-time damage. 
+ */
+class ThunderAttack extends Agent{
+	/**
+	 * @param {GameEngine} game Instance of the game.
+	 * @param {number} x Horizontal coordinate to place attack.
+	 * @param {number} y Vertical coordinate to place attack.
+	 * @param {number} degree Degree the attack is shooting out.
+	 */
+	constructor(game, x, y, facing) {
+		super(game, x, y, "./Sprites/thunder.png");
+		this.facing = facing;
+		this.setDimensions(1, PARAMS.TILE_WIDTH * 2 , PARAMS.TILE_WIDTH / 2);
+		this.vel.x = facing === 0 ? -700 : 700;
+		this.attack = 2;	// attack value
+		this.existTime = 5;	// how long the attack would last
+		this.force = 600;
+
+		let RADIUS = this.dim.y / 2;
+		this.agentBB = [
+			new BoundingCircle(
+				this.pos.x + RADIUS,
+				this.pos.y + RADIUS, RADIUS),
+			new BoundingCircle(
+				this.pos.x + RADIUS * 3,
+				this.pos.y + RADIUS, RADIUS),
+			new BoundingCircle(
+				this.pos.x + RADIUS * 5,
+				this.pos.y + RADIUS, RADIUS),
+			new BoundingCircle(
+				this.pos.x + RADIUS * 7,
+				this.pos.y + RADIUS, RADIUS)];
 	}
 
-	createProjectileList() {
-		var RADIUS = PARAMS.BLOCKWIDTH / 4;
-		for (var i = 0; i < 4; i++) {
-			if (i == 0) {
-				var hasAnimation = true;
-			} else {
-				var hasAnimation = false;
-			}
-			this.projectiles.push(new BasicRangedAttack(
-				this.game, this.pos.x + i * 2 * RADIUS, this.pos.y,
-				this.degree, RADIUS,
-				this.speed, this.attack, hasAnimation));
-			this.projectiles[i].owner = this;
+	/** @override */
+	loadAnimations() {
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, true);
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, false);
+	}
 
-			let leftAnimation = new Animator(
-				this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, true);
-			let rightAnimation = new Animator(
-				this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, false);
-			if (hasAnimation) {
-				this.projectiles[0].changeAnimations(leftAnimation, rightAnimation);
-			}
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Ground) {
+			this.removeFromWorld = true;
 		}
 	}
 
-	addEntityList() {
-		let that = this;
-		this.projectiles.forEach(function (entity) {
-			that.game.addEntity(entity);
-		});
-	}
-
-	freeProjectiles() {
-		for (var i = 0; i < this.projectiles.length; i++) {
-			this.projectiles[i].attack = 0;
-			this.projectiles.removeFromWorld = true;
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy) {
+			entity.takeDamage(this.attack);
+			this.removeFromWorld = true;
 		}
 	}
 
+	/** @override */
 	update() {
 		this.existTime -= this.game.clockTick
-		if (this.existTime <= 0) this.removeFromWorld = true;
-
-		for (var i = 0; i < this.projectiles.length; i++) {
-			if (this.removeFromWorld == true || this.projectiles[i].removeFromWorld == true) {
-				this.removeFromWorld = true;
-				for (var j = 0; j < this.projectiles.length; j++) {
-					this.projectiles[j].removeFromWorld = true;
-				}
-			}
+		if (this.existTime <= 0) {
+			this.removeFromWorld = true;
 		}
+		this.move(this.game.clockTick);
 	}
 }
 
@@ -299,7 +326,7 @@ class EnemyRangedAttack extends Agent {
 		super(game, x, y, "./Sprites/TestEnemyAttack.png");
 		this.setDimensions(1.5, 16, 16);
 		this.force = 450;
-		this.attack = 25;
+		this.attack = 5;
 		this.startX = x;
 		this.startY = y;
 		this.maxDist = 1200;
@@ -322,11 +349,12 @@ class EnemyRangedAttack extends Agent {
 
 	/** @override */
 	update() {
-		if (this.maxDist < Math.sqrt(Math.pow(this.startX - this.pos.x, 2) + Math.pow(this.startY - this.pos.y, 2))) {
+		if (this.maxDist < Math.sqrt(
+			Math.pow(this.startX - this.pos.x, 2) +
+			Math.pow(this.startY - this.pos.y, 2))) {
 			this.removeFromWorld = true;
 		}
 		this.move(this.game.clockTick);
-
 	}
 
 	/** @override
@@ -353,4 +381,3 @@ class EnemyRangedAttack extends Agent {
 		}
 	}
 }
-

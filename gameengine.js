@@ -98,8 +98,8 @@ class GameEngine {
                 case "KeyL":
                     that.C = true;
                     break;
+                case "Space":
                 case "KeyZ":
-                case "KeyK":
                     that.B = true;
                     break;
                 case "KeyX":
@@ -140,8 +140,8 @@ class GameEngine {
                 case "KeyL":
                     that.C = false;
                     break;
+                case "Space":
                 case "KeyZ":
-                case "KeyK":
                     that.B = false;
                     break;
                 case "KeyX":
@@ -172,8 +172,9 @@ class GameEngine {
      */
     draw() {
         let entity;
+        this.druid.draw(this.context);
         this.context.clearRect(
-            0, 0, this.context.canvas.width, this.context.canvas.height);
+           0, 0, this.context.canvas.width, this.context.canvas.height);
         if (this.screen) {
             this.screen.display(this.context);
         } else {
@@ -189,8 +190,7 @@ class GameEngine {
      * camera and removes entities from the world if they are set to be removed. 
      */
     update() {
-        var entitiesCount = this.entities.length;
-        let i;
+        let entitiesCount = this.entities.length, i;
         for (i = 0; i < entitiesCount; i++) {
             var entity = this.entities[i];
             if (!entity.removeFromWorld) {
@@ -198,12 +198,16 @@ class GameEngine {
             }
         }
         this.camera.update();
-        for (i = this.entities.length - 1; i >= 0; --i) {
+        for (i = entitiesCount - 1; i >= 0; --i) {
             if (this.entities[i].removeFromWorld) {
                 this.entities.splice(i, 1);
             }
         }
         AUDIO_PLAYER.update();
+        if (this.druid.pos.x > 50 * PARAMS.TILE_WIDTH) {
+            AUDIO_PLAYER.stopAll();
+            this.screen = this.camera.winScreen;
+        }
     };
 
     /** 

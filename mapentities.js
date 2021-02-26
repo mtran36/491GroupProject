@@ -514,8 +514,13 @@ class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");
 		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 3);
-		this.updateBB();
 	};
+
+	static construct(game, params) {
+		game.addEntity(new Door(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,));
+	}
 
 	/** @override */
 	draw(context) {

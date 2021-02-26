@@ -18,7 +18,7 @@ class Druid extends Agent {
 		this.flashing = false;
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
-		this.potionCounter = 6;
+		this.potionCounter = 0;
 		this.maxPotions = 10;
 		this.keyCounter = 0;
 		this.xOffset = 45;
@@ -95,6 +95,7 @@ class Druid extends Agent {
 				x = entity.worldBB.right;
 				this.vel.x = 0;
 			}
+			if (entity instanceof Door) entity.removeFromWorld = true;
 		}
 		if (entity instanceof StandingBreakBlock) {
 			if (collisions.down) {

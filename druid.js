@@ -6,7 +6,8 @@ class Druid extends Agent {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
 		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
+			this.pos.x + 65, this.pos.y + 23,
+			this.scaleDim.x - 120, this.scaleDim.y - 23)
 		this.game.druid = this;
 
 		this.loadAnimations();
@@ -35,7 +36,8 @@ class Druid extends Agent {
 		let druidCenter = this.worldBB.centerPoint();
 		if (this.meleeAttackCooldown <= 0 && this.game.C) {
 			// stab
-			this.game.addEntity(new SwordAttack(this.game, druidCenter.x, druidCenter.y, this.facing));
+			this.game.addEntity(new SwordAttack(
+				this.game, druidCenter.x, druidCenter.y, this.facing));
 			this.game.C = false;
 			this.meleeAttackCooldown = 1;
 		}
@@ -178,7 +180,6 @@ class Druid extends Agent {
 		} else {
 			this.flashing = false;
 		}
-
 		// Jump handling
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
@@ -198,7 +199,6 @@ class Druid extends Agent {
 			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
 		}
-
 		// check if melee attack is made
 		this.meleeAttack();
 		// check if switch attack

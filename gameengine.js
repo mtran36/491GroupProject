@@ -204,6 +204,10 @@ class GameEngine {
             }
         }
         AUDIO_PLAYER.update();
+        if (this.druid.pos.x > 50 * PARAMS.TILE_WIDTH) {
+            AUDIO_PLAYER.stopAll();
+            this.screen = this.camera.winScreen;
+        }
     };
 
     /** 

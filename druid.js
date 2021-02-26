@@ -6,7 +6,18 @@ class Druid extends Agent {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
 		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
+			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23);
+		this.agentBB = [
+			new BoundingCircle(
+				this.worldBB.x + this.worldBB.width / 2,
+				this.worldBB.y + this.worldBB.height / 4,
+				this.worldBB.width / 2),
+			new BoundingCircle(
+				this.worldBB.x + this.worldBB.width / 2,
+				this.worldBB.y + 3 * this.worldBB.height / 4,
+				this.worldBB.width / 2
+			)
+		];
 		this.game.druid = this;
 
 		this.loadAnimations();

@@ -27,7 +27,7 @@ class Scene {
 			});
 			entityArr.splice(0, 0, construct);
 		}
-
+		console.log(x + " " + y);
 		this.game.druid = new Druid(this.game, x, y);
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
@@ -41,6 +41,7 @@ class Scene {
 			this.pos.x = Math.floor(this.pos.x);
 			this.pos.y = Math.floor(this.pos.y);
 		}
+		console.log("Druid current location -> x: " + this.game.druid.pos.x / PARAMS.TILE_WIDTH + "y: " + this.game.druid.pos.y / PARAMS.TILE_WIDTH)
 	};
 
 	/** @override */

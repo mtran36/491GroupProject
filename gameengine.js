@@ -116,14 +116,6 @@ class GameEngine {
                         that.mutePressed = true;
                     }
                     break;
-                case "KeyI":
-                    that.screen = that.camera.winScreen;
-                    AUDIO_PLAYER.stopAll();
-                    break;
-                case "KeyR":
-                    that.camera.loadLevel(
-                        levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
-                    break;
             }
         });
         this.context.canvas.addEventListener("keyup", function (e) {

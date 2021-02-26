@@ -2,9 +2,11 @@ const GAME_ENGINE = new GameEngine();
 const ASSET_LOADER = new AssetLoader();
 const AUDIO_PLAYER = new AudioPlayer();
 const IMAGE_PATHS = [
-	"./Sprites/TestFly.png",
-	"./Sprites/TestBeetle.png",
-	"./Sprites/TestHopper.png",
+	"./Sprites/Fly.png",
+	"./Sprites/Snail.png",
+	"./Sprites/Bee.png",
+	"./Sprites/HopperStart.png",
+	"./Sprites/HopperJump.png",
 	"./Sprites/druid.png",
 	"./Sprites/ground.png",
 	"./Sprites/ball.png",
@@ -28,7 +30,9 @@ const IMAGE_PATHS = [
 	"./Sprites/druidmerge.png",
 	"./Sprites/potions.png",
 	"./Sprites/powerupsUI.png",
-	"./Sprites/select.png"
+	"./Sprites/select.png",
+	"./Sprites/transparency.png",
+	"./Sprites/tree.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
@@ -46,7 +50,10 @@ const AUDIO_PATHS = [
 ]
 
 // ENTRY POINT
-window.addEventListener('scroll', noScroll);
+window.onkeydown = function (e) {
+	// Stop spacebar from scrolling screen
+	return !(e.keyCode == 32);
+};
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
 });

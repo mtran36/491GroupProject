@@ -7,7 +7,7 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
-        this.mapPipColor = 'red';
+        this.mapPipColor = 'green';
         this.scale = 1;
         this.pos = {
             x: x,
@@ -105,6 +105,7 @@ class Agent extends Entity {
         this.facing = 0; // Left = 0, Right = 1
         this.agentBB = this.makeDefaultBoundingCircle();
         this.lastAgentBB = this.makeDefaultBoundingCircle();
+        this.mapPipColor = 'red';
         this.loadAnimations();
     }
 
@@ -132,7 +133,6 @@ class Agent extends Entity {
      * @param {number} damage Damage to health as an integer
      */
     takeDamage(damage) {
-        console.log("before hit:" + this.health);
         this.health -= damage;
         if (this.health <= 0) {
             if (this.spawnPrize) {
@@ -140,7 +140,6 @@ class Agent extends Entity {
             }
             this.removeFromWorld = true;
         }
-        console.log("after hit:" + this.health);
     }
 
     /**

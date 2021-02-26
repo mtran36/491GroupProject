@@ -5,10 +5,10 @@ class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
-		this.setBoundingShapes();
+		this.worldBB = new BoundingBox(
+			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23)
 		this.game.druid = this;
 
-		this.storedAnimations = null;
 		this.loadAnimations();
 		this.isJumping = false;
 		this.health = 100;
@@ -23,40 +23,19 @@ class Druid extends Agent {
 		this.keyCounter = 0;
 		this.xOffset = 45;
 		this.currentOffset = this.xOffset;
-
 		this.attackSelection = null;
 		this.attacks = [];
 	}
 
-	setBoundingShapes() {
-		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23,
-			this.scaleDim.x - 120, this.scaleDim.y - 23)
-		const WIDTH = this.worldBB.right - this.worldBB.left;
-		const HEIGHT = this.worldBB.bottom - this.worldBB.top;
-		const SEPERATION = 25;
-		this.agentBB = [
-			new BoundingCircle(
-				this.worldBB.x + WIDTH / 2,
-				this.worldBB.y + HEIGHT / 2 - SEPERATION,
-				WIDTH / 2),
-			new BoundingCircle(this.worldBB.x + WIDTH / 2,
-				this.worldBB.y + HEIGHT / 2 + SEPERATION,
-				WIDTH / 2)
-		];
-    }
-
 	/** 
-	 * 
+	 *
 	 */
 	meleeAttack() {
 		this.meleeAttackCooldown -= this.game.clockTick;
+		let druidCenter = this.worldBB.centerPoint();
 		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			if (this.facing === 0) { // stab left
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			} else { // stab right
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			}
+			// stab
+			this.game.addEntity(new SwordAttack(this.game, druidCenter.x, druidCenter.y, this.facing));
 			this.game.C = false;
 			this.meleeAttackCooldown = 1;
 		}
@@ -84,6 +63,12 @@ class Druid extends Agent {
 		if (entity instanceof Enemy && this.invincTime <= 0) {
 			this.takeDamage(entity.attack);
 		}
+		if (entity instanceof Door) {
+			if (this.keyCounter > 0) {
+				entity.removeFromWorld = true;
+				this.keyCounter -= 1;
+            }
+        }
 	}
 
 	/** @override */
@@ -126,22 +111,30 @@ class Druid extends Agent {
 			this.animations.push([]);
 		}
 		this.storedAnimations = {
-			standingRight: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, true),
-			standingLeft: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 3, 0.7, 0, true, true, false),
-			walkingRight: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, true),
-			walkingLeft: new Animator(
-				this.spritesheet, 0, 0, this.dim.x, this.dim.y, 8, 0.1, 0, true, true, false),
-			jumpingRight: new Animator(
-				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, true),
-			jumpingLeft: new Animator(
-				this.spritesheet, 0, 128, this.dim.x, this.dim.y, 6, 0.3, 0, false, false, false),
-			airHangRight: new Animator(
-				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, true),
-			airHangLeft: new Animator(
-				this.spritesheet, this.dim.x * 4, 128, this.dim.x, this.dim.y, 1, 1, 0, false, true, false),
+			standingRight: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				3, 0.7, 0, true, true, true, true),
+			standingLeft: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				3, 0.7, 0, true, true, false, true),
+			walkingRight: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				8, 0.1, 0, true, true, true),
+			walkingLeft: new Animator(this.spritesheet,
+				0, 0, this.dim.x, this.dim.y,
+				8, 0.1, 0, true, true, false),
+			jumpingRight: new Animator(this.spritesheet,
+				0, 128, this.dim.x, this.dim.y,
+				6, 0.3, 0, false, false, true),
+			jumpingLeft: new Animator(this.spritesheet,
+				0, 128, this.dim.x, this.dim.y,
+				6, 0.3, 0, false, false, false),
+			airHangRight: new Animator(this.spritesheet,
+				this.dim.x * 4, 128, this.dim.x, this.dim.y,
+				1, 1, 0, false, true, true),
+			airHangLeft: new Animator(this.spritesheet,
+				this.dim.x * 4, 128, this.dim.x, this.dim.y,
+				1, 1, 0, false, true, false),
 		};
 		this.animations[0][0] = this.storedAnimations.walkingRight;
 		this.animations[1][0] = this.storedAnimations.walkingLeft;
@@ -155,6 +148,7 @@ class Druid extends Agent {
 		const WALK_SPEED = 300;
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
+		let i, remainder = this.maxHealth - this.health;
 
 		// Check if player is moving
 		if (this.game.right) {
@@ -172,6 +166,11 @@ class Druid extends Agent {
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
 		}
+		// Update potion counter
+		if (this.potionCounter > 0 && remainder > 20) {
+			this.health += 20;
+			this.potionCounter -= 1;
+		}
 		// Damage flashing 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;
@@ -179,10 +178,12 @@ class Druid extends Agent {
 		} else {
 			this.flashing = false;
 		}
+
 		// Jump handling
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
+			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 			this.game.B = false;
 			this.animations[0][1] = this.storedAnimations.jumpingRight;
 			this.animations[1][1] = this.storedAnimations.jumpingLeft;
@@ -196,20 +197,28 @@ class Druid extends Agent {
 			}
 			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
-		}		
-		// Check if player is switching weapons
+		}
+
+		// check if melee attack is made
+		this.meleeAttack();
+		// check if switch attack
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
         }
-		// Check if player is attacking
-		this.meleeAttack();
+		// check if any special attack if made
 		if (this.attackSelection != null) {
-			// update cooldown of all attacks
-			for (var i = 0; i < this.attacks.length; i++) {
+			for (i = 0; i < this.attacks.length; i++) {
 				this.attacks[i].updateCooldown();
             }
 			this.attacks[this.attackSelection].attack(this);
+        }
+		if (this.game.right) { 
+			this.vel.x = WALK_SPEED;
+		} else if (this.game.left) {
+			this.vel.x = -WALK_SPEED;
+		} else {
+			this.vel.x = 0;
 		}
 		this.move(TICK);
 	}
@@ -234,6 +243,13 @@ class Druid extends Agent {
 				tickWidth: 40
 			},
 			"POTIONS", "teal");
+
+		context.fillStyle = "black";
+		context.font = "italic bold 16px Castellar";
+		context.fillText(
+			"Key: " + this.keyCounter,
+			10, 100);
+		context.restore();
 		// powerups UI
 		HUD.drawPowerupUI(context,
 			PARAMS.CANVAS_WIDTH - 288, PARAMS.CANVAS_HEIGHT - 48,

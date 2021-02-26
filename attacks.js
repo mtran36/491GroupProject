@@ -1,17 +1,15 @@
 class SwordAttack extends Agent {
 	constructor(game, x, y, facing) {
 		super(game, x, y - 30, "./Sprites/sword.png");
+		this.setDimensions(2.5, 34, 15);
 
 		this.facing = facing;
-		this.setDimensions(2.5, 34, 15);
 		this.duration = 0.5;
 		this.currentTime = 0;
 		this.vel = { x: 75, y: 0 };
 		this.attack = 1;
 		this.force = 600;
 		this.damagedEnemies = [];
-		this.defineWorldCollisions = () => { /* Do nothing */ };
-
 		this.agentBB = [
 			new BoundingCircle(
 				this.pos.x + this.scaleDim.x * 1 / 6,
@@ -22,6 +20,8 @@ class SwordAttack extends Agent {
 			new BoundingCircle(
 				this.pos.x + this.scaleDim.x * 5 / 6,
 				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2)];
+		
+		this.updatePos();
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 		this.updatePos();
 	}
@@ -50,24 +50,26 @@ class SwordAttack extends Agent {
 
 	/** @override */
 	updatePos() {
+		let i, swordPos = this.currentTime * this.vel.x;
 		let druidCenter = this.game.druid.worldBB.centerPoint();
+
 		this.facing = this.game.druid.facing;
 		if (this.facing === 0) {
-			this.pos.x = druidCenter.x - this.currentTime * this.vel.x - this.scaleDim.x;
-			this.worldBB.shift(druidCenter.x - this.currentTime * this.vel.x - this.worldBB.width,
+			this.pos.x = druidCenter.x - swordPos - this.scaleDim.x;
+			this.worldBB.shift(druidCenter.x - swordPos - this.worldBB.width,
 				druidCenter.y - 30);
-			for (let i = 0; i < this.agentBB.length; i++) {
+			for (i = 0; i < this.agentBB.length; i++) {
 				this.agentBB[i].shift(
-					druidCenter.x - this.currentTime * this.vel.x - this.scaleDim.x * (2 * i + 1) / 6,
+					druidCenter.x - swordPos - this.scaleDim.x * (2 * i + 1) / 6,
 					this.pos.y + this.scaleDim.y / 2);
 			}
 		} else {
-			this.pos.x = druidCenter.x + this.currentTime * this.vel.x;
-			this.worldBB.shift(druidCenter.x + this.currentTime * this.vel.x,
+			this.pos.x = druidCenter.x + swordPos;
+			this.worldBB.shift(druidCenter.x + swordPos,
 				druidCenter.y - 30);
-			for (let i = 0; i < this.agentBB.length; i++) {
+			for (i = 0; i < this.agentBB.length; i++) {
 				this.agentBB[i].shift(
-					druidCenter.x + this.currentTime * this.vel.x + this.scaleDim.x * (2 * i + 1) / 6,
+					druidCenter.x + swordPos + this.scaleDim.x * (2 * i + 1) / 6,
 					this.pos.y + this.scaleDim.y / 2);
 			}
 		}
@@ -84,6 +86,11 @@ class SwordAttack extends Agent {
 			entity.knockback(this);
 		}
 	}
+
+	/** @override */
+	defineWorldCollisions() {
+		// Do nothing
+    }
 
 	/** @override */
 	draw(context) {
@@ -185,18 +192,14 @@ class TornadoAttack extends Agent {
 	 */
 	constructor(game, x, y, facing) {
 		super(game, x, y, "./Sprites/tornado.png");
-		this.facing = facing;
 		this.setDimensions(1, 96, 192);
-		if (facing == 0) {
-			this.vel.x = -400;
-		} else {
-			this.vel.x = 400;
-        }
-		this.attack = 0.8;		// attack value
-		this.existTime = 2;		// how long the attack would last
-		this.force = 600;
 
 		let RADIUS = this.dim.x / 2;
+		this.facing = facing;
+		this.vel.x = facing === 0 ? -400 : 400;
+		this.attack = 0.8;	// attack value
+		this.existTime = 2;	// how long the attack would last
+		this.force = 600;
 		this.agentBB = [
 			new BoundingCircle(
 				this.pos.x + RADIUS,
@@ -234,8 +237,7 @@ class TornadoAttack extends Agent {
 		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
 			entity.takeDamage(this.attack);
 			this.damagedEnemies.push(entity);
-			//entity.knockback(this, Math.pi / 2);
-			entity.knockup(this);
+			entity.knockback(this, -Math.PI / 2);
 		}
 	}
 
@@ -262,13 +264,9 @@ class ThunderAttack extends Agent{
 		super(game, x, y, "./Sprites/thunder.png");
 		this.facing = facing;
 		this.setDimensions(1, PARAMS.TILE_WIDTH * 2 , PARAMS.TILE_WIDTH / 2);
-		if (facing == 0) {
-			this.vel.x = -700;
-		} else {
-			this.vel.x = 700;
-		}
-		this.attack = 2;		// attack value
-		this.existTime = 5;		// how long the attack would last
+		this.vel.x = facing === 0 ? -700 : 700;
+		this.attack = 2;	// attack value
+		this.existTime = 5;	// how long the attack would last
 		this.force = 600;
 
 		let RADIUS = this.dim.y / 2;
@@ -295,7 +293,6 @@ class ThunderAttack extends Agent{
 			this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, false);
 	}
 
-
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
@@ -314,7 +311,9 @@ class ThunderAttack extends Agent{
 	/** @override */
 	update() {
 		this.existTime -= this.game.clockTick
-		if (this.existTime <= 0) this.removeFromWorld = true;
+		if (this.existTime <= 0) {
+			this.removeFromWorld = true;
+		}
 		this.move(this.game.clockTick);
 	}
 }
@@ -350,11 +349,12 @@ class EnemyRangedAttack extends Agent {
 
 	/** @override */
 	update() {
-		if (this.maxDist < Math.sqrt(Math.pow(this.startX - this.pos.x, 2) + Math.pow(this.startY - this.pos.y, 2))) {
+		if (this.maxDist < Math.sqrt(
+			Math.pow(this.startX - this.pos.x, 2) +
+			Math.pow(this.startY - this.pos.y, 2))) {
 			this.removeFromWorld = true;
 		}
 		this.move(this.game.clockTick);
-
 	}
 
 	/** @override
@@ -381,4 +381,3 @@ class EnemyRangedAttack extends Agent {
 		}
 	}
 }
-

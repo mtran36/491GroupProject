@@ -6,9 +6,13 @@ class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
 		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
-		this.defineAgentCollisions = () => { };
 		this.cooldown = 0;
 	} 
+
+	/** Update the coodown of this powerup. */
+	updateCooldown() {
+		this.cooldown -= this.game.clockTick;
+	}
 
 	/** @override */
 	update() {
@@ -28,9 +32,21 @@ class PowerUp extends Agent {
 		}
 	}
 
-	/** Update the coodown of this powerup. */
-	updateCooldown() {
-		this.cooldown -= this.game.clockTick;
+	/** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 64, 64,
+			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.scaleDim.x, this.scaleDim.y);
+	}
+
+	/** @override */
+	defineAgentCollisions() {
+		// Do nothing
+	}
+
+	/** @override */
+	loadAnimations() {
+		// Do nothing
     }
 }
 
@@ -38,9 +54,14 @@ class PowerUp extends Agent {
  * Adds the basic ranged attack function to the druids list of attacks.
  */
 class RangedPowerUp extends PowerUp {
-
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/greengem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new RangedPowerUp(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -51,7 +72,6 @@ class RangedPowerUp extends PowerUp {
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
-				console.log("got in here")
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.TILE_WIDTH,
@@ -71,22 +91,20 @@ class RangedPowerUp extends PowerUp {
 			this.cooldown = 1;
 		}
 	}
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 64, 64,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.scaleDim.x, this.scaleDim.y);
-	}
 }
 
 /**
  * Adds the wind element power up to druid's attack
  */
 class WindElement extends PowerUp {
-
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/bluegem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new WindElement(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -110,22 +128,20 @@ class WindElement extends PowerUp {
 			this.cooldown = 2;
 		}
 	}
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 64, 64,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.scaleDim.x, this.scaleDim.y);
-	}
 }
 
 /**
  * Adds the light element power up to druid's attack
  */
 class LightElement extends PowerUp {
-
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/yellowgem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new LightElement(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -148,12 +164,5 @@ class LightElement extends PowerUp {
 			this.game.A = false;
 			this.cooldown = 3;
 		}
-	}
-
-	/** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 64, 64,
-			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
-			this.scaleDim.x, this.scaleDim.y);
 	}
 }

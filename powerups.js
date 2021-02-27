@@ -72,11 +72,10 @@ class RangedPowerUp extends PowerUp {
 		if (this.cooldown <= 0 && this.game.A) {
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
-				console.log("got in here")
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.TILE_WIDTH,
-					DRUID.pos.y + DRUID.scaleDim.y / 2,
+					DRUID.pos.y + DRUID.scaleDim.y / 3,
 					180, PARAMS.TILE_WIDTH / 2,
 					600, 1, true));
 			} else { // shoot right
@@ -84,7 +83,7 @@ class RangedPowerUp extends PowerUp {
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + DRUID.scaleDim.y / 2,
+					DRUID.pos.y + DRUID.scaleDim.y / 3,
 					0, PARAMS.TILE_WIDTH / 2,
 					600, 1, true));
 			}
@@ -105,7 +104,7 @@ class WindElement extends PowerUp {
 	static construct(game, params) {
 		game.addEntity(new WindElement(game,
 			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH));
+			params.y * PARAMS.TILE_WIDTH - 10));
 	}
 
 	/**

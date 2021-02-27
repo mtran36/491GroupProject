@@ -99,6 +99,7 @@ class GameEngine {
                     that.C = true;
                     break;
                 case "Space":
+                case "KeyZ":
                     that.B = true;
                     break;
                 case "KeyX":
@@ -140,6 +141,7 @@ class GameEngine {
                     that.C = false;
                     break;
                 case "Space":
+                case "KeyZ":
                     that.B = false;
                     break;
                 case "KeyX":
@@ -202,6 +204,10 @@ class GameEngine {
             }
         }
         AUDIO_PLAYER.update();
+        if (this.druid.pos.x > 50 * PARAMS.TILE_WIDTH) {
+            AUDIO_PLAYER.stopAll();
+            this.screen = this.camera.winScreen;
+        }
     };
 
     /** 

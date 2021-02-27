@@ -43,19 +43,6 @@ class Enemy extends Agent {
 	}
 
 	/**
-	 * Uses an attack agent to knock this enemy up.
-	* @param {Agent} attack Agent that has a knockup force value defined.
-	*/
-	knockup(attack) {
-		if (attack.vel.x > 0) {
-			this.vel.x = attack.force / 2;
-		} else if (attack.vel.x < 0) {
-			this.vel.x = -attack.force / 2;
-        }
-		this.vel.y = -attack.force;
-	}
-
-	/**
 	 * Spawns a prize at this Enemy location if PARAMS.DEBUG is true or on a random
 	 * chance based on this.prizeRate. Prize rate is a standard probablity value in range
 	 * 0-1.
@@ -120,7 +107,7 @@ class Enemy extends Agent {
  */
 class Fly extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestFly.png", prize, prizeRate);
+		super(game, x, y, "./Sprites/Fly.png", prize, prizeRate);
 		this.setDimensions(1, 32, 32);
 		// Override default values
 		this.ACC = { x: 700, y: 700 };
@@ -133,6 +120,7 @@ class Fly extends Enemy {
 		this.up = false;
 		this.seesDruid = false;
 		this.accelerate = false;
+		this.xOffset = 5;
 	}
 
 	static construct(game, params) {
@@ -145,9 +133,9 @@ class Fly extends Enemy {
 	/** @override */
 	loadAnimations() {
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+			this.spritesheet, 0, 0, 32, 32, 8, 0.083, 0, false, true, false);
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+			this.spritesheet, 0, 0, 32, 32, 8, 0.083, 0, false, true, true);
 	}
 
 	/** @override */
@@ -189,6 +177,11 @@ class Fly extends Enemy {
 			} else {
 				this.vel.y = Math.min(0, this.vel.y + velChangeY);
 			}
+		}
+		if (this.left) {
+			this.xOffset = 5;
+		} else {
+			this.xOffset = -5;
 		}
 		this.move(this.game.clockTick);
 	}
@@ -232,6 +225,17 @@ class Fly extends Enemy {
 			AUDIO_PLAYER.playSound("./Audio/EnemyBounce.mp3");
 		}
 		this.worldBB.shift(x, y);
+	}
+
+	draw(context) {
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick, context,
+			this.pos.x, this.pos.y,
+			this.scale, this.game.camera, this.xOffset);
+		this.worldBB.display(this.game);
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
 	}
 }
 
@@ -305,13 +309,19 @@ class RangedFly extends Fly {
  */
 class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestBeetle.png", prize, prizeRate);
-		this.setDimensions(2, 32, 32);
+		super(game, x, y, "./Sprites/Snail.png", prize, prizeRate);
+		this.setDimensions(3.3, 32, 24);
 		this.velMax.x = 200;
 		this.vel.x = -200;
 		this.loadAnimations();
 		this.farLeft = -1;
 		this.farRight = -1;
+		this.groundCheckLeft = new BoundingBox(
+			this.worldBB.left, this.worldBB.bottom, 1, 1);
+		this.groundCheckRight = new BoundingBox(
+			this.worldBB.right - 1, this.worldBB.bottom, 1, 1);
+		this.leftGround = false;
+		this.rightGround = false;
 	}
 
 	/**
@@ -321,17 +331,29 @@ class Beetle extends Enemy{
 	 * direction and it is not moving vertically, then it will start moving left.
 	 */
 	avoidLedge() {
-		if (this.farLeft > this.pos.x
-			&& this.vel.x < 0
-			&& this.vel.y === 0) {
+		if (this.vel.y !== 0 || (this.rightGround && this.leftGround)) return;
+		this.game.entities.forEach((entity) => {
+			if (entity instanceof Ground) {
+				if (this.groundCheckLeft.collide(entity.worldBB)) {
+					this.leftGround = true;
+				}
+				if (this.groundCheckRight.collide(entity.worldBB)) {
+					this.rightGround = true;
+				}
+			}
+		});
+		if ((this.vel.x > 0 && !this.rightGround)
+			|| (this.vel.x < 0 && !this.leftGround)) {
 			this.vel.x = -this.vel.x;
-			this.facing = 1;
+			this.updateFacing();
 		}
-		if (this.farRight < this.pos.x + this.scaleDim.x
-			&& this.vel.x > 0
-			&& this.vel.y === 0) {
-			this.vel.x = -this.vel.x;
-			this.facing = 0;
+	}
+
+	draw(context) {
+		super.draw(context);
+		if (PARAMS.DEBUG) {
+			this.groundCheckLeft.display(this.game);
+			this.groundCheckRight.display(this.game);
 		}
 	}
 
@@ -345,9 +367,9 @@ class Beetle extends Enemy{
 	/** @override */
 	loadAnimations() {
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
+			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, true);
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, false);
 	}
 
 	/** @override */
@@ -370,10 +392,15 @@ class Beetle extends Enemy{
 					this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
 			}
 		}
-		this.avoidLedge();
 		this.vel.y = Math.min(
 			this.vel.y + this.game.clockTick * this.ACC.y,
 			this.velMax.y);
+		this.groundCheckLeft = new BoundingBox(
+			this.worldBB.left - 4, this.worldBB.bottom, 1, 5);
+		this.groundCheckRight = new BoundingBox(
+			this.worldBB.right - 1, this.worldBB.bottom, 1, 5);
+		this.leftGround = false;
+		this.rightGround = false;
 		this.move(this.game.clockTick);
 		this.avoidLedge();
 	}
@@ -400,10 +427,12 @@ class Beetle extends Enemy{
 				this.vel.x = -this.vel.x;
 			}
 			if (entity instanceof Ground) {
-				this.farLeft = entity.worldBB.left < this.farLeft
-					? entity.worldBB.left : this.farLeft;
-				this.farRight = entity.worldBB.right > this.farRight
-					? entity.worldBB.right : this.farRight;
+				if (this.groundCheckLeft.collide(entity.worldBB)) {
+					this.leftGround = true;
+				}
+				if (this.groundCheckRight.collide(entity.worldBB)) {
+					this.rightGround = true;
+				}
 			}
 		}
 		this.worldBB.shift(x, y);
@@ -413,6 +442,17 @@ class Beetle extends Enemy{
 class FlyBeetle extends Beetle {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
+		this.setDimensions(0.8, 84, 98)
+		this.loadAnimations();
+	}
+
+	/** @override */
+	loadAnimations() {
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/Bee.png");
+		this.animations[1] = new Animator(
+			this.spritesheet, 32, 26, 84, 98, 4, 0.1, 67, false, true, true);
+		this.animations[0] = new Animator(
+			this.spritesheet, 32, 26, 84, 98, 4, 0.1, 67, false, true, false);
 	}
 
 	static construct(game, params) {
@@ -424,6 +464,23 @@ class FlyBeetle extends Beetle {
 
 	/** @override */
 	update() {
+		if (this.facing === 0) { // Facing left
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
+			}
+		} else { // Facing right
+			if (this.vel.x > this.velMax.x) {
+				this.vel.x = Math.max(
+					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
+			} else {
+				this.vel.x = Math.min(
+					this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
+			}
+		}
 		if (this.vel.x > this.velMax.x) {
 			this.vel.x -= this.ACC.x * this.game.clockTick;
 			this.vel.x = Math.max(this.velMax.x, this.vel.x);
@@ -448,8 +505,8 @@ class FlyBeetle extends Beetle {
  */
 class Hopper extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/TestHopper.png", prize, prizeRate);
-		this.setDimensions(2, 32, 32);
+		super(game, x, y, "./Sprites/HopperStart.png", prize, prizeRate);
+		this.setDimensions(0.9, 148, 100);
 		// Override default values
 		this.ACC = { y: 2000 };
 		this.attack = 7;
@@ -462,6 +519,15 @@ class Hopper extends Enemy {
 		this.landTime = this.landLag;
 		this.jumping = false;
 		this.loadAnimations();
+
+		this.agentBB = [new BoundingCircle(
+			this.pos.x + this.scaleDim.x / 4,
+			this.pos.y + this.scaleDim.y / 2,
+			this.scaleDim.y / 2),
+			new BoundingCircle(
+				this.pos.x + 3 * this.scaleDim.x / 4,
+				this.pos.y + this.scaleDim.y / 2,
+				this.scaleDim.y / 2)]
 	}
 
 	static construct(game, params) {
@@ -473,10 +539,22 @@ class Hopper extends Enemy {
 
 	/** @override */
 	loadAnimations() {
-		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, false);
-		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 32, 32, 1, 1, 0, false, true, true);
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperStart.png");
+		this.idle = [];
+		this.idle[1] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, true);
+		this.idle[0] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, false);
+
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperJump.png");
+		this.jump = [];
+		this.jump[1] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, true);
+		this.jump[0] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, false);
+
+		this.animations[0] = this.idle[0];
+		this.animations[1] = this.idle[1];
 	}
 
 	/** @override */
@@ -491,9 +569,11 @@ class Hopper extends Enemy {
 		// Keeps hopper grounded for a brief moment before it can jump again.
 		this.landTime -= this.game.clockTick;
 		if (this.canSee(this.game.druid) && !this.jumping && this.landTime < 0) {
-			this.left = this.sightRange.x > druidCenter.x;
+			this.left = this.sight.x > druidCenter.x;
 			this.vel.y = this.jumpForce;
 			this.jumping = true;
+			this.animations[0] = this.jump[0];
+			this.animations[1] = this.jump[1];
 			AUDIO_PLAYER.playSound("./Audio/Hopper.mp3");
 		}
 		if (this.jumping) {
@@ -516,6 +596,8 @@ class Hopper extends Enemy {
 					this.landTime = this.landLag;
 				}
 				this.jumping = false;
+				this.animations[0] = this.idle[0];
+				this.animations[1] = this.idle[1];
 			}
 			if (collisions.up) {
 				y = entity.worldBB.bottom;

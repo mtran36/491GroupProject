@@ -23,6 +23,7 @@ class SwordAttack extends Agent {
 		
 		this.updatePos();
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
+		this.updatePos();
 	}
 
 	/** @override */
@@ -236,8 +237,7 @@ class TornadoAttack extends Agent {
 		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
 			entity.takeDamage(this.attack);
 			this.damagedEnemies.push(entity);
-			//entity.knockback(this, Math.pi / 2);
-			entity.knockup(this);
+			entity.knockback(this, -Math.PI / 2);
 		}
 	}
 

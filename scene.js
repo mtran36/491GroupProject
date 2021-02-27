@@ -8,8 +8,9 @@ class Scene {
 	};
 
 	createScreens() {
-		this.pauseScreen = new PauseScreen(this.game, { fill: 'white', stroke: 'red' });
-		new StartScreen(this.game, {fill: 'white', stroke: 'red'});
+		this.pauseScreen = new PauseScreen(this.game);
+		this.winScreen = new WinScreen(this.game);
+		this.StartScreen = new StartScreen(this.game);
 	}
 
 	loadLevel(level, x, y) {
@@ -18,16 +19,16 @@ class Scene {
 		let entry, construct, entityArr;
 		document.getElementById("gameWorld").setAttribute('style', 'background: black');
 		// Add all entities from level data
-		for (entry of Object.entries(level)) {
-			console.log("Loading", entry.shift());
-			entityArr = entry.shift();
+		for ([entry, entityArr] of Object.entries(level)) {
+			console.log("Loading", entry);
 			construct = entityArr.shift();
 			entityArr.forEach((params) => {
 				construct(this.game, params);
 			});
+			entityArr.splice(0, 0, construct);
 		}
 
-		this.game.druid = new Druid(this.game, x - 6500, y - 200);
+		this.game.druid = new Druid(this.game, x, y);
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
 	};

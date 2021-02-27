@@ -5,10 +5,21 @@ class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
-		this.setBoundingShapes();
+		this.worldBB = new BoundingBox(
+			this.pos.x + 65, this.pos.y + 23, this.scaleDim.x - 120, this.scaleDim.y - 23);
+		this.agentBB = [
+			new BoundingCircle(
+				this.worldBB.x + this.worldBB.width / 2,
+				this.worldBB.y + this.worldBB.height / 4,
+				this.worldBB.width / 2),
+			new BoundingCircle(
+				this.worldBB.x + this.worldBB.width / 2,
+				this.worldBB.y + 3 * this.worldBB.height / 4,
+				this.worldBB.width / 2
+			)
+		];
 		this.game.druid = this;
 
-		this.storedAnimations = null;
 		this.loadAnimations();
 		this.isJumping = false;
 		this.health = 100;
@@ -27,35 +38,15 @@ class Druid extends Agent {
 		this.attacks = [];
 	}
 
-	setBoundingShapes() {
-		this.worldBB = new BoundingBox(
-			this.pos.x + 65, this.pos.y + 23,
-			this.scaleDim.x - 120, this.scaleDim.y - 23)
-		const WIDTH = this.worldBB.right - this.worldBB.left;
-		const HEIGHT = this.worldBB.bottom - this.worldBB.top;
-		const SEPERATION = 25;
-		this.agentBB = [
-			new BoundingCircle(
-				this.worldBB.x + WIDTH / 2,
-				this.worldBB.y + HEIGHT / 2 - SEPERATION,
-				WIDTH / 2),
-			new BoundingCircle(this.worldBB.x + WIDTH / 2,
-				this.worldBB.y + HEIGHT / 2 + SEPERATION,
-				WIDTH / 2)
-		];
-    }
-
 	/** 
-	 * 
+	 *
 	 */
 	meleeAttack() {
 		this.meleeAttackCooldown -= this.game.clockTick;
+		let druidCenter = this.worldBB.centerPoint();
 		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			if (this.facing === 0) { // stab left
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			} else { // stab right
-				this.game.addEntity(new SwordAttack(this.game, 0, 0, this.facing));
-			}
+			// stab
+			this.game.addEntity(new SwordAttack(this.game, druidCenter.x, druidCenter.y, this.facing));
 			this.game.C = false;
 			this.meleeAttackCooldown = 1;
 		}
@@ -198,10 +189,12 @@ class Druid extends Agent {
 		} else {
 			this.flashing = false;
 		}
+
 		// Jump handling
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
+			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
 			this.game.B = false;
 			this.animations[0][1] = this.storedAnimations.jumpingRight;
 			this.animations[1][1] = this.storedAnimations.jumpingLeft;
@@ -215,19 +208,28 @@ class Druid extends Agent {
 			}
 			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
-		}		
-		// Check if player is switching weapons
+		}
+
+		// check if melee attack is made
+		this.meleeAttack();
+		// check if switch attack
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
         }
-		// Check if player is attacking
-		this.meleeAttack();
+		// check if any special attack if made
 		if (this.attackSelection != null) {
 			for (i = 0; i < this.attacks.length; i++) {
 				this.attacks[i].updateCooldown();
             }
 			this.attacks[this.attackSelection].attack(this);
+        }
+		if (this.game.right) { 
+			this.vel.x = WALK_SPEED;
+		} else if (this.game.left) {
+			this.vel.x = -WALK_SPEED;
+		} else {
+			this.vel.x = 0;
 		}
 		this.move(TICK);
 	}

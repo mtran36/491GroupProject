@@ -3,9 +3,9 @@
  * is pressed.
  */
 class PauseScreen {
-    constructor(game, style) {
+    constructor(game) {
         this.game = game;
-        this.style = style;
+        this.style = { fill: 'white', stroke: 'red' };
         this.pausePressed = false;
         this.game.canvas.addEventListener('keydown', (e) => {
             switch (e.code) {
@@ -60,15 +60,25 @@ class PauseScreen {
  * Game starts when canvas is clicked.
  */
 class StartScreen {
-    constructor(game, style) {
+    constructor(game) {
         this.game = game;
-        this.style = style;
-        var clickStart = () => {
+        this.style = { fill: 'white', stroke: 'red' };
+        // Start upon first load.
+        let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
-            this.game.camera.loadLevel(levelOne, PARAMS.TILE_WIDTH * 5.5, PARAMS.TILE_WIDTH);
+            this.game.camera.loadLevel(
+                levelOne, PARAMS.TILE_WIDTH * 5.5 - 6500, PARAMS.TILE_WIDTH - 200);
             this.game.start();
-        }
+        };
         this.game.canvas.addEventListener('click', clickStart);
+        // Start after reset, win, or lose.
+        this.game.canvas.addEventListener('click', (e) => {
+            if (this.game.screen === this) {
+                this.game.camera.loadLevel(
+                    levelOne, PARAMS.TILE_WIDTH * 5.5 - 6500, PARAMS.TILE_WIDTH - 200);
+                this.game.screen = null;
+            }
+        });
         this.display(this.game.context);
     }
 
@@ -79,15 +89,50 @@ class StartScreen {
     display(context) {
         context.save();
         context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
-        if (this.style.fill) {
-            context.fillStyle = this.style.fill;
-        }
-        if (this.style.stroke) {
-            context.strokeStyle = this.style.stroke;
-        }
+        context.fillStyle = this.style.fill;
+        context.strokeStyle = this.style.stroke;
         context.font = "bold 64px sans-serif";
-        context.fillText("Click to Start", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText("Click to Start", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.fillText(
+            "Click to Start",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.strokeText(
+            "Click to Start",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.restore();
+    }
+}
+
+class WinScreen {
+    constructor(game) {
+        this.game = game;
+        this.style = { fill: 'white', stroke: 'blue' };
+        this.game.canvas.addEventListener('click', (e) => {
+            if (this.game.screen === this) {
+                this.game.camera.pos = { x: 0, y: 0 };
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
+            }
+        })
+    }
+
+    display(context) {
+        context.save();
+        context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+        context.fillStyle = this.style.fill;
+        context.strokeStyle = this.style.stroke;
+        context.font = "bold 64px sans-serif";
+        context.fillText(
+            "You Win!",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.strokeText(
+            "You Win!",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.font = "bold 16px sans-serif";
+        context.fillText(
+            "Click to restart.",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+        context.strokeText(
+            "Click to restart",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.restore();
     }
 }

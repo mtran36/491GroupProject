@@ -75,7 +75,7 @@ class RangedPowerUp extends PowerUp {
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.TILE_WIDTH,
-					DRUID.pos.y + DRUID.scaleDim.y / 2,
+					DRUID.pos.y + DRUID.scaleDim.y / 3,
 					180, PARAMS.TILE_WIDTH / 2,
 					600, 1, true));
 			} else { // shoot right
@@ -83,7 +83,7 @@ class RangedPowerUp extends PowerUp {
 				this.game.addEntity(new BasicRangedAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + DRUID.scaleDim.y / 2,
+					DRUID.pos.y + DRUID.scaleDim.y / 3,
 					0, PARAMS.TILE_WIDTH / 2,
 					600, 1, true));
 			}
@@ -117,12 +117,12 @@ class WindElement extends PowerUp {
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.TILE_WIDTH,
-					DRUID.pos.y - PARAMS.TILE_WIDTH, 0));
+					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0));
 			} else { // shoot right
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - PARAMS.TILE_WIDTH, 1));
+					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1));
 			}
 			this.game.A = false;
 			this.cooldown = 2;

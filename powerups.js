@@ -104,7 +104,7 @@ class WindElement extends PowerUp {
 	static construct(game, params) {
 		game.addEntity(new WindElement(game,
 			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH - 10));
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/**
@@ -117,12 +117,12 @@ class WindElement extends PowerUp {
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x - PARAMS.TILE_WIDTH,
-					DRUID.pos.y - PARAMS.TILE_WIDTH, 0));
+					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0));
 			} else { // shoot right
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
 					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - PARAMS.TILE_WIDTH, 1));
+					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1));
 			}
 			this.game.A = false;
 			this.cooldown = 2;

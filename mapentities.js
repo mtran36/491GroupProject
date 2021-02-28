@@ -51,6 +51,7 @@ class Tree extends Block {
 		super(game, x, y, width, height, "./Sprites/tree.png");
 		Object.assign(this, { xOffset, yOffset });
 		this.setSize(width, height, 59);
+		this.hidden = true;
 	}
 
 	static construct(game, params) {
@@ -300,6 +301,7 @@ class Mask extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");
 		this.setSize(width, height, 32);
+		this.hidden = true;
 	}
 
 	static construct(game, params) {
@@ -368,6 +370,7 @@ class BreakBlock extends Entity {
 		this.collisionAmount = 0;
 		this.breakPoint = 1;
 		this.minCrack = 0;
+		this.hidden = true;
 	}
 
 	/**
@@ -508,14 +511,29 @@ class HitBreakBlock extends BreakBlock {
 			this.lingerTime -= this.game.clockTick;
 		}
 	}
+
+	static construct(game, params) {
+		let hitBreakBlock = new HitBreakBlock(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height,
+			params.blockType);
+		game.addEntity(hitBreakBlock);
+		hitBreakBlock.addBlock();
+	}
 }
 
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");
 		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 3);
-		this.updateBB();
 	};
+
+	static construct(game, params) {
+		game.addEntity(new Door(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,));
+	}
 
 	/** @override */
 	draw(context) {
@@ -540,22 +558,39 @@ class Minimap extends Entity {
 
 	draw(context) {
 		const SCALE = 16;
-		const PIP_SIDE_LEN = 4;
 
 		context.save();
 		context.strokeStyle = "black";
 		context.lineWidth = 3;
-		context.strokeRect(this.pos.x, this.pos.y, this.width, this.width);
+		context.strokeRect(this.pos.x - 2, this.pos.y - 2, this.width + 4, this.width + 4);
 		this.game.entities.forEach((entity) => {
+			if (entity.hidden) return;
 			context.fillStyle = entity.mapPipColor;
 			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE;
+			let width = entity.worldBB.width / SCALE;
 			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE;
-			if (x > this.pos.x
-				&& y > this.pos.y
-				&& y < this.pos.y + this.width
-				&& x < this.pos.x + this.width) {
-				context.fillRect(x, y, PIP_SIDE_LEN, PIP_SIDE_LEN);
+			let height = entity.worldBB.height / SCALE;
+			if (x < this.pos.x) {
+				width -= this.pos.x - x;
+				x = this.pos.x;
+			} else if (x > this.pos.x + this.width) {
+				width = 0;
+			} else if (width > this.width - (x - this.pos.x)) {
+				width = this.width - (x - this.pos.x); 
 			}
+			if (y < this.pos.y) {
+				height -= this.pos.y - y;
+				y = this.pos.y;
+			} else if (y > this.pos.y + this.width) {
+				height = 0;
+			} else if (height > this.width - (y - this.pos.y)) {
+				height = this.width - (y - this.pos.y);
+			}
+			if (width < 0) width = 0;
+			if (height < 0) height = 0;
+			if (width > this.width) width = this.width;
+			if (height > this.height) height = this.width;
+			context.fillRect(x, y, width, height);
 		});
 		context.restore();
 	};

@@ -32,8 +32,13 @@ var levelOne = {
 	],
 	ground: [
 		(game, params) => Ground.construct(game, params),
+		// A6 (boss room):
+		{ x: 45, y: 25, width: 5, height: 12 },
+		{ x: 45, y: 10, width: 5, height: 13 },
+
 		// A5:
 		// secret room:
+		{ x: -8, y: 58, width: 5, height: 3 },
 		{ x: -10, y: 60, width: 50, height: 1 },
 		{ x: 5, y: 55, width: 33, height: 1 },
 		{ x: -11, y: 45, width: 3, height: 16 },
@@ -43,12 +48,21 @@ var levelOne = {
 		{ x: 54, y: 42, width: 3, height: 11 },
 		{ x: 53, y: 51, width: 2, height: 1 },
 		{ x: 58, y: 50, width: 3, height: 7 },
-		// platform
+		// right platform:
 		{ x: 75, y: 57, width: 8, height: 7 },
-		// ceiling:
+		// top left platform:
 		{ x: 37, y: 50, width: 13, height: 1 },
-		{ x: 35, y: 40, width: 4, height: 17 },
-		{ x: 35, y: 30, width: 65, height: 14 },
+		// ladder:
+		{ x: 38, y: 46, width: 3, height: 1 },
+		{ x: 41, y: 42, width: 2, height: 1 },
+		{ x: 43, y: 38, width: 3, height: 1 },
+		{ x: 41, y: 34, width: 2, height: 1 },
+		{ x: 38, y: 30, width: 3, height: 1 },
+		{ x: 43, y: 28, width: 3, height: 1 },
+		{ x: 35, y: 10, width: 4, height: 47 },
+		// ceiling:
+		{ x: 45, y: 35, width: 55, height: 9 },
+
 		// A4:
 		// left platform:
 		{ x: 45, y: 77, width: 5, height: 5 },
@@ -65,7 +79,7 @@ var levelOne = {
 		{ x: 95, y: 69, width: 2, height: 1 },
 		{ x: 94, y: 73, width: 3, height: 1 },
 		{ x: 93, y: 77, width: 4, height: 1 },
-		{ x: 96, y: 40, width: 4, height: 40 },
+		{ x: 96, y: 20, width: 4, height: 60 },
 		// ceiling:
 		{ x: 35, y: 60, width: 52, height: 5 },
 
@@ -163,9 +177,15 @@ var levelOne = {
 		{ x: 56, y: 50, width: 3, blockType: 'Ground' },
 		{ x: 53, y: 55, width: 6, blockType: 'Ground' },
 	],
+	hitBreakBlock: [
+		(game, params) => HitBreakBlock.construct(game, params),
+		// secret room:
+		{ x: 35, y: 56, width: 4, height: 4, blockType: 'Ground' },
+
+	],
 	door: [
 		(game, params) => Door.construct(game, params),
-		{ x: 36, y: 57 }
+		{ x: 47, y: 22},
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
@@ -181,7 +201,7 @@ var levelOne = {
 		// A2:
 		{ x: 40, y: 90, prizeRate: 0.1, prize: 'PotionMid' },
 		// A3:
-		{ x: 30, y: 70, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 25, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
 		// A4:
 		{ x: 60, y: 65, prizeRate: 0.1, prize: 'PotionMid' },
 		{ x: 70, y: 65, prizeRate: 0.1, prize: 'PotionMid' }
@@ -229,23 +249,23 @@ var levelOne = {
 		{ x: 65, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
 		{ x: 40, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
 		// serect room: 
-		{ x: -7, y: 55, prizeRate: 0 },
-		{ x: -6, y: 55, prizeRate: 0 },
-		{ x: -5, y: 55, prizeRate: 0 },
-		{ x: -4, y: 55, prizeRate: 0 },
-		{ x: -3, y: 55, prizeRate: 0 },
+		//{ x: -7, y: 55, prizeRate: 0 },
+		//{ x: -6, y: 55, prizeRate: 0 },
+		//{ x: -5, y: 55, prizeRate: 0 },
+		//{ x: -4, y: 55, prizeRate: 0 },
+		//{ x: -3, y: 55, prizeRate: 0 },
 	],
-	powerups: [
+	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),
-		{ x: 15, y: 119 }
+		{ x: 15, y: 119 },
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
-		{ x: 80, y: 99 }
+		{ x: 80, y: 99 },
 	],
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
-		{ x: 45, y: 76 }
+		{ x: -6, y: 57 }
 	]
 }
 

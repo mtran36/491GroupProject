@@ -7,7 +7,18 @@ class Druid extends Agent {
 		this.setDimensions(1, 176, 128);
 		this.worldBB = new BoundingBox(
 			this.pos.x + 65, this.pos.y + 23,
-			this.scaleDim.x - 120, this.scaleDim.y - 23)
+			this.scaleDim.x - 120, this.scaleDim.y - 23);
+		this.agentBB = [
+			new BoundingCircle(
+				this.worldBB.x + this.worldBB.width / 2,
+				this.worldBB.y + this.worldBB.height / 4,
+				this.worldBB.width / 2),
+			new BoundingCircle(
+				this.worldBB.x + this.worldBB.width / 2,
+				this.worldBB.y + 3 * this.worldBB.height / 4,
+				this.worldBB.width / 2
+			)
+		];
 		this.game.druid = this;
 
 		this.loadAnimations();
@@ -97,7 +108,10 @@ class Druid extends Agent {
 				x = entity.worldBB.right;
 				this.vel.x = 0;
 			}
-			if (entity instanceof Door) entity.removeFromWorld = true;
+			if (entity instanceof Door && this.keyCounter > 0) {
+				entity.removeFromWorld = true;
+				this.keyCounter--;
+			}
 		}
 		if (entity instanceof StandingBreakBlock) {
 			if (collisions.down) {

@@ -508,6 +508,16 @@ class HitBreakBlock extends BreakBlock {
 			this.lingerTime -= this.game.clockTick;
 		}
 	}
+
+	static construct(game, params) {
+		let hitBreakBlock = new HitBreakBlock(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.width, params.height,
+			params.blockType);
+		game.addEntity(hitBreakBlock);
+		hitBreakBlock.addBlock();
+	}
 }
 
 class Door extends Entity {

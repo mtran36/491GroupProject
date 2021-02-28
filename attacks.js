@@ -88,8 +88,11 @@ class SwordAttack extends Agent {
 	}
 
 	/** @override */
-	defineWorldCollisions() {
-		// Do nothing
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof HitBreakBlock && !this.damagedEnemies.includes(entity)) {
+			entity.hitBlock(this.attack);
+			this.damagedEnemies.push(entity);
+		}
     }
 
 	/** @override */
@@ -167,6 +170,9 @@ class BasicRangedAttack extends Agent {
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
 			this.removeFromWorld = true;
+		} else if (entity instanceof HitBreakBlock) {
+			entity.hitBlock(this.attack);
+			this.removeFromWorld = true;
 		}
 	}
 
@@ -228,6 +234,9 @@ class TornadoAttack extends Agent {
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
+			this.removeFromWorld = true;
+		} else if (entity instanceof HitBreakBlock) {
+			entity.hitBlock(this.attack);
 			this.removeFromWorld = true;
 		}
 	}
@@ -296,6 +305,9 @@ class ThunderAttack extends Agent{
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
+			this.removeFromWorld = true;
+		} else if (entity instanceof HitBreakBlock) {
+			entity.hitBlock(this.attack);
 			this.removeFromWorld = true;
 		}
 	}

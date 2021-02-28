@@ -137,6 +137,55 @@ class WinScreen {
     }
 }
 
+class MenuScreen {
+    constructor(game) {
+        this.game = game;
+        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.menuPressed = false;
+        this.game.canvas.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case "KeyI":
+                    if (!this.menuPressed) {
+                        this.menuPressed = true;
+                        if (this.game.screen) {
+                            this.game.screen = false;
+                        } else {
+                            this.game.screen = this;
+                        }
+                    }
+                    break;
+            }
+        })
+        this.game.canvas.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case "KeyI":
+                    this.menuPressed = false;
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Display the pause screen.
+     * @param {CanvasRenderingContext2D} context
+     */
+    display(context) {
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
+            155, 100, PARAMS.CANVAS_WIDTH / 1.5, PARAMS.CANVAS_HEIGHT / 1.5);
+        context.save();
+        if (this.style.fill) {
+            context.fillStyle = this.style.fill;
+        }
+        if (this.style.stroke) {
+            context.strokeStyle = this.style.stroke;
+        }
+        context.font = "bold 32px sans-serif";
+        context.fillText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
+        context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
+        context.restore();
+    }
+}
+
 class HUD {
     /**
      * Draws a standard resource bar which can be depleted.

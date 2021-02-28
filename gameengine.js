@@ -25,6 +25,7 @@ class GameEngine {
         this.mute = false;
         this.mutePressed = false;
         this.screen = false;
+        this.menuPressed = false;
     };
 
     /**

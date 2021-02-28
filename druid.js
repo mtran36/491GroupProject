@@ -36,6 +36,7 @@ class Druid extends Agent {
 		this.currentOffset = this.xOffset;
 		this.attackSelection = null;
 		this.attacks = [];
+		this.items = [];
 	}
 
 	/** 

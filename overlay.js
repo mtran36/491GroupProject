@@ -13,7 +13,7 @@ class PauseScreen {
                 case "Escape":
                     if (!this.pausePressed) {
                         this.pausePressed = true;
-                        if (this.game.screen) {
+                        if (this.game.screen === this) {
                             this.game.screen = false;
                         } else {
                             this.game.screen = this;
@@ -138,9 +138,11 @@ class WinScreen {
 }
 
 class MenuScreen {
-    constructor(game, itemList) {
+    constructor(game) {
         this.game = game;
-        this.items = itemList;
+        this.camera = new Object();
+        this.camera.pos = {x: 0, y: 0};
+        //this.items = this.game.druid.items;
         this.style = { fill: 'beige', stroke: 'darkgreen' };
         this.menuPressed = false;
         this.game.canvas.addEventListener('keydown', (e) => {
@@ -148,7 +150,7 @@ class MenuScreen {
                 case "KeyI":
                     if (!this.menuPressed) {
                         this.menuPressed = true;
-                        if (this.game.screen) {
+                        if (this.game.screen === this) {
                             this.game.screen = false;
                         } else {
                             this.game.screen = this;
@@ -173,6 +175,7 @@ class MenuScreen {
     display(context) {
         const imageY = (PARAMS.CANVAS_HEIGHT - 48) + 12;
         let i, imageX;
+
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
             155, 100, PARAMS.CANVAS_WIDTH / 1.5, PARAMS.CANVAS_HEIGHT / 1.5);
         context.save();
@@ -185,10 +188,13 @@ class MenuScreen {
         context.font = "bold 32px sans-serif";
         context.fillText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
         context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
-        for (i = 0; i < this.items.length; i++) {
-            context.drawImage(this.items[i].spritesheet,
-                0, 0, 64, 64, imageX, imageY, 24, 24);
+
+        for (i = 0; i < this.game.druid.items.length; i++) {
+            //context.drawImage(this.game.druid.items[i].spritesheet,
+            //    0, 0, 60, 60, 50, 50, 60, 60);
+            this.game.druid.items[i].animations[0].drawFrame(0, context, (i * 86) + 215, (Math.floor(i/7) * 72) + 185, 0.9, this.camera);
         }
+
         context.restore();
 
         //for (i = 0; i < this.items.length; i++) {

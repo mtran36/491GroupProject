@@ -273,11 +273,10 @@ class ThunderAttack extends Agent{
 		super(game, x, y, "./Sprites/thunder.png");
 		this.facing = facing;
 		this.setDimensions(1, PARAMS.TILE_WIDTH * 2 , PARAMS.TILE_WIDTH / 2);
-		this.vel.x = facing === 0 ? -700 : 700;
+		this.vel.x = facing === 0 ? -660 : 660;
 		this.attack = 2;	// attack value
 		this.existTime = 5;	// how long the attack would last
 		this.force = 600;
-
 		let RADIUS = this.dim.y / 2;
 		this.agentBB = [
 			new BoundingCircle(
@@ -297,9 +296,9 @@ class ThunderAttack extends Agent{
 	/** @override */
 	loadAnimations() {
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, true);
+			this.spritesheet, 150, 35, 130, 35, 4, 0.2, 20, false, true, false);
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 144, 32, 1, 0.2, 0, false, true, false);
+			this.spritesheet, 150, 35, 130, 35, 4, 0.2, 20, false, true, true);
 	}
 
 	/** @override */

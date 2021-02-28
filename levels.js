@@ -248,12 +248,6 @@ var levelOne = {
 		{ x: 75, y: 50, prizeRate: 0.1, prize: 'PotionMid' },
 		{ x: 65, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
 		{ x: 40, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
-		// serect room: 
-		//{ x: -7, y: 55, prizeRate: 0 },
-		//{ x: -6, y: 55, prizeRate: 0 },
-		//{ x: -5, y: 55, prizeRate: 0 },
-		//{ x: -4, y: 55, prizeRate: 0 },
-		//{ x: -3, y: 55, prizeRate: 0 },
 	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),

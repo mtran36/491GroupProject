@@ -138,8 +138,9 @@ class WinScreen {
 }
 
 class MenuScreen {
-    constructor(game) {
+    constructor(game, itemList) {
         this.game = game;
+        this.items = itemList;
         this.style = { fill: 'beige', stroke: 'darkgreen' };
         this.menuPressed = false;
         this.game.canvas.addEventListener('keydown', (e) => {
@@ -170,6 +171,8 @@ class MenuScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        const imageY = (PARAMS.CANVAS_HEIGHT - 48) + 12;
+        let i, imageX;
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
             155, 100, PARAMS.CANVAS_WIDTH / 1.5, PARAMS.CANVAS_HEIGHT / 1.5);
         context.save();
@@ -182,7 +185,16 @@ class MenuScreen {
         context.font = "bold 32px sans-serif";
         context.fillText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
         context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
+        for (i = 0; i < this.items.length; i++) {
+            context.drawImage(this.items[i].spritesheet,
+                0, 0, 64, 64, imageX, imageY, 24, 24);
+        }
         context.restore();
+
+        //for (i = 0; i < this.items.length; i++) {
+        //    context.drawImage(this.items[i].spritesheet,
+        //        0, 0, 64, 64, imageX, imageY, 24, 24);
+        //}
     }
 }
 

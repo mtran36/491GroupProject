@@ -11,7 +11,6 @@ class Scene {
 		this.pauseScreen = new PauseScreen(this.game);
 		this.winScreen = new WinScreen(this.game);
 		this.StartScreen = new StartScreen(this.game);
-		this.menuScreen = new MenuScreen(this.game);
 	}
 
 	loadLevel(level, x, y) {
@@ -32,6 +31,7 @@ class Scene {
 		this.game.druid = new Druid(this.game, x, y);
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
+		this.menuScreen = new MenuScreen(this.game, this.game.druid.items);
 	};
 
 	update() {

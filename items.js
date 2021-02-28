@@ -11,6 +11,7 @@ class Items extends Agent {
     defineAgentCollisions(entity) {
         if (entity instanceof Druid) {
             this.removeFromWorld = true;
+            this.game.druid.items.push(entity);
             this.addItemsToDruid(entity);
         }
     }

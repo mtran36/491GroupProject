@@ -3,7 +3,7 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 0.1) {
+	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate) {
 		super(game, x, y, spritesheet);
 		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.
@@ -49,7 +49,7 @@ class Enemy extends Agent {
 	 */
 	spawnPrize() {
 		let thisCenter = this.worldBB.centerPoint();
-		if (PARAMS.DEBUG || Math.random() < this.prizeRate) {
+		if (Math.random() < this.prizeRate) {
 			switch (this.prize) {
 				case 'Potion':
 					this.game.addEntity(new Potion(

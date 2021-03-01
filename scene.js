@@ -28,6 +28,13 @@ class Scene {
 			});
 			entityArr.splice(0, 0, construct);
 		}
+		// Author: tommy
+		// temporary boss:
+		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 30 * PARAMS.TILE_WIDTH);
+		this.temporaryBoss.setDimensions(2, this.temporaryBoss.dim.x, this.temporaryBoss.dim.y);
+		this.temporaryBoss.health = 10;
+		this.temporaryBoss.attack = 10;
+		this.game.addEntity(this.temporaryBoss);
 
 		this.game.druid = new Druid(this.game, x, y);
 		this.game.addEntity(this.game.druid);
@@ -45,7 +52,22 @@ class Scene {
 	};
 
 	/** @override */
-	draw() {
-		// Do nothing
+	draw(context) {
+		const ANCHOR_X = PARAMS.CANVAS_WIDTH / 2 - 200;
+		const ANCHOR_Y = PARAMS.CANVAS_HEIGHT / 2;
+
+		if (PARAMS.DEBUG) {
+			context.save();
+			context.font = "bold 16px sans-serif";
+			context.fillStyle = 'grey';
+			context.fillRect(ANCHOR_X - 10, ANCHOR_Y - 17, 400, 25);
+			context.fillStyle = 'black';
+			context.fillText(
+				"Current location = x: "
+				+ Math.floor(this.game.druid.pos.x / PARAMS.TILE_WIDTH)
+				+ ", y: " + Math.floor(this.game.druid.pos.y / PARAMS.TILE_WIDTH),
+				ANCHOR_X, ANCHOR_Y);
+			context.restore();
+		}
     }
 }

@@ -7,6 +7,7 @@ class PauseScreen {
         this.game = game;
         this.style = { fill: 'white', stroke: 'red' };
         this.pausePressed = false;
+        this.screen = false;
         this.game.canvas.addEventListener('keydown', (e) => {
             switch (e.code) {
                 case "KeyP":
@@ -14,8 +15,9 @@ class PauseScreen {
                     if (!this.pausePressed) {
                         this.pausePressed = true;
                         if (this.game.screen === this) {
-                            this.game.screen = false;
+                            this.game.screen = this.screen;
                         } else {
+                            this.screen = this.game.screen;
                             this.game.screen = this;
                         }
                     }
@@ -67,7 +69,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.camera.loadLevel(
-                levelOne, PARAMS.TILE_WIDTH * 5.5 - 6500, PARAMS.TILE_WIDTH - 200);
+                levelOne, PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
@@ -75,7 +77,7 @@ class StartScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(
-                    levelOne, PARAMS.TILE_WIDTH * 5.5 - 6500, PARAMS.TILE_WIDTH - 200);
+                    levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
                 this.game.screen = null;
             }
         });

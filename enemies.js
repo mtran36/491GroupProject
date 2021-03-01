@@ -108,7 +108,7 @@ class Enemy extends Agent {
 class Fly extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/Fly.png", prize, prizeRate);
-		this.setDimensions(1, 32, 32);
+		this.setDimensions(1.5, 32, 32);
 		// Override default values
 		this.ACC = { x: 700, y: 700 };
 		this.attack = 3;
@@ -246,7 +246,7 @@ class Fly extends Enemy {
 class RangedFly extends Fly {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
-		this.setDimensions(2, 32, 32);
+		this.setDimensions(2.5, 32, 32);
 		this.sightRange = 900;
 		this.ACC = { x: 500, y: 500 };
 		this.health = 3;
@@ -444,6 +444,8 @@ class FlyBeetle extends Beetle {
 		super(game, x, y, prize, prizeRate);
 		this.setDimensions(0.8, 84, 98)
 		this.loadAnimations();
+		this.groundCheckLeft = new BoundingBox(0, 0, 0, 0);
+		this.groundCheckRight = this.groundCheckLeft;
 	}
 
 	/** @override */

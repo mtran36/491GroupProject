@@ -43,7 +43,6 @@ class PauseScreen {
         AUDIO_PLAYER.pauseSounds();
         context.save();
         context.fillStyle = 'black';
-        context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
         if (this.style.fill) {
             context.fillStyle = this.style.fill;
         }
@@ -90,6 +89,7 @@ class StartScreen {
      */
     display(context) {
         context.save();
+        this.fillStyle = 'black';
         context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
@@ -118,7 +118,6 @@ class WinScreen {
 
     display(context) {
         context.save();
-        context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
         context.font = "bold 64px sans-serif";

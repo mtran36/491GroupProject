@@ -564,7 +564,7 @@ class Minimap extends Entity {
 		context.lineWidth = 3;
 		context.strokeRect(this.pos.x - 2, this.pos.y - 2, this.width + 4, this.width + 4);
 		this.game.entities.forEach((entity) => {
-			if (entity.hidden) return;
+			if (entity.hidden || entity instanceof Effect) return;
 			context.fillStyle = entity.mapPipColor;
 			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE;
 			let width = entity.worldBB.width / SCALE;

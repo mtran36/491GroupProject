@@ -381,7 +381,7 @@ class ThunderAttack extends Agent{
 					this.hitAnimation, 0.4, 2));
 		} else {
 			this.game.addEntity(
-				new Effect(this.game, this.pos.x + this.dim.x * 1.5, this.pos.y,
+				new Effect(this.game, this.pos.x + this.dim.x * 0.75, this.pos.y,
 					this.hitAnimation, 0.4, 2));
         }
 	}

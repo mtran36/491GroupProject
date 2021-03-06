@@ -1,6 +1,7 @@
 class Items extends Agent {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
+        this.mapPipColor = 'yellow';
         this.emerging = false;
     }
 

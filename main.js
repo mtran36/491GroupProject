@@ -15,6 +15,7 @@ const IMAGE_PATHS = [
 	"./Sprites/door.png",
 	"./Sprites/key.png",
 	"./Sprites/TestEnemyAttack.png",
+	"./Sprites/TestEnemyHomingAttack.png",
 	"./Sprites/layer1.png",
 	"./Sprites/layer2.png",
 	"./Sprites/layer3.png",
@@ -30,6 +31,7 @@ const IMAGE_PATHS = [
 	"./Sprites/druidmerge.png",
 	"./Sprites/potions.png",
 	"./Sprites/powerupsUI.png",
+	"./Sprites/puffBoom.png",
 	"./Sprites/select.png",
 	"./Sprites/transparency.png",
 	"./Sprites/tree.png"

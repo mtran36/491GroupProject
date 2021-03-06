@@ -558,7 +558,6 @@ class Minimap extends Entity {
 
 	draw(context) {
 		const SCALE = 16;
-
 		context.save();
 		context.strokeStyle = "black";
 		context.lineWidth = 3;
@@ -566,9 +565,9 @@ class Minimap extends Entity {
 		this.game.entities.forEach((entity) => {
 			if (entity.hidden) return;
 			context.fillStyle = entity.mapPipColor;
-			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE;
+			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE + 50;
 			let width = entity.worldBB.width / SCALE;
-			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE;
+			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE + 80;
 			let height = entity.worldBB.height / SCALE;
 			if (x < this.pos.x) {
 				width -= this.pos.x - x;

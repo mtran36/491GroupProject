@@ -7,7 +7,7 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
-        this.mapPipColor = 'green';
+        this.mapPipColor = 'Sienna';
         this.scale = 1;
         this.pos = {
             x: x,

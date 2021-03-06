@@ -27,19 +27,13 @@ class Enemy extends Agent {
 	knockback(attack, angle) {
 		let thisCenter = this.worldBB.centerPoint();
 		let attackCenter = attack.worldBB.centerPoint();
-		if (thisCenter.x - attackCenter.x === 0) {
-			// If the collision is directly vertical, then the entire force applies to 
-			// the y velocity.
-			this.vel.y = attack.force;
-		} else {
-			if (!angle) {
-				angle = Math.atan2(
-					thisCenter.y - attackCenter.y,
-					thisCenter.x - attackCenter.x);
-			}
-			this.vel.y = attack.force * Math.sin(angle);
-			this.vel.x = attack.force * Math.cos(angle);
+		if (!angle) {
+			angle = Math.atan2(
+				thisCenter.y - attackCenter.y,
+				thisCenter.x - attackCenter.x);
 		}
+		this.vel.y = attack.force * Math.sin(angle);
+		this.vel.x = attack.force * Math.cos(angle);
 	}
 
 	/**
@@ -616,4 +610,117 @@ class Hopper extends Enemy {
 		}
 		this.worldBB.shift(x, y);
 	}
+}
+
+class Mantis extends Enemy {
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/HopperStart.png", prize, prizeRate);
+		this.sightRangeFar = 1500;
+		this.sightRangeMid = 600;
+		this.sightRangeClose = 100;
+		this.ACC = { y: 2000, x: 500 };
+		this.health = 5;
+		this.cooldown = 0;
+	}
+
+	knockback(attack, angle) {
+		super.knockback(attack, angle);
+		this.vel.x /= 10;
+		this.vel.y /= 10;
+	}
+
+	loadAnimations() {
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, true);
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, false);
+
+	}
+
+	update() {
+		this.vel.y += this.game.clockTick * this.ACC.y;
+		this.cooldown -= this.game.clockTick;
+		let thisCenter = this.worldBB.centerPoint();
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+		if (druidCenter.x < thisCenter.x) {
+			this.facing = 0;
+		} else {
+			this.facing = 1;
+		}
+		this.sightRange = this.sightRangeClose;
+		if (this.canSee(this.game.druid) && this.cooldown < 0) {
+			if (this.facing === 0) {
+				this.game.addEntity(new EnemyPuff(this.game, this.pos.x - PARAMS.TILE_WIDTH, this.pos.y, this.facing));
+			} else {
+				this.game.addEntity(new EnemyPuff(this.game, this.pos.x + this.worldBB.width, this.pos.y, this.facing));
+			}
+			this.cooldown = 0.5;
+		}
+		this.sightRange = this.sightRangeMid;
+		if (this.canSee(this.game.druid) && this.cooldown < 0) {
+			this.game.addEntity(new EnemyHomingAttack(this.game,
+				thisCenter.x, thisCenter.y,
+				druidCenter.x - thisCenter.x,
+				druidCenter.y - thisCenter.y));
+			AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
+			this.canShoot = false;
+			this.cooldown = 1.5;
+		}
+		this.sightRange = this.sightRangeFar;
+		if (this.canSee(this.game.druid) && this.cooldown < 0) {
+			if (this.facing === 0) {
+				this.game.addEntity(new EnemyRangedAttack(this.game,
+					thisCenter.x, thisCenter.y - 20,
+					druidCenter.x - thisCenter.x,
+					druidCenter.y - thisCenter.y - 80));
+			} else {
+				this.game.addEntity(new EnemyRangedAttack(this.game,
+					thisCenter.x, thisCenter.y - 20,
+					druidCenter.x - thisCenter.x,
+					druidCenter.y - thisCenter.y - 80));
+			}
+			AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
+			this.cooldown = 3;
+		}
+		if (this.vel.x > 0) {
+			this.vel.x = Math.max(0, this.vel.x -= this.ACC.x * this.game.clockTick);
+		} else {
+			this.vel.x = Math.min(0, this.vel.x += this.ACC.x * this.game.clockTick);
+		}
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				y = entity.worldBB.top - this.worldBB.height;
+				this.vel.y = 0;
+			}
+			if (collisions.up) {
+				y = entity.worldBB.bottom;
+				this.vel.y = 0;
+			}
+			if (collisions.left) {
+				x = entity.worldBB.right;
+				this.vel.x = 0;
+			}
+			if (collisions.right) {
+				x = entity.worldBB.left - this.worldBB.width;
+				this.vel.x = 0;
+			}
+		}
+		this.worldBB.shift(x, y);
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Mantis(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
+	}
+
+
 }

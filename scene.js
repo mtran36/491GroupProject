@@ -10,7 +10,8 @@ class Scene {
 	createScreens() {
 		this.pauseScreen = new PauseScreen(this.game);
 		this.winScreen = new WinScreen(this.game);
-		this.StartScreen = new StartScreen(this.game);
+		this.startScreen = new StartScreen(this.game);
+		this.loseScreen = new LoseScreen(this.game);
 	}
 
 	loadLevel(level, x, y) {

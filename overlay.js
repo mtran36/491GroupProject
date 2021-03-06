@@ -67,13 +67,22 @@ class StartScreen {
         // Start upon first load.
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
+            this.game.canvas.removeEventListener('keydown', clickStart);
             this.game.camera.loadLevel(
                 levelOne, PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
+        this.game.canvas.addEventListener('keydown', clickStart);
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener('click', (e) => {
+            if (this.game.screen === this) {
+                this.game.camera.loadLevel(
+                    levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
+                this.game.screen = null;
+            }
+        });
+        this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(
                     levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
@@ -93,17 +102,20 @@ class StartScreen {
         context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
-        context.font = "bold 64px sans-serif";
+        context.font = "bold 32px sans-serif";
         context.fillText(
-            "Click to Start",
+            "Click or press any key to Start",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.strokeText(
-            "Click to Start",
+            "Click or press any key to Start",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.restore();
     }
 }
 
+/**
+ * The win screen for the game.
+ */
 class WinScreen {
     constructor(game) {
         this.game = game;
@@ -111,31 +123,81 @@ class WinScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
-                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
+                setTimeout(() => {this.game.screen = this.game.camera.startScreen;}, 100);
+                setTimeout(() => { console.log(this.game.screen);}, 200);
             }
-        })
+        });
+        this.game.canvas.addEventListener('keydown', (e) => {
+            if (this.game.screen === this && e.code == 'KeyR') {
+                this.game.camera.pos = { x: 0, y: 0 };
+                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+            }
+        });
     }
 
     display(context) {
         context.save();
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
-        context.font = "bold 64px sans-serif";
+        context.font = "bold 32px sans-serif";
         context.fillText(
             "You Win!",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.strokeText(
             "You Win!",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.font = "bold 16px sans-serif";
+        context.font = "bold 20px sans-serif";
         context.fillText(
-            "Click to restart.",
+            "Click or press R to restart.",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.strokeText(
-            "Click to restart",
+            "Click or press R to restart",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.restore();
     }
+}
+
+
+class LoseScreen {
+    constructor(game) {
+        this.game = game;
+        this.style = { fill: 'red', stroke: 'black' };
+        this.game.canvas.addEventListener('click', (e) => {
+            if (this.game.screen === this) {
+                this.game.camera.pos = { x: 0, y: 0 };
+                setTimeout(() => { this.game.screen = this.game.camera.startScreen }, 100);
+                console.log(this.game.screen);
+            }
+        });
+        this.game.canvas.addEventListener('keydown', (e) => {
+            if (this.game.screen === this && e.code == 'KeyR') {
+                this.game.camera.pos = { x: 0, y: 0 };
+                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+            }
+        });
+    }
+
+    display(context) {
+        context.save();
+        context.fillStyle = this.style.fill;
+        context.strokeStyle = this.style.stroke;
+        context.font = "bold 32px sans-serif";
+        context.fillText(
+            "You are dead. Please try again.",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.strokeText(
+            "You are dead. Please try again.",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.font = "bold 20px sans-serif";
+        context.fillText(
+            "Click or press R to restart.",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+        context.strokeText(
+            "Click or press R to restart",
+            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+        context.restore();
+    }
+    
 }
 
 class HUD {

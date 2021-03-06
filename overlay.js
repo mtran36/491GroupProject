@@ -7,15 +7,17 @@ class PauseScreen {
         this.game = game;
         this.style = { fill: 'white', stroke: 'red' };
         this.pausePressed = false;
+        this.screen = false;
         this.game.canvas.addEventListener('keydown', (e) => {
             switch (e.code) {
                 case "KeyP":
                 case "Escape":
                     if (!this.pausePressed) {
                         this.pausePressed = true;
-                        if (this.game.screen) {
-                            this.game.screen = false;
+                        if (this.game.screen === this) {
+                            this.game.screen = this.screen;
                         } else {
+                            this.screen = this.game.screen;
                             this.game.screen = this;
                         }
                     }
@@ -109,7 +111,7 @@ class WinScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
-                this.game.screen = this.game.camera.StartScreen;
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         })
     }

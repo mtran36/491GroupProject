@@ -7,6 +7,7 @@ const IMAGE_PATHS = [
 	"./Sprites/Bee.png",
 	"./Sprites/HopperStart.png",
 	"./Sprites/HopperJump.png",
+	"./Sprites/Mantis.png",
 	"./Sprites/druid.png",
 	"./Sprites/ground.png",
 	"./Sprites/ball.png",

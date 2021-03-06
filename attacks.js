@@ -402,10 +402,11 @@ class EnemyHomingAttack extends Agent {
 		this.setDimensions(1.5, 16, 16);
 		this.force = 250;
 		this.attack = 7;
-		this.maxDist = 2500;
+		this.maxDist = 1500;
 		this.angle = Math.atan2(ydist, xdist);
 		this.vel.y = this.force * Math.sin(this.angle);
 		this.vel.x = this.force * Math.cos(this.angle);
+		this.turnAmount = Math.PI / 2;
 	}
 
 	loadAnimations() {
@@ -434,19 +435,20 @@ class EnemyHomingAttack extends Agent {
 	}
 
 	update() {
+		let turnAmount = this.turnAmount * this.game.clockTick;
 		let thisCenter = this.worldBB.centerPoint();
 		let druidCenter = this.game.druid.worldBB.centerPoint();
 		let angle = Math.atan2(druidCenter.y - thisCenter.y, druidCenter.x - thisCenter.x);
 		if (angle > Math.PI / 2 && this.angle < 0) {
-			this.angle -= Math.PI / 30;
+			this.angle -= turnAmount;
 		} else if (angle < -Math.PI / 2 && this.angle > 0) {
-			this.angle += Math.PI / 30;
+			this.angle += turnAmount;
 		} else {
 			if (this.angle < angle) {
-				this.angle += Math.PI / 30;
+				this.angle += turnAmount;
 			}
 			if (this.angle > angle) {
-				this.angle -= Math.PI / 30;
+				this.angle -= turnAmount;
 			}
 		}
 		if (this.angle > Math.PI) {
@@ -471,7 +473,7 @@ class EnemyPuff extends Agent {
 
 	constructor(game, x, y, facing) {
 		super(game, x, y, "./Sprites/puffBoom.png");
-		this.setDimensions(1, 120, 120);
+		this.setDimensions(1.3, 120, 120);
 		this.force = 1200;
 		this.attack = 10;
 		this.facing = facing;
@@ -497,7 +499,6 @@ class EnemyPuff extends Agent {
 			}
 			entity.takeDamage(this.attack);
 			entity.knockback(this, angle);
-			this.removeFromWorld = true;
 		}
 	}
 

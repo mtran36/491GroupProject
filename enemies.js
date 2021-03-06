@@ -614,13 +614,20 @@ class Hopper extends Enemy {
 
 class Mantis extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/HopperStart.png", prize, prizeRate);
+		super(game, x, y, "./Sprites/Mantis.png", prize, prizeRate);
+		this.setDimensions(1.5, 134, 120);
+		this.worldBB = new BoundingBox(this.pos.x + this.scaleDim.x / 4, this.pos.y, 4 * this.scaleDim.x / 8, this.scaleDim.y - 20)
+		this.agentBB = [new BoundingCircle(this.pos.x + this.scaleDim.x / 2, this.pos.y + this.scaleDim.y / 4, this.worldBB.width / 2),
+			new BoundingCircle(this.pos.x + this.scaleDim.x / 2, this.pos.y + 3 * this.scaleDim.y / 4, this.worldBB.width / 2)];
 		this.sightRangeFar = 1500;
 		this.sightRangeMid = 600;
-		this.sightRangeClose = 100;
+		this.sightRangeClose = 150;
 		this.ACC = { y: 2000, x: 500 };
 		this.health = 5;
 		this.cooldown = 0;
+		this.puffCooldown = 0;
+		this.xOffset = 20;
+		this.animationTimer = 0;
 	}
 
 	knockback(attack, angle) {
@@ -630,16 +637,33 @@ class Mantis extends Enemy {
 	}
 
 	loadAnimations() {
-		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, true);
-		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, false);
-
+		this.idle = [];
+		this.attackAnimation = [];
+		this.hitDruid = [];
+		this.idle[1] = new Animator(
+			this.spritesheet, 2, 2, 134, 118, 1, 0.4, 5, false, true, false);
+		this.idle[0] = new Animator(
+			this.spritesheet, 2, 2, 134, 118, 1, 0.4, 5, false, true, true);
+		this.attackAnimation[1] = new Animator(
+			this.spritesheet, 152, 2, 134, 118, 1, 0.4, 5, false, true, false);
+		this.attackAnimation[0] = new Animator(
+			this.spritesheet, 152, 2, 134, 118, 1, 0.4, 5, false, true, true);
+		this.hitDruid[1] = new Animator(
+			this.spritesheet, 434, 2, 134, 118, 1, 0.4, 5, false, true, false);
+		this.hitDruid[0] = new Animator(
+			this.spritesheet, 434, 2, 134, 118, 1, 0.4, 5, false, true, true);
+		this.animations = this.idle;
 	}
 
 	update() {
 		this.vel.y += this.game.clockTick * this.ACC.y;
 		this.cooldown -= this.game.clockTick;
+		this.animationTimer -= this.game.clockTick;
+		this.puffCooldown -= this.game.clockTick;
+		if (this.animationTimer < 0) {
+			this.animations = this.idle;
+			this.xOffset = 20;
+		} 
 		let thisCenter = this.worldBB.centerPoint();
 		let druidCenter = this.game.druid.worldBB.centerPoint();
 		if (druidCenter.x < thisCenter.x) {
@@ -648,13 +672,17 @@ class Mantis extends Enemy {
 			this.facing = 1;
 		}
 		this.sightRange = this.sightRangeClose;
-		if (this.canSee(this.game.druid) && this.cooldown < 0) {
+		if (this.canSee(this.game.druid) && this.puffCooldown < 0) {
 			if (this.facing === 0) {
 				this.game.addEntity(new EnemyPuff(this.game, this.pos.x - PARAMS.TILE_WIDTH, this.pos.y, this.facing));
 			} else {
 				this.game.addEntity(new EnemyPuff(this.game, this.pos.x + this.worldBB.width, this.pos.y, this.facing));
 			}
-			this.cooldown = 0.5;
+			this.animations = this.hitDruid;
+			this.animationTimer = 1;
+			this.puffCooldown = 2;
+			this.cooldown = 2;
+			this.xOffset = 20;
 		}
 		this.sightRange = this.sightRangeMid;
 		if (this.canSee(this.game.druid) && this.cooldown < 0) {
@@ -663,8 +691,10 @@ class Mantis extends Enemy {
 				druidCenter.x - thisCenter.x,
 				druidCenter.y - thisCenter.y));
 			AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
-			this.canShoot = false;
+			this.animations = this.attackAnimation;
+			this.animationTimer = 0.4;
 			this.cooldown = 1.5;
+			this.xOffset = -12;
 		}
 		this.sightRange = this.sightRangeFar;
 		if (this.canSee(this.game.druid) && this.cooldown < 0) {
@@ -680,7 +710,10 @@ class Mantis extends Enemy {
 					druidCenter.y - thisCenter.y - 80));
 			}
 			AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
+			this.animations = this.attackAnimation;
+			this.animationTimer = 0.4;
 			this.cooldown = 3;
+			this.xOffset = -12;
 		}
 		if (this.vel.x > 0) {
 			this.vel.x = Math.max(0, this.vel.x -= this.ACC.x * this.game.clockTick);
@@ -722,5 +755,18 @@ class Mantis extends Enemy {
 			params.prize, params.prizeRate));
 	}
 
+	draw(context) {
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick,
+			context, this.pos.x,
+			this.pos.y,
+			this.scale,
+			this.game.camera,
+			this.xOffset);
+		this.worldBB.display(this.game);
+		this.agentBB.forEach((bb) => {
+			bb.display(this.game);
+		});
+	}
 
 }

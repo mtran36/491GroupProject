@@ -674,3 +674,26 @@ class Background extends Entity {
 			this.dim.x, this.dim.y + 300);
 	}
 }
+
+class Effect {
+	constructor(game, x, y, animation, existTime = 1, scale) {
+		this.game = game;
+		this.pos = {
+			x: x,
+			y: y
+		};
+		this.animation = animation;
+		this.existTime = existTime;
+		this.scale = scale;
+	}
+
+	update() {
+		this.existTime -= this.game.clockTick;
+		if (this.existTime <= 0) this.removeFromWorld = true;
+	}
+
+	draw(context) {
+		this.animation.drawFrame(
+			this.game.clockTick, context, this.pos.x, this.pos.y, this.scale, this.game.camera);
+    }
+}

@@ -82,6 +82,7 @@ class SwordAttack extends Agent {
 			if (!this.damagedEnemies.includes(entity)) {
 				entity.takeDamage(this.attack);
 				this.damagedEnemies.push(entity);
+				this.playHitAnimation();
 			}
 			entity.knockback(this);
 		}
@@ -92,6 +93,7 @@ class SwordAttack extends Agent {
 		if (entity instanceof HitBreakBlock && !this.damagedEnemies.includes(entity)) {
 			entity.hitBlock(this.attack);
 			this.damagedEnemies.push(entity);
+			this.playHitAnimation();
 		}
     }
 
@@ -105,6 +107,22 @@ class SwordAttack extends Agent {
 		this.agentBB.forEach((BB) => {
 			BB.display(this.game);
 		});
+	}
+
+	playHitAnimation() {
+		// hit effect animation
+		this.hitAnimation = new Animator(
+			ASSET_LOADER.getImageAsset("./Sprites/HitEffect.png"),
+			0, 0, 32, 32, 4, 0.1, 0, false, false, false);
+		if (this.facing == 0) {
+			this.game.addEntity(
+				new Effect(this.game, this.pos.x - this.scaleDim.x, this.pos.y,
+					this.hitAnimation, 0.4, 2));
+		} else {
+			this.game.addEntity(
+				new Effect(this.game, this.pos.x + this.scaleDim.x, this.pos.y,
+					this.hitAnimation, 0.4, 2));
+		}
 	}
 }
 
@@ -170,9 +188,11 @@ class BasicRangedAttack extends Agent {
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
 			this.removeFromWorld = true;
+			this.playHitAnimation();
 		} else if (entity instanceof HitBreakBlock) {
 			entity.hitBlock(this.attack);
 			this.removeFromWorld = true;
+			this.playHitAnimation();
 		}
 	}
 
@@ -181,8 +201,18 @@ class BasicRangedAttack extends Agent {
 		if (entity instanceof Enemy) {
 			entity.takeDamage(this.attack);
 			this.removeFromWorld = true;
+			this.playHitAnimation();
 		}
 	}
+
+	playHitAnimation() {
+		// hit effect animation
+		this.hitAnimation = new Animator(
+			ASSET_LOADER.getImageAsset("./Sprites/EnergyBallHitEffect.png"),
+			32, 16, 32, 32, 4, 0.1, 0, false, false, false);
+		this.game.addEntity(
+			new Effect(this.game, this.pos.x, this.pos.y, this.hitAnimation, 0.4, 2));
+    }
 }
 
 /** 
@@ -247,6 +277,7 @@ class TornadoAttack extends Agent {
 			entity.takeDamage(this.attack);
 			this.damagedEnemies.push(entity);
 			entity.knockback(this, -Math.PI / 2);
+			this.playHitAnimation(entity.pos.x, entity.pos.y + entity.dim.y);
 		}
 	}
 
@@ -255,6 +286,14 @@ class TornadoAttack extends Agent {
 		this.existTime -= this.game.clockTick
 		if (this.existTime <= 0) this.removeFromWorld = true;
 		this.move(this.game.clockTick);
+	}
+
+	playHitAnimation(x, y) {
+		this.hitAnimation = new Animator(
+			ASSET_LOADER.getImageAsset("./Sprites/TornadoHitEffect.png"),
+			0, 0, 36, 32, 7, 0.06, 0, false, false, false);
+		this.game.addEntity(
+			new Effect(this.game, x, y, this.hitAnimation, 0.4, 2));
 	}
 }
 
@@ -305,9 +344,11 @@ class ThunderAttack extends Agent{
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
 			this.removeFromWorld = true;
+			this.playHitAnimation();
 		} else if (entity instanceof HitBreakBlock) {
 			entity.hitBlock(this.attack);
 			this.removeFromWorld = true;
+			this.playHitAnimation();
 		}
 	}
 
@@ -316,6 +357,7 @@ class ThunderAttack extends Agent{
 		if (entity instanceof Enemy) {
 			entity.takeDamage(this.attack);
 			this.removeFromWorld = true;
+			this.playHitAnimation();
 		}
 	}
 
@@ -326,6 +368,22 @@ class ThunderAttack extends Agent{
 			this.removeFromWorld = true;
 		}
 		this.move(this.game.clockTick);
+	}
+
+	playHitAnimation() {
+		// hit effect animation
+		this.hitAnimation = new Animator(
+			ASSET_LOADER.getImageAsset("./Sprites/ThunderHitEffect.png"),
+			0, 16, 32, 32, 4, 0.1, 0, false, false, false);
+		if (this.facing == 0) {
+			this.game.addEntity(
+				new Effect(this.game, this.pos.x, this.pos.y,
+					this.hitAnimation, 0.4, 2));
+		} else {
+			this.game.addEntity(
+				new Effect(this.game, this.pos.x + this.dim.x * 1.5, this.pos.y,
+					this.hitAnimation, 0.4, 2));
+        }
 	}
 }
 

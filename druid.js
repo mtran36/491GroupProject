@@ -241,6 +241,13 @@ class Druid extends Agent {
 		}
 		// check if melee attack is made
 		this.meleeAttack();
+		// for spell upgrade testing:
+		if (this.game.Q == true) {
+			if (this.attacks[this.attackSelection].canLevelUp == true) {
+				this.attacks[this.attackSelection].levelUp();
+			}
+			this.game.Q = false;
+        }
 		// check if switch attack
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;

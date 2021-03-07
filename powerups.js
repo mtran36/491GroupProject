@@ -8,12 +8,22 @@ class PowerUp extends Agent {
 		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
 		this.cooldown = 0;
 		this.cost = 0;
+		this.level = 1;
+		this.canLevelUp = true;
 	} 
 
 	/** Update the coodown of this powerup. */
 	updateCooldown() {
 		this.cooldown -= this.game.clockTick;
 	}
+
+	/** Level up this powerup. */
+	levelUp() {
+		if (this.canLevelUp) {
+			this.level++;
+        }
+		if (this.level >= 3) this.canLevelUp = false;
+    }
 
 	/** @override */
 	update() {
@@ -78,25 +88,40 @@ class RangedPowerUp extends PowerUp {
 	attack(DRUID) {
 		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
 			DRUID.mana -= this.cost;
-			if (DRUID.facing === 0) { // shoot left
-				// basic ranged attack:
-				this.game.addEntity(new BasicRangedAttack(
-					DRUID.game,
-					DRUID.pos.x - PARAMS.TILE_WIDTH,
-					DRUID.pos.y + DRUID.scaleDim.y / 3,
-					180, PARAMS.TILE_WIDTH / 2,
-					600, 1, true));
-			} else { // shoot right
-				// basic ranged attack:
-				this.game.addEntity(new BasicRangedAttack(
-					DRUID.game,
-					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + DRUID.scaleDim.y / 3,
-					0, PARAMS.TILE_WIDTH / 2,
-					600, 1, true));
+			if (this.level == 1) {
+				if (DRUID.facing === 0) { // shoot left
+					this.game.addEntity(new EnergyBallAttack(
+						DRUID.game,
+						DRUID.pos.x - PARAMS.TILE_WIDTH,
+						DRUID.pos.y + DRUID.scaleDim.y / 3,
+						180, PARAMS.TILE_WIDTH / 2, 600));
+				} else { // shoot right
+					this.game.addEntity(new EnergyBallAttack(
+						DRUID.game,
+						DRUID.pos.x + DRUID.scaleDim.x,
+						DRUID.pos.y + DRUID.scaleDim.y / 3,
+						0, PARAMS.TILE_WIDTH / 2, 600));
+				}
+			} else if (this.level >= 2) {
+				if (DRUID.facing === 0) {
+					var attack = new EnergyBallAttack(
+						DRUID.game,
+						DRUID.pos.x - PARAMS.TILE_WIDTH,
+						DRUID.pos.y,
+						180, PARAMS.TILE_WIDTH / 2 * 1.5, 600);
+				} else {
+					var attack = new EnergyBallAttack(
+						DRUID.game,
+						DRUID.pos.x + DRUID.scaleDim.x,
+						DRUID.pos.y,
+						0, PARAMS.TILE_WIDTH / 2 * 1.5, 600);
+				}
+				attack.scale = 1.5;
+				if (this.level == 3) attack.hasExplosion = true;
+				this.game.addEntity(attack);
 			}
 			this.game.A = false;
-			this.cooldown = 0.1;
+			this.cooldown = 0.3;
 		}
 	}
 }
@@ -123,17 +148,31 @@ class WindElement extends PowerUp {
 	attack(DRUID) {
 		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
 			DRUID.mana -= this.cost;
-			if (DRUID.facing === 0) { // shoot left
-				this.game.addEntity(new TornadoAttack(
-					DRUID.game,
-					DRUID.pos.x - PARAMS.TILE_WIDTH,
-					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0));
-			} else { // shoot right
-				this.game.addEntity(new TornadoAttack(
-					DRUID.game,
-					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1));
-			}
+			if (this.level <= 2) {
+				if (DRUID.facing === 0) { // shoot left
+					this.game.addEntity(new TornadoAttack(
+						DRUID.game,
+						DRUID.pos.x - PARAMS.TILE_WIDTH / 2,
+						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0, 0.8 * this.level));
+				} else { // shoot right
+					this.game.addEntity(new TornadoAttack(
+						DRUID.game,
+						DRUID.pos.x + PARAMS.TILE_WIDTH * 2,
+						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1, 0.8 * this.level));
+				}
+			} else if (this.level == 3) {
+				if (DRUID.facing === 0) { // shoot left
+					this.game.addEntity(new TornadoAttack(
+						DRUID.game,
+						DRUID.pos.x - PARAMS.TILE_WIDTH / 2,
+						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0, 1.6, true));
+				} else { // shoot right
+					this.game.addEntity(new TornadoAttack(
+						DRUID.game,
+						DRUID.pos.x + PARAMS.TILE_WIDTH * 2,
+						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1, 1.6, true));
+				}
+            }
 			this.game.A = false;
 			this.cooldown = 1;
 		}

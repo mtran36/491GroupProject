@@ -220,7 +220,7 @@ class LightElement extends PowerUp {
 
 class HealthPowerup extends PowerUp {
 	constructor(game, x, y) {
-		super(game, x, y, "./Sprites/greengem.png");
+		super(game, x, y, "./Sprites/HealthPowerup.png");
 	}
 
 	static construct(game, params) {

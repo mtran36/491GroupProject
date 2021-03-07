@@ -24,6 +24,7 @@ const IMAGE_PATHS = [
 	"./Sprites/bluegem.png",
 	"./Sprites/yellowgem.png",
 	"./Sprites/greygem.png",
+	"./Sprites/HealthPowerup.png",
 	"./Sprites/energyball.png",
 	"./Sprites/EnergyBallExplosion.png",
 	"./Sprites/tornado.png",

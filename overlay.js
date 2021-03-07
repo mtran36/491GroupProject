@@ -180,14 +180,14 @@ class MenuScreen {
                 case "ArrowUp":
                     this.selectUp = true;
                     if (this.selectUp == true && this.game.druid.itemSelection != null) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 2) % this.game.druid.items.length;
                         this.selectUp = false;
                     }
                     break;
                 case "ArrowDown":
                     this.selectDown = true;
                     if (this.selectDown == true && this.game.druid.itemSelection != null) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 2) % this.game.druid.items.length;
                         this.selectDown = false;
                     }
                     break;
@@ -237,10 +237,10 @@ class MenuScreen {
         context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 150, PARAMS.CANVAS_HEIGHT / 3 - 135);
 
         for (i = 0; i < this.game.druid.items.length; i++) {
-            this.game.druid.items[i].animations[0].drawFrame(0, context, ((i % 7) * 80) + 255, (Math.floor(i / 7) * 80) + 164, 0.9, this.camera);
+            this.game.druid.items[i].animations[0].drawFrame(0, context, ((i % 2) * 80) + 255, (Math.floor(i / 2) * 80) + 164, 0.9, this.camera);
             if (i === this.game.druid.itemSelection) {
                 context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
-                    (i * 80) + 235, (Math.floor(i / 7) * 80) + 155, 32 * 2.4, 32 * 2.4);
+                    ((i % 2)  * 80) + 235, (Math.floor(i / 2) * 80) + 155, 32 * 2.4, 32 * 2.4);
             }
         }
 

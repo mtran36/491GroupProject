@@ -14,7 +14,7 @@ class Scene {
 		this.loseScreen = new LoseScreen(this.game);
 	}
 
-	loadLevel(level, x, y) {
+	loadLevel(level) {
 		this.game.entities = [];
 		AUDIO_PLAYER.stopAll();
 		let entry, construct, entityArr;
@@ -36,9 +36,9 @@ class Scene {
 		this.temporaryBoss.attack = 10;
 		this.game.addEntity(this.temporaryBoss);
 
-		this.game.druid = new Druid(this.game, x, y);
+		this.game.druid = new Druid(this.game, PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
 		this.game.addEntity(this.game.druid);
-		this.game.addEntity(new Minimap(this.game, 860, 10, 150));
+		this.game.addEntity(new Minimap(this.game, 7, 7, 100));
 	};
 
 	update() {
@@ -53,19 +53,19 @@ class Scene {
 
 	/** @override */
 	draw(context) {
-		const ANCHOR_X = PARAMS.CANVAS_WIDTH / 2 - 200;
-		const ANCHOR_Y = PARAMS.CANVAS_HEIGHT / 2;
+		const ANCHOR_X = 20;
+		const ANCHOR_Y = PARAMS.CANVAS_HEIGHT - 15;
 
 		if (PARAMS.DEBUG) {
 			context.save();
 			context.font = "bold 16px sans-serif";
 			context.fillStyle = 'grey';
-			context.fillRect(ANCHOR_X - 10, ANCHOR_Y - 17, 400, 25);
+			context.fillRect(ANCHOR_X - 10, ANCHOR_Y - 17, 300, 25);
 			context.fillStyle = 'black';
 			context.fillText(
-				"Current location = x: "
+				"Druid Location: (x = "
 				+ Math.floor(this.game.druid.pos.x / PARAMS.TILE_WIDTH)
-				+ ", y: " + Math.floor(this.game.druid.pos.y / PARAMS.TILE_WIDTH),
+				+ ", y = " + Math.floor(this.game.druid.pos.y / PARAMS.TILE_WIDTH) + ")",
 				ANCHOR_X, ANCHOR_Y);
 			context.restore();
 		}

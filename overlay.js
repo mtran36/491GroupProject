@@ -68,8 +68,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.canvas.removeEventListener('keydown', clickStart);
-            this.game.camera.loadLevel(
-                levelOne, PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
+            this.game.camera.loadLevel(levelOne);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
@@ -77,8 +76,7 @@ class StartScreen {
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(
-                    levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
+                this.game.camera.loadLevel(levelOne);
                 this.game.screen = null;
             }
         });
@@ -214,42 +212,45 @@ class HUD {
      * @param {String} name Text to be placed on the left side of the bar.
      * @param {String} color Color to use for bar fill.
      */
-    static drawBar(context, xOffset, yOffset, width, borderOffset, resource, name, color) {
-        const FONT = "italic bold 16px Castellar"
-        const TEXT_COLOR = "black";
-        const X_TEXT_NUDGE = 10;
-        const X_TEXT_POS_SCALE = 0.65;
-        const Y_TEXT_NUDGE = 2;
-        const Y_TEXT_POS_SCALE = 1.5;
+    static drawBar(context, xOffset, yOffset, width, borderOffset, resource, name, color, tabColor) {
+        const X_TEXT_NUDGE = 8;
+        const Y_TEXT_NUDGE = 17;
+        const TAB_WIDTH = 6;
 
         context.save();
         // Draw Bars
         context.fillStyle = "black";
-        context.fillRect(
+        context.fillRect( // Black border
             xOffset, yOffset,
             resource.max * resource.tickWidth + borderOffset,
             width + borderOffset);
-        context.fillStyle = "white";
-        context.fillRect(
+        context.fillStyle = COLORS.FRAME_TAN;
+        context.fillRect( // Depleted bar background
             xOffset + borderOffset, yOffset + borderOffset,
             resource.max * resource.tickWidth - borderOffset,
             width - borderOffset);
         context.fillStyle = color;
-        context.fillRect(
+        context.fillRect( // Resource fill bar
             xOffset + borderOffset, yOffset + borderOffset,
             resource.current * resource.tickWidth - borderOffset,
             width - borderOffset);
+        context.fillStyle = tabColor;
+        context.fillRect(
+            xOffset + borderOffset + resource.current * resource.tickWidth - borderOffset - TAB_WIDTH,
+            yOffset + borderOffset,
+            TAB_WIDTH, width - borderOffset);
         // Draw Text
-        context.fillStyle = TEXT_COLOR;
-        context.font = FONT;
+        context.font = "bold 15px Castellar";
+        context.fillStyle = tabColor;
         context.fillText(
-            resource.current + "/" + resource.max + resource.name,
-            (xOffset + resource.max * resource.tickWidth) * X_TEXT_POS_SCALE,
-            yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
+            name,
+            xOffset + X_TEXT_NUDGE + 1,
+            yOffset + Y_TEXT_NUDGE + 1);
+        context.fillStyle = "black";
         context.fillText(
             name,
             xOffset + X_TEXT_NUDGE,
-            yOffset + (width / Y_TEXT_POS_SCALE) + Y_TEXT_NUDGE);
+            yOffset + Y_TEXT_NUDGE);
         context.restore();
     }
 
@@ -270,16 +271,18 @@ class HUD {
 
         // draw the interface
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
-            0, 0, WIDTH, HEIGHT, xOffset, yOffset, WIDTH * 1.5, HEIGHT);
+            0, 0, WIDTH, HEIGHT, xOffset, yOffset, WIDTH, HEIGHT);
         // draw text
         context.save();
+        context.font = "bold 15px Castellar";
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText("SPELLS", xOffset + 20, yOffset + 31);
         context.fillStyle = "black";
-        context.font = "italic bold 14px Castellar";
-        context.fillText("SPELLS:", xOffset + 20, yOffset + 29);
+        context.fillText("SPELLS", xOffset + 19, yOffset + 30);
         context.restore();
         // draw each of the powerups in the interface
         for (i = 0; i < powerups.length; i++) {
-            imageX = xOffset + 105 + 32 * i;
+            imageX = xOffset + 85 + 32 * i;
             if (powerups[i].cooldown > 0) { // if the powerup is on cooldown
                 context.drawImage(powerups[i].cooldownSpritesheet,
                     0, 0, 64, 64, imageX, imageY, 24, 24);
@@ -295,3 +298,86 @@ class HUD {
         }
     }
 }
+
+class Minimap extends Entity {
+    constructor(game, x, y, width) {
+        super(game, x, y);
+        this.width = width;
+    };
+
+    draw(context) {
+        const SCALE = 16;
+        const OFFSET = 2;
+        const PIP_OFFSET = OFFSET * 3;
+        const ORIGIN_X = this.pos.x;
+        const ORIGIN_Y = this.pos.y;
+        const WIDTH = this.width + OFFSET * 4;
+
+        // Draw minimap frame
+        context.save();
+        context.lineWidth = OFFSET;
+        context.fillStyle = "black";
+        context.fillRect(ORIGIN_X, ORIGIN_Y, WIDTH, WIDTH);
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillRect(
+            ORIGIN_X + OFFSET, ORIGIN_Y + OFFSET,
+            WIDTH - OFFSET * 2, WIDTH - OFFSET * 2);
+        context.fillStyle = "black";
+        context.fillRect(
+            ORIGIN_X + OFFSET * 2, ORIGIN_Y + OFFSET * 2,
+            WIDTH - OFFSET * 4, WIDTH - OFFSET * 4);
+        context.fillStyle = COLORS.FRAME_TAN;
+        context.fillRect(
+            ORIGIN_X + OFFSET * 3, ORIGIN_Y + OFFSET * 3,
+            WIDTH - OFFSET * 6, WIDTH - OFFSET * 6);
+        // Draw each pip
+        this.game.entities.forEach((entity) => {
+            if (entity.hidden || entity instanceof Effect) return;
+            context.fillStyle = entity.mapPipColor;
+            let pip = {
+                x: this.pos.x + 25 + (entity.pos.x - this.game.camera.pos.x) / SCALE,
+                y: this.pos.y + 25 + (entity.pos.y - this.game.camera.pos.y) / SCALE,
+                width: entity.worldBB.width / SCALE,
+                height: entity.worldBB.height / SCALE
+            };
+            // Set pip width and/or x position
+            if (pip.x < this.pos.x + PIP_OFFSET) {
+                pip.width -= this.pos.x - pip.x + PIP_OFFSET;
+                pip.x = this.pos.x + PIP_OFFSET;
+            } else if (pip.x > this.pos.x + this.width + PIP_OFFSET) {
+                pip.width = 0;
+            } else if (pip.width > this.width - (pip.x - this.pos.x) + OFFSET) {
+                pip.width = this.width - (pip.x - this.pos.x) + OFFSET;
+            }
+            // Set pip height and/or y position
+            if (pip.y < this.pos.y + PIP_OFFSET) {
+                pip.height -= this.pos.y - pip.y + PIP_OFFSET;
+                pip.y = this.pos.y + PIP_OFFSET;
+            } else if (pip.y > this.pos.y + this.width + PIP_OFFSET) {
+                pip.height = 0;
+            } else if (pip.height > this.width - (pip.y - this.pos.y) + OFFSET) {
+                pip.height = this.width - (pip.y - this.pos.y) + OFFSET;
+            }
+            // Enforce map boundaries on pip
+            if (pip.width < 0) {
+                pip.width = 0;
+            }
+            if (pip.height < 0) {
+                pip.height = 0;
+            }
+            if (pip.width > WIDTH - PIP_OFFSET * 2) {
+                pip.width = WIDTH - PIP_OFFSET * 2;
+            }
+            if (pip.height > WIDTH - PIP_OFFSET * 2) {
+                pip.height = WIDTH - PIP_OFFSET * 2;
+            }
+            context.fillRect(pip.x, pip.y, pip.width, pip.height);
+        });
+        context.restore();
+    };
+
+    /** @override */
+    update(context) {
+        // Do nothing
+    }
+};

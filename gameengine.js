@@ -25,6 +25,8 @@ class GameEngine {
         this.mute = false;
         this.mutePressed = false;
         this.screen = false;
+        // for testing
+        this.Q = false;
     };
 
     /**
@@ -116,6 +118,9 @@ class GameEngine {
                         that.mutePressed = true;
                     }
                     break;
+                case "KeyQ":
+                    that.Q = true;
+                    break;
             }
         });
         this.context.canvas.addEventListener("keyup", function (e) {
@@ -154,6 +159,9 @@ class GameEngine {
                     break;
                 case "KeyM":
                     that.mutePressed = false;
+                    break;
+                case "KeyQ":
+                    that.Q = false;
                     break;
             };
         });

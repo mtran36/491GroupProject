@@ -33,6 +33,15 @@ window.requestAnimFrame = (function () {
         };
 })();
 
+/**
+ * Add custom color codes here.
+ */
+var COLORS = {
+    LAPIS: "#345E83",
+    FRAME_BROWN: "#795548",
+    FRAME_TAN: "#D7CCC8"
+}
+
 /** 
  * Add global parameters here 
  */

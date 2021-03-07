@@ -83,7 +83,7 @@ class SwordAttack extends Agent {
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
 			if (!this.damagedEnemies.includes(entity)) {
-				entity.takeDamage(this.attack);
+				entity.takeDamage(this);
 				this.damagedEnemies.push(entity);
 				this.playHitAnimation();
 			}
@@ -180,7 +180,7 @@ class EnergyBallAttack extends Agent {
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.removeFromWorld = true;
 			this.playHitAnimation();
 		}
@@ -270,7 +270,7 @@ class TornadoAttack extends Agent {
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.damagedEnemies.push(entity);
 			entity.knockback(this, -Math.PI / 2);
 			this.playHitAnimation(entity.pos.x, entity.pos.y, false); // knockup animation
@@ -368,7 +368,7 @@ class ThunderAttack extends Agent{
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.removeFromWorld = true;
 			this.playHitAnimation();
 		}
@@ -419,6 +419,7 @@ class EnemyRangedAttack extends Agent {
 			this.vel.y = this.force * Math.sin(angle);
 			this.vel.x = this.force * Math.cos(angle);
 		}
+		AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
 	}
 
 	/** @override */
@@ -446,6 +447,9 @@ class EnemyRangedAttack extends Agent {
 	defineAgentCollisions(entity) {
 		if (entity instanceof Druid) {
 			entity.takeDamage(this.attack);
+			this.removeFromWorld = true;
+		}
+		if (entity instanceof SwordAttack) {
 			this.removeFromWorld = true;
 		}
 	}
@@ -519,8 +523,119 @@ class Explosion extends Agent{
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.damagedEnemies.push(entity);
 		}
 	}
+}
+
+class EnemyHomingAttack extends Agent {
+	constructor(game, x, y, xdist, ydist) {
+		super(game, x, y, "./Sprites/TestEnemyHomingAttack.png");
+		this.setDimensions(1.5, 16, 16);
+		this.force = 250;
+		this.attack = 7;
+		this.maxDist = 1500;
+		this.angle = Math.atan2(ydist, xdist);
+		this.vel.y = this.force * Math.sin(this.angle);
+		this.vel.x = this.force * Math.cos(this.angle);
+		this.turnAmount = Math.PI / 2;
+		AUDIO_PLAYER.playSound("./Audio/EnemyHoming.mp3");
+	}
+
+	loadAnimations() {
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 16, 16, 1, 1, 0, false, true, false);
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 0, 16, 16, 1, 1, 0, false, true, false);
+	}
+
+	/** @override
+	 * If the projectile hits the druid, then damage druid and remove projectile.
+	 * @param {Entity} entity
+	 */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			entity.takeDamage(this.attack);
+			this.removeFromWorld = true;
+		}
+		if (entity instanceof SwordAttack) {
+			this.removeFromWorld = true;
+		}
+	}
+
+	defineWorldCollisions(entity) {
+
+	}
+
+	update() {
+		let turnAmount = this.turnAmount * this.game.clockTick;
+		let thisCenter = this.worldBB.centerPoint();
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+		let angle = Math.atan2(druidCenter.y - thisCenter.y, druidCenter.x - thisCenter.x);
+		if (angle > Math.PI / 2 && this.angle < 0) {
+			this.angle -= turnAmount;
+		} else if (angle < -Math.PI / 2 && this.angle > 0) {
+			this.angle += turnAmount;
+		} else {
+			if (this.angle < angle) {
+				this.angle += turnAmount;
+			}
+			if (this.angle > angle) {
+				this.angle -= turnAmount;
+			}
+		}
+		if (this.angle > Math.PI) {
+			this.angle = -(Math.PI - (this.angle - Math.PI));
+		}
+		if (this.angle < -Math.PI) {
+			this.angle = Math.PI + (this.angle + Math.PI);
+		}
+		this.vel.y = this.force * Math.sin(this.angle);
+		this.vel.x = this.force * Math.cos(this.angle);
+		let dist = Math.sqrt(Math.pow(this.vel.x, 2) + Math.pow(this.vel.y, 2));
+		dist *= this.game.clockTick;
+		this.maxDist -= dist;
+		if (this.maxDist < 0) {
+			this.removeFromWorld = true;
+		}
+		this.move(this.game.clockTick);
+	}
+}
+
+class EnemyPuff extends Agent {
+
+	constructor(game, x, y, facing) {
+		super(game, x, y, "./Sprites/puffBoom.png");
+		this.setDimensions(1.3, 120, 120);
+		this.force = 1200;
+		this.attack = 10;
+		this.facing = facing;
+		AUDIO_PLAYER.playSound("./Audio/PuffBoom.mp3");
+	}
+
+	loadAnimations() {
+		this.animations[0] = new Animator(this.spritesheet, 16, 10, 120, 120, 6, 0.05, 10, false, false, false, false);
+		this.animations[1] = new Animator(this.spritesheet, 16, 10, 120, 120, 6, 0.05, 10, false, false, true, false);
+	}
+
+	update() {
+		if (this.animations[this.facing].isDone()) this.removeFromWorld = true;
+		this.move(this.game.clockTick);
+	}
+
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			let angle;
+			if (this.facing === 0) {
+				angle = Math.atan2(-1, -1);
+			} else {
+				angle = Math.atan2(-1, 1);
+			}
+			entity.takeDamage(this.attack);
+			entity.knockback(this, angle);
+		}
+	}
+
+	defineWorldCollisions(entity, collisions) { };
 }

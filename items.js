@@ -1,6 +1,7 @@
 class Items extends Agent {
     constructor(game, x, y, spritesheet) {
         super(game, x, y, spritesheet);
+        this.mapPipColor = 'yellow';
         this.emerging = false;
     }
 
@@ -108,6 +109,7 @@ class Key extends Items {
 
     addItemsToDruid(DRUID) {
         DRUID.keyCounter += 1;
+        AUDIO_PLAYER.playSound("./Audio/Key.mp3");
     }
 
     /** @override */

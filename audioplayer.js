@@ -27,7 +27,6 @@ class AudioPlayer {
         let audio = audioArr[i];
         audio.loop = true;
         audio.muted = this.mute;
-        audio.play();
         // Check to ensure only one copy of an audio element is allowed in the playing list.
         if (!this.music.includes(audio)) {
             this.music.push(audio);
@@ -49,7 +48,6 @@ class AudioPlayer {
         let audio = audioArr[i];
         audio.muted = this.mute;
         audio.currentTime = 0;
-        audio.play();
         // Check to ensure only one copy of an audio element is allowed in the playing list.
         if (!this.playing.includes(audio)) {
             this.playing.push(audio);

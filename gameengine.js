@@ -180,16 +180,16 @@ class GameEngine {
      */
     draw() {
         let entity;
+        if (this.screen) this.clockTick = 0;
         this.druid.draw(this.context);
         this.context.clearRect(
-           0, 0, this.context.canvas.width, this.context.canvas.height);
+            0, 0, this.context.canvas.width, this.context.canvas.height);
+        for (entity = 0; entity < this.entities.length; entity++) {
+            this.entities[entity].draw(this.context);
+        }
+        this.camera.draw(this.context);
         if (this.screen) {
             this.screen.display(this.context);
-        } else {
-            for (entity = 0; entity < this.entities.length; entity++) {
-                this.entities[entity].draw(this.context);
-            }
-            this.camera.draw(this.context);
         }
     };
 
@@ -215,7 +215,6 @@ class GameEngine {
         // Author: tommy
         // temporary winning condition checking:
         if (!this.entities.includes(this.camera.temporaryBoss)) {
-            AUDIO_PLAYER.stopAll();
             this.screen = this.camera.winScreen;
         }
     };

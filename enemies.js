@@ -27,19 +27,13 @@ class Enemy extends Agent {
 	knockback(attack, angle) {
 		let thisCenter = this.worldBB.centerPoint();
 		let attackCenter = attack.worldBB.centerPoint();
-		if (thisCenter.x - attackCenter.x === 0) {
-			// If the collision is directly vertical, then the entire force applies to 
-			// the y velocity.
-			this.vel.y = attack.force;
-		} else {
-			if (!angle) {
-				angle = Math.atan2(
-					thisCenter.y - attackCenter.y,
-					thisCenter.x - attackCenter.x);
-			}
-			this.vel.y = attack.force * Math.sin(angle);
-			this.vel.x = attack.force * Math.cos(angle);
+		if (!angle) {
+			angle = Math.atan2(
+				thisCenter.y - attackCenter.y,
+				thisCenter.x - attackCenter.x);
 		}
+		this.vel.y = attack.force * Math.sin(angle);
+		this.vel.x = attack.force * Math.cos(angle);
 	}
 
 	/**
@@ -91,8 +85,8 @@ class Enemy extends Agent {
 	 * 
 	 * @param {any} damage
 	 */
-	takeDamage(damage) {
-		super.takeDamage(damage);
+	takeDamage(entity) {
+		super.takeDamage(entity.attack);
 		if (this.removeFromWorld) {
 			AUDIO_PLAYER.playSound("./Audio/EnemyDeath.mp3");
 		} else {
@@ -108,7 +102,7 @@ class Enemy extends Agent {
 class Fly extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/Fly.png", prize, prizeRate);
-		this.setDimensions(1, 32, 32);
+		this.setDimensions(1.5, 32, 32);
 		// Override default values
 		this.ACC = { x: 700, y: 700 };
 		this.attack = 3;
@@ -246,7 +240,7 @@ class Fly extends Enemy {
 class RangedFly extends Fly {
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, prize, prizeRate);
-		this.setDimensions(2, 32, 32);
+		this.setDimensions(2.5, 32, 32);
 		this.sightRange = 900;
 		this.ACC = { x: 500, y: 500 };
 		this.health = 3;
@@ -287,7 +281,6 @@ class RangedFly extends Fly {
 					thisCenter.x, thisCenter.y,
 					druidCenter.x - thisCenter.x,
 					druidCenter.y - thisCenter.y));
-				AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
 				this.canShoot = false;
 			}
 			this.move(this.game.clockTick);
@@ -322,6 +315,9 @@ class Beetle extends Enemy{
 			this.worldBB.right - 1, this.worldBB.bottom, 1, 1);
 		this.leftGround = false;
 		this.rightGround = false;
+		this.angryTimer = 0;
+		this.angry = false;
+		this.druidLeft = false;
 	}
 
 	/**
@@ -357,6 +353,13 @@ class Beetle extends Enemy{
 		}
 	}
 
+	takeDamage(entity) {
+		super.takeDamage(entity);
+		if (!(entity instanceof SwordAttack)) {
+			this.angryTimer = 3.5;
+		}
+	}
+
 	static construct(game, params) {
 		game.addEntity(new Beetle(game,
 			params.x * PARAMS.TILE_WIDTH,
@@ -366,14 +369,37 @@ class Beetle extends Enemy{
 
 	/** @override */
 	loadAnimations() {
-		this.animations[1] = new Animator(
+		this.idleAnim = [];
+		this.angryAnim = [];
+
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/Snail.png");
+		this.idleAnim[1] = new Animator(
 			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, true);
-		this.animations[0] = new Animator(
+		this.idleAnim[0] = new Animator(
 			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, false);
+
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/SnailAngry.png");
+		this.angryAnim[1] = new Animator(
+			this.spritesheet, 5, 0, 32, 24, 15, 0.033, 6, false, true, true);
+		this.angryAnim[0] = new Animator(
+			this.spritesheet, 5, 0, 32, 24, 15, 0.033, 6, false, true, false);
+
+		this.animations = this.idleAnim;
 	}
 
 	/** @override */
 	update() {
+		if (!this.angry && this.angryTimer == 3.5) {
+			this.velMax.x *= 2.5;
+			this.animations = this.angryAnim;
+			this.angry = true;
+		} else if ( this.angry && this.angryTimer < 0 ) {
+			this.velMax.x /= 2.5;
+			this.animations = this.idleAnim;
+			this.angry = false;
+		}
+		this.angryTimer -= this.game.clockTick;
+
 		// Cap speed to return beetle to normal speed after being hit
 		if (this.facing === 0) { // Facing left
 			if (this.vel.x > this.velMax.x) {
@@ -401,8 +427,19 @@ class Beetle extends Enemy{
 			this.worldBB.right - 1, this.worldBB.bottom, 1, 5);
 		this.leftGround = false;
 		this.rightGround = false;
+		if (this.angry) {
+			let thisCenter = this.worldBB.centerPoint();
+			let druidCenter = this.game.druid.worldBB.centerPoint();
+			this.druidLeft = thisCenter.x > druidCenter.x;
+			if (thisCenter.x < druidCenter.x - PARAMS.TILE_WIDTH * 3 && this.vel.x < 0 ||
+				thisCenter.x > druidCenter.x + PARAMS.TILE_WIDTH * 3 && this.vel.x > 0) {
+				this.vel.x = -this.vel.x;
+			}
+		}
 		this.move(this.game.clockTick);
-		this.avoidLedge();
+		if (!this.angry) {
+			this.avoidLedge();
+		}
 	}
 
 	/** @override */
@@ -420,11 +457,15 @@ class Beetle extends Enemy{
 			}
 			if (collisions.left) {
 				x = entity.worldBB.right;
-				this.vel.x = -this.vel.x;
+				if (!(this.angry && this.druidLeft)) {
+					this.vel.x = -this.vel.x;
+				}
 			}
 			if (collisions.right) {
 				x = entity.worldBB.left - this.worldBB.width;
-				this.vel.x = -this.vel.x;
+				if (!(this.angry && !this.druidLeft)) {
+					this.vel.x = -this.vel.x;
+				}
 			}
 			if (entity instanceof Ground) {
 				if (this.groundCheckLeft.collide(entity.worldBB)) {
@@ -444,6 +485,8 @@ class FlyBeetle extends Beetle {
 		super(game, x, y, prize, prizeRate);
 		this.setDimensions(0.8, 84, 98)
 		this.loadAnimations();
+		this.groundCheckLeft = new BoundingBox(0, 0, 0, 0);
+		this.groundCheckRight = this.groundCheckLeft;
 	}
 
 	/** @override */
@@ -505,8 +548,8 @@ class FlyBeetle extends Beetle {
  */
 class Hopper extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/HopperStart.png", prize, prizeRate);
-		this.setDimensions(0.9, 148, 100);
+		super(game, x, y, "./Sprites/Hopper.png", prize, prizeRate);
+		this.setDimensions(0.5, 274, 200);
 		// Override default values
 		this.ACC = { y: 2000 };
 		this.attack = 7;
@@ -519,15 +562,15 @@ class Hopper extends Enemy {
 		this.landTime = this.landLag;
 		this.jumping = false;
 		this.loadAnimations();
-
-		this.agentBB = [new BoundingCircle(
+		this.worldBB = new BoundingBox(
 			this.pos.x + this.scaleDim.x / 4,
-			this.pos.y + this.scaleDim.y / 2,
-			this.scaleDim.y / 2),
-			new BoundingCircle(
-				this.pos.x + 3 * this.scaleDim.x / 4,
-				this.pos.y + this.scaleDim.y / 2,
-				this.scaleDim.y / 2)]
+			this.pos.y + this.scaleDim.y / 2 - 15,
+			this.scaleDim.x / 2,
+			this.scaleDim.y / 2 + 15);
+		this.agentBB = [new BoundingCircle(
+			this.worldBB.centerPoint().x,
+			this.worldBB.centerPoint().y,
+			this.worldBB.height / 2)];
 	}
 
 	static construct(game, params) {
@@ -539,19 +582,17 @@ class Hopper extends Enemy {
 
 	/** @override */
 	loadAnimations() {
-		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperStart.png");
 		this.idle = [];
 		this.idle[1] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, true);
+			this.spritesheet, 0, 0, 274, 200, 2, 0.6, 0, false, true, true);
 		this.idle[0] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, false);
+			this.spritesheet, 0, 0, 274, 200, 2, 0.6, 0, false, true, false);
 
-		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperJump.png");
 		this.jump = [];
 		this.jump[1] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, true);
+			this.spritesheet, 550, 0, 274, 200, 2, 0.1, 0, false, true, true);
 		this.jump[0] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, false);
+			this.spritesheet, 550, 0, 274, 200, 2, 0.1, 0, false, true, false);
 
 		this.animations[0] = this.idle[0];
 		this.animations[1] = this.idle[1];
@@ -614,4 +655,164 @@ class Hopper extends Enemy {
 		}
 		this.worldBB.shift(x, y);
 	}
+}
+
+class Mantis extends Enemy {
+	constructor(game, x, y, prize, prizeRate) {
+		super(game, x, y, "./Sprites/Mantis.png", prize, prizeRate);
+		this.setDimensions(1.5, 134, 120);
+		this.worldBB = new BoundingBox(this.pos.x + this.scaleDim.x / 4, this.pos.y, 4 * this.scaleDim.x / 8, this.scaleDim.y - 20)
+		this.agentBB = [new BoundingCircle(this.pos.x + this.scaleDim.x / 2, this.pos.y + this.scaleDim.y / 4, this.worldBB.width / 2),
+			new BoundingCircle(this.pos.x + this.scaleDim.x / 2, this.pos.y + 3 * this.scaleDim.y / 4, this.worldBB.width / 2)];
+		this.sightRangeFar = 1500;
+		this.sightRangeMid = 600;
+		this.sightRangeClose = 130;
+		this.ACC = { y: 2000, x: 500 };
+		this.health = 5;
+		this.cooldown = 0;
+		this.puffCooldown = 0;
+		this.xOffset = 20;
+		this.animationTimer = 0;
+	}
+
+	knockback(attack, angle) {
+		super.knockback(attack, angle);
+		this.vel.x /= 10;
+		this.vel.y /= 10;
+	}
+
+	loadAnimations() {
+		this.idle = [];
+		this.attackAnimation = [];
+		this.hitDruid = [];
+		this.idle[1] = new Animator(
+			this.spritesheet, 2, 2, 134, 118, 1, 0.4, 5, false, true, false);
+		this.idle[0] = new Animator(
+			this.spritesheet, 2, 2, 134, 118, 1, 0.4, 5, false, true, true);
+		this.attackAnimation[1] = new Animator(
+			this.spritesheet, 152, 2, 134, 118, 1, 0.4, 5, false, true, false);
+		this.attackAnimation[0] = new Animator(
+			this.spritesheet, 152, 2, 134, 118, 1, 0.4, 5, false, true, true);
+		this.hitDruid[1] = new Animator(
+			this.spritesheet, 434, 2, 134, 118, 1, 0.4, 5, false, true, false);
+		this.hitDruid[0] = new Animator(
+			this.spritesheet, 434, 2, 134, 118, 1, 0.4, 5, false, true, true);
+		this.animations = this.idle;
+	}
+
+	update() {
+		this.vel.y += this.game.clockTick * this.ACC.y;
+		this.cooldown -= this.game.clockTick;
+		this.animationTimer -= this.game.clockTick;
+		this.puffCooldown -= this.game.clockTick;
+		if (this.animationTimer < 0) {
+			this.animations = this.idle;
+			this.xOffset = 20;
+		} 
+		let thisCenter = this.worldBB.centerPoint();
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+		if (druidCenter.x < thisCenter.x) {
+			this.facing = 0;
+		} else {
+			this.facing = 1;
+		}
+		this.sightRange = this.sightRangeClose;
+		if (this.canSee(this.game.druid) && this.puffCooldown < 0) {
+			if (this.facing === 0) {
+				this.game.addEntity(new EnemyPuff(this.game, this.pos.x - PARAMS.TILE_WIDTH, this.pos.y, this.facing));
+			} else {
+				this.game.addEntity(new EnemyPuff(this.game, this.pos.x + this.worldBB.width, this.pos.y, this.facing));
+			}
+			this.animations = this.hitDruid;
+			this.animationTimer = 2;
+			this.puffCooldown = 2.5;
+			this.cooldown = 2.5;
+			this.xOffset = 20;
+			AUDIO_PLAYER.playSound("./Audio/MantisCackle.mp3");
+		}
+		this.sightRange = this.sightRangeMid;
+		if (this.canSee(this.game.druid) && this.cooldown < 0) {
+			this.game.addEntity(new EnemyHomingAttack(this.game,
+				thisCenter.x, thisCenter.y,
+				druidCenter.x - thisCenter.x,
+				druidCenter.y - thisCenter.y));
+			AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
+			this.animations = this.attackAnimation;
+			this.animationTimer = 0.4;
+			this.cooldown = 1.5;
+			this.xOffset = -12;
+		}
+		this.sightRange = this.sightRangeFar;
+		if (this.canSee(this.game.druid) && this.cooldown < 0) {
+			if (this.facing === 0) {
+				this.game.addEntity(new EnemyRangedAttack(this.game,
+					thisCenter.x, thisCenter.y - 20,
+					druidCenter.x - thisCenter.x,
+					druidCenter.y - thisCenter.y - 80));
+			} else {
+				this.game.addEntity(new EnemyRangedAttack(this.game,
+					thisCenter.x, thisCenter.y - 20,
+					druidCenter.x - thisCenter.x,
+					druidCenter.y - thisCenter.y - 80));
+			}
+			AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
+			this.animations = this.attackAnimation;
+			this.animationTimer = 0.4;
+			this.cooldown = 3;
+			this.xOffset = -12;
+		}
+		if (this.vel.x > 0) {
+			this.vel.x = Math.max(0, this.vel.x -= this.ACC.x * this.game.clockTick);
+		} else {
+			this.vel.x = Math.min(0, this.vel.x += this.ACC.x * this.game.clockTick);
+		}
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		let x = this.worldBB.x;
+		let y = this.worldBB.y;
+		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+			if (collisions.down) {
+				y = entity.worldBB.top - this.worldBB.height;
+				this.vel.y = 0;
+			}
+			if (collisions.up) {
+				y = entity.worldBB.bottom;
+				this.vel.y = 0;
+			}
+			if (collisions.left) {
+				x = entity.worldBB.right;
+				this.vel.x = 0;
+			}
+			if (collisions.right) {
+				x = entity.worldBB.left - this.worldBB.width;
+				this.vel.x = 0;
+			}
+		}
+		this.worldBB.shift(x, y);
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Mantis(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
+	}
+
+	draw(context) {
+		this.animations[this.facing].drawFrame(
+			this.game.clockTick,
+			context, this.pos.x,
+			this.pos.y,
+			this.scale,
+			this.game.camera,
+			this.xOffset);
+		this.worldBB.display(this.game);
+		this.agentBB.forEach((bb) => {
+			bb.display(this.game);
+		});
+	}
+
 }

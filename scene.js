@@ -10,7 +10,8 @@ class Scene {
 	createScreens() {
 		this.pauseScreen = new PauseScreen(this.game);
 		this.winScreen = new WinScreen(this.game);
-		this.StartScreen = new StartScreen(this.game);
+		this.startScreen = new StartScreen(this.game);
+		this.loseScreen = new LoseScreen(this.game);
 	}
 
 	loadLevel(level) {
@@ -27,8 +28,9 @@ class Scene {
 			});
 			entityArr.splice(0, 0, construct);
 		}
-		// Temporary boss
-		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 30 * PARAMS.TILE_WIDTH);
+		// Author: tommy
+		// temporary boss:
+		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 28 * PARAMS.TILE_WIDTH);
 		this.temporaryBoss.setDimensions(2, this.temporaryBoss.dim.x, this.temporaryBoss.dim.y);
 		this.temporaryBoss.health = 10;
 		this.temporaryBoss.attack = 10;

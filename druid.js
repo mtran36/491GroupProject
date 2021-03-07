@@ -4,6 +4,7 @@
 class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
+		this.mapPipColor = 'green'
 		this.setDimensions(1, 176, 128);
 		this.worldBB = new BoundingBox(
 			this.pos.x + 65, this.pos.y + 23,
@@ -43,6 +44,7 @@ class Druid extends Agent {
 		this.currentOffset = this.xOffset;
 		this.attackSelection = null;
 		this.attacks = [];
+		this.knockbackTime = 0;
 	}
 
 	/** 
@@ -68,12 +70,33 @@ class Druid extends Agent {
 				this.vel.x = 0;
 				AUDIO_PLAYER.playSound("./Audio/DruidDeath.mp3");
 				this.removeFromWorld = true;
+				this.game.screen = this.game.camera.loseScreen;
 			} else {
 				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
 		this.invincTime = 1;
 		this.flashing = true;
+	}
+
+/**
+ * Uses an attack agent to knock this the druid in a direction. The angle of the collision
+ * is determined and then the force is used as a force vector with that angle to 
+ * detemine the x and y components of the force vector. The x and y components of the 
+ * force vector are then applied to the druids x and y velocities respectively.
+ * @param {Agent} attack Agent that has a knockback force value defined.
+ */
+	knockback(attack, angle) {
+		let thisCenter = this.worldBB.centerPoint();
+		let attackCenter = attack.worldBB.centerPoint();
+		if (!angle) {
+			angle = Math.atan2(
+				thisCenter.y - attackCenter.y,
+				thisCenter.x - attackCenter.x);
+		}
+		this.vel.y = attack.force * Math.sin(angle);
+		this.vel.x = attack.force * Math.cos(angle);
+		this.knockbackTime = 2;
 	}
 
 	/** @override */
@@ -117,6 +140,7 @@ class Druid extends Agent {
 				entity.removeFromWorld = true;
 				this.keyCounter--;
 			}
+			this.knockbackTime = 0;
 		}
 		if (entity instanceof StandingBreakBlock) {
 			if (collisions.down) {
@@ -187,18 +211,21 @@ class Druid extends Agent {
 		if (this.mana > this.maxMana) {
 			this.mana = this.maxMana;
 		}
+
+		this.knockbackTime -= TICK;
+
 		// Check if player is moving
-		if (this.game.right) {
+		if (this.game.right && this.knockbackTime < 0) {
 			this.animations[0][0] = this.storedAnimations.walkingRight;
 			this.animations[1][0] = this.storedAnimations.walkingLeft;
 			this.vel.x = WALK_SPEED;
 		}
-		if (this.game.left) {
+		if (this.game.left && this.knockbackTime < 0) {
 			this.animations[0][0] = this.storedAnimations.walkingRight;
 			this.animations[1][0] = this.storedAnimations.walkingLeft;
 			this.vel.x = -WALK_SPEED;
 		}
-		if (!this.game.left && !this.game.right) {
+		if (!this.game.left && !this.game.right && this.knockbackTime < 0) {
 			this.animations[0][0] = this.storedAnimations.standingRight;
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
@@ -259,14 +286,7 @@ class Druid extends Agent {
 				this.attacks[i].updateCooldown();
 			}
 			this.attacks[this.attackSelection].attack(this);
-		}
-		if (this.game.right) {
-			this.vel.x = WALK_SPEED;
-		} else if (this.game.left) {
-			this.vel.x = -WALK_SPEED;
-		} else {
-			this.vel.x = 0;
-		}
+        }
 		this.move(TICK);
 	}
 

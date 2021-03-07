@@ -167,6 +167,7 @@ class MenuScreen {
                     this.selectLeft = true;
                     if (this.selectLeft == true && this.game.druid.itemSelection != null) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
+                        //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
                         this.selectLeft = false;
                     }
                     break;

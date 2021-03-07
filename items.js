@@ -93,7 +93,9 @@ class Potion extends Items {
 
 class Key extends Items {
     constructor(game, x, y) {
-        super(game, x, y - 100, "./Sprites/key.png");
+        super(game, x, y - 100, "./Sprites/keyTest.png");
+        this.worldBB.display(this.game);
+        this.loadAnimations();
     };
 
     static construct(game, params) {
@@ -111,12 +113,7 @@ class Key extends Items {
         DRUID.keyCounter += 1;
     }
 
-    /** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 128, 128,
-            this.pos.x - this.game.camera.pos.x,
-            this.pos.y - this.game.camera.pos.y,
-			this.dim.x, this.dim.y);
-		this.worldBB.display(this.game);
-	}
+    loadAnimations() {
+        this.animations[0] = new Animator(this.spritesheet, 0, 0, 65, 60, 1, 1, 0, false, true, false);
+    }
 }

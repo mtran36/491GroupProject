@@ -192,17 +192,10 @@ class MenuScreen {
         context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
 
         for (i = 0; i < this.game.druid.items.length; i++) {
-            //context.drawImage(this.game.druid.items[i].spritesheet,
-            //    0, 0, 60, 60, 50, 50, 60, 60);
             this.game.druid.items[i].animations[0].drawFrame(0, context, (i * 86) + 215, (Math.floor(i/7) * 72) + 185, 0.9, this.camera);
         }
 
         context.restore();
-
-        //for (i = 0; i < this.items.length; i++) {
-        //    context.drawImage(this.items[i].spritesheet,
-        //        0, 0, 64, 64, imageX, imageY, 24, 24);
-        //}
     }
 }
 

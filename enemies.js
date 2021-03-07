@@ -357,7 +357,6 @@ class Beetle extends Enemy{
 		super.takeDamage(entity);
 		if (!(entity instanceof SwordAttack)) {
 			this.angryTimer = 3.5;
-			this.angry = true;
 		}
 	}
 
@@ -390,9 +389,10 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
-		if (this.angryTimer == 3.5) {
+		if (!this.angry && this.angryTimer == 3.5) {
 			this.velMax.x *= 2.5;
 			this.animations = this.angryAnim;
+			this.angry = true;
 		} else if ( this.angry && this.angryTimer < 0 ) {
 			this.velMax.x /= 2.5;
 			this.animations = this.idleAnim;

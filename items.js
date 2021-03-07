@@ -109,6 +109,7 @@ class Key extends Items {
 
     addItemsToDruid(DRUID) {
         DRUID.keyCounter += 1;
+        AUDIO_PLAYER.playSound("./Audio/Key.mp3");
     }
 
     /** @override */

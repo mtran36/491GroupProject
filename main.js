@@ -8,6 +8,7 @@ const IMAGE_PATHS = [
 	"./Sprites/Bee.png",
 	"./Sprites/HopperStart.png",
 	"./Sprites/HopperJump.png",
+	"./Sprites/Hopper.png",
 	"./Sprites/Mantis.png",
 	"./Sprites/druid.png",
 	"./Sprites/ground.png",
@@ -53,7 +54,8 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/EnemyBounce.mp3", players: 4 },
 	{ path: "./Audio/FlyBuzz.mp3", players: 2 },
 	{ path: "./Audio/PuffBoom.mp3", players: 2 },
-	{ path: "./Audio/MantisCackle.mp3", players: 2 }
+	{ path: "./Audio/MantisCackle.mp3", players: 2 },
+	{ path: "./Audio/Key.mp3", players: 1 }
 ]
 
 // ENTRY POINT

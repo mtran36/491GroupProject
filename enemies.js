@@ -548,8 +548,8 @@ class FlyBeetle extends Beetle {
  */
 class Hopper extends Enemy {
 	constructor(game, x, y, prize, prizeRate) {
-		super(game, x, y, "./Sprites/HopperStart.png", prize, prizeRate);
-		this.setDimensions(0.9, 148, 100);
+		super(game, x, y, "./Sprites/Hopper.png", prize, prizeRate);
+		this.setDimensions(0.5, 274, 200);
 		// Override default values
 		this.ACC = { y: 2000 };
 		this.attack = 7;
@@ -562,15 +562,15 @@ class Hopper extends Enemy {
 		this.landTime = this.landLag;
 		this.jumping = false;
 		this.loadAnimations();
-
-		this.agentBB = [new BoundingCircle(
+		this.worldBB = new BoundingBox(
 			this.pos.x + this.scaleDim.x / 4,
-			this.pos.y + this.scaleDim.y / 2,
-			this.scaleDim.y / 2),
-			new BoundingCircle(
-				this.pos.x + 3 * this.scaleDim.x / 4,
-				this.pos.y + this.scaleDim.y / 2,
-				this.scaleDim.y / 2)]
+			this.pos.y + this.scaleDim.y / 2 - 15,
+			this.scaleDim.x / 2,
+			this.scaleDim.y / 2 + 15);
+		this.agentBB = [new BoundingCircle(
+			this.worldBB.centerPoint().x,
+			this.worldBB.centerPoint().y,
+			this.worldBB.height / 2)];
 	}
 
 	static construct(game, params) {
@@ -582,19 +582,17 @@ class Hopper extends Enemy {
 
 	/** @override */
 	loadAnimations() {
-		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperStart.png");
 		this.idle = [];
 		this.idle[1] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, true);
+			this.spritesheet, 0, 0, 274, 200, 2, 0.6, 0, false, true, true);
 		this.idle[0] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 2, 0.4, 0, false, true, false);
+			this.spritesheet, 0, 0, 274, 200, 2, 0.6, 0, false, true, false);
 
-		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/HopperJump.png");
 		this.jump = [];
 		this.jump[1] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, true);
+			this.spritesheet, 550, 0, 274, 200, 2, 0.1, 0, false, true, true);
 		this.jump[0] = new Animator(
-			this.spritesheet, 0, 0, 148, 100, 1, 1, 0, false, true, false);
+			this.spritesheet, 550, 0, 274, 200, 2, 0.1, 0, false, true, false);
 
 		this.animations[0] = this.idle[0];
 		this.animations[1] = this.idle[1];

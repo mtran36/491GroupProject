@@ -30,7 +30,7 @@ class Scene {
 		}
 		// Author: tommy
 		// temporary boss:
-		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 30 * PARAMS.TILE_WIDTH);
+		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 28 * PARAMS.TILE_WIDTH);
 		this.temporaryBoss.setDimensions(2, this.temporaryBoss.dim.x, this.temporaryBoss.dim.y);
 		this.temporaryBoss.health = 10;
 		this.temporaryBoss.attack = 10;

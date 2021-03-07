@@ -85,8 +85,8 @@ class Enemy extends Agent {
 	 * 
 	 * @param {any} damage
 	 */
-	takeDamage(damage) {
-		super.takeDamage(damage);
+	takeDamage(entity) {
+		super.takeDamage(entity.attack);
 		if (this.removeFromWorld) {
 			AUDIO_PLAYER.playSound("./Audio/EnemyDeath.mp3");
 		} else {
@@ -315,6 +315,9 @@ class Beetle extends Enemy{
 			this.worldBB.right - 1, this.worldBB.bottom, 1, 1);
 		this.leftGround = false;
 		this.rightGround = false;
+		this.angryTimer = 0;
+		this.angry = false;
+		this.druidLeft = false;
 	}
 
 	/**
@@ -350,6 +353,14 @@ class Beetle extends Enemy{
 		}
 	}
 
+	takeDamage(entity) {
+		super.takeDamage(entity);
+		if (!(entity instanceof SwordAttack)) {
+			this.angryTimer = 3.5;
+			this.angry = true;
+		}
+	}
+
 	static construct(game, params) {
 		game.addEntity(new Beetle(game,
 			params.x * PARAMS.TILE_WIDTH,
@@ -359,14 +370,36 @@ class Beetle extends Enemy{
 
 	/** @override */
 	loadAnimations() {
-		this.animations[1] = new Animator(
+		this.idleAnim = [];
+		this.angryAnim = [];
+
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/Snail.png");
+		this.idleAnim[1] = new Animator(
 			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, true);
-		this.animations[0] = new Animator(
+		this.idleAnim[0] = new Animator(
 			this.spritesheet, 5, 0, 32, 24, 15, 0.1, 6, false, true, false);
+
+		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/SnailAngry.png");
+		this.angryAnim[1] = new Animator(
+			this.spritesheet, 5, 0, 32, 24, 15, 0.033, 6, false, true, true);
+		this.angryAnim[0] = new Animator(
+			this.spritesheet, 5, 0, 32, 24, 15, 0.033, 6, false, true, false);
+
+		this.animations = this.idleAnim;
 	}
 
 	/** @override */
 	update() {
+		if (this.angryTimer == 3.5) {
+			this.velMax.x *= 2.5;
+			this.animations = this.angryAnim;
+		} else if ( this.angry && this.angryTimer < 0 ) {
+			this.velMax.x /= 2.5;
+			this.animations = this.idleAnim;
+			this.angry = false;
+		}
+		this.angryTimer -= this.game.clockTick;
+
 		// Cap speed to return beetle to normal speed after being hit
 		if (this.facing === 0) { // Facing left
 			if (this.vel.x > this.velMax.x) {
@@ -394,6 +427,15 @@ class Beetle extends Enemy{
 			this.worldBB.right - 1, this.worldBB.bottom, 1, 5);
 		this.leftGround = false;
 		this.rightGround = false;
+		if (this.angry) {
+			let thisCenter = this.worldBB.centerPoint();
+			let druidCenter = this.game.druid.worldBB.centerPoint();
+			this.druidLeft = thisCenter.x > druidCenter.x;
+			if (thisCenter.x < druidCenter.x - PARAMS.TILE_WIDTH * 3 && this.vel.x < 0 ||
+				thisCenter.x > druidCenter.x + PARAMS.TILE_WIDTH * 3 && this.vel.x > 0) {
+				this.vel.x = -this.vel.x;
+			}
+		}
 		this.move(this.game.clockTick);
 		this.avoidLedge();
 	}
@@ -413,11 +455,15 @@ class Beetle extends Enemy{
 			}
 			if (collisions.left) {
 				x = entity.worldBB.right;
-				this.vel.x = -this.vel.x;
+				if (!(this.angry && this.druidLeft)) {
+					this.vel.x = -this.vel.x;
+				}
 			}
 			if (collisions.right) {
 				x = entity.worldBB.left - this.worldBB.width;
-				this.vel.x = -this.vel.x;
+				if (!(this.angry && !this.druidLeft)) {
+					this.vel.x = -this.vel.x;
+				}
 			}
 			if (entity instanceof Ground) {
 				if (this.groundCheckLeft.collide(entity.worldBB)) {

@@ -80,7 +80,7 @@ class SwordAttack extends Agent {
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
 			if (!this.damagedEnemies.includes(entity)) {
-				entity.takeDamage(this.attack);
+				entity.takeDamage(this);
 				this.damagedEnemies.push(entity);
 			}
 			entity.knockback(this);
@@ -179,7 +179,7 @@ class BasicRangedAttack extends Agent {
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.removeFromWorld = true;
 		}
 	}
@@ -244,7 +244,7 @@ class TornadoAttack extends Agent {
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.damagedEnemies.push(entity);
 			entity.knockback(this, -Math.PI / 2);
 		}
@@ -314,7 +314,7 @@ class ThunderAttack extends Agent{
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-			entity.takeDamage(this.attack);
+			entity.takeDamage(this);
 			this.removeFromWorld = true;
 		}
 	}

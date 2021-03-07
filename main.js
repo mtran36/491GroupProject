@@ -4,6 +4,7 @@ const AUDIO_PLAYER = new AudioPlayer();
 const IMAGE_PATHS = [
 	"./Sprites/Fly.png",
 	"./Sprites/Snail.png",
+	"./Sprites/SnailAngry.png",
 	"./Sprites/Bee.png",
 	"./Sprites/HopperStart.png",
 	"./Sprites/HopperJump.png",

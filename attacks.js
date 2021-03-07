@@ -446,7 +446,7 @@ class EnemyRangedAttack extends Agent {
 	 */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Druid) {
-			entity.takeDamage(this);
+			entity.takeDamage(this.attack);
 			this.removeFromWorld = true;
 		}
 		if (entity instanceof SwordAttack) {
@@ -556,7 +556,7 @@ class EnemyHomingAttack extends Agent {
 	 */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Druid) {
-			entity.takeDamage(this);
+			entity.takeDamage(this.attack);
 			this.removeFromWorld = true;
 		}
 		if (entity instanceof SwordAttack) {
@@ -632,9 +632,10 @@ class EnemyPuff extends Agent {
 			} else {
 				angle = Math.atan2(-1, 1);
 			}
-			entity.takeDamage(this);
+			entity.takeDamage(this.attack);
 			entity.knockback(this, angle);
 		}
 	}
 
-	defineWorldCollisions(entity, collisions) {
+	defineWorldCollisions(entity, collisions) { };
+}

@@ -69,9 +69,9 @@ class Tree extends Block {
 				context.drawImage(this.spritesheet,
 					col * this.dim.x, row * this.dim.y, this.dim.x, this.dim.y,
 					this.pos.x + col * this.scaleDim.x -
-						this.game.camera.pos.x - this.xOffset * PARAMS.TILE_WIDTH,
+					this.game.camera.pos.x - this.xOffset * PARAMS.TILE_WIDTH,
 					this.pos.y + row * this.scaleDim.y -
-						this.game.camera.pos.y - this.yOffset * PARAMS.TILE_WIDTH,
+					this.game.camera.pos.y - this.yOffset * PARAMS.TILE_WIDTH,
 					this.scaleDim.x, this.scaleDim.y);
 			}
 		}
@@ -89,7 +89,7 @@ class TreeTrunk extends Tree {
 			params.x * PARAMS.TILE_WIDTH,
 			params.y * PARAMS.TILE_WIDTH,
 			params.width, params.height));
-    }
+	}
 }
 
 class Branch extends Tree {
@@ -148,7 +148,7 @@ class Branch extends Tree {
 		}
 		if (!this.isDark) {
 			this.yOffset += 3;
-        }
+		}
 	}
 }
 
@@ -199,7 +199,7 @@ class Leaves extends Tree {
 				this.xOffset = 9;
 				this.yOffset = 6;
 				break;
-        }
+		}
 	}
 }
 
@@ -208,7 +208,7 @@ class Ground extends Block {
 		super(game, x, y, width, height, "./Sprites/ground.png");
 		this.setSize(width, height, 32);
 		this.setBoundingBox();
-		
+
 		this.look = { x: 0, y: 0 };
 	};
 
@@ -220,8 +220,8 @@ class Ground extends Block {
 				0.9, 0.5));
 			game.addEntity(new Mesh(game,
 				params.x * PARAMS.TILE_WIDTH
-					+ params.width * PARAMS.TILE_WIDTH
-					- 1.1 * PARAMS.TILE_WIDTH,
+				+ params.width * PARAMS.TILE_WIDTH
+				- 1.1 * PARAMS.TILE_WIDTH,
 				params.y * PARAMS.TILE_WIDTH,
 				1, 0.5));
 		}
@@ -355,7 +355,7 @@ class Mesh extends Ground {
 	/** @override */
 	setBoundingBox() {
 		// Do nothing
-    }
+	}
 
 	/** @override */
 	pickLook(row, col) {
@@ -420,10 +420,10 @@ class BreakBlock extends Entity {
 		let drawX = this.worldBB.x + (this.worldBB.width - drawWidth) / 2;
 		let drawY = this.worldBB.y + (this.worldBB.height - drawHeight) / 2;
 		context.drawImage(this.spritesheet, sourcePosX, sourcePosY,
-				sourceWidth, sourceHeight,
-				drawX - this.game.camera.pos.x,
-				drawY - this.game.camera.pos.y,
-				drawWidth, drawHeight);
+			sourceWidth, sourceHeight,
+			drawX - this.game.camera.pos.x,
+			drawY - this.game.camera.pos.y,
+			drawWidth, drawHeight);
 	}
 
 	/** @override */
@@ -488,7 +488,7 @@ class StandingBreakBlock extends BreakBlock {
 			params.blockType);
 		game.addEntity(standingBreakBlock);
 		standingBreakBlock.addBlock();
-    }
+	}
 }
 
 /**
@@ -544,7 +544,7 @@ class Door extends Entity {
 	static construct(game, params) {
 		game.addEntity(new Door(game,
 			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH,));
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/** @override */
@@ -562,57 +562,6 @@ class Door extends Entity {
 	}
 }
 
-class Minimap extends Entity {
-	constructor(game, x, y, width) {
-		super(game, x, y);
-		this.width = width;
-	};
-
-	draw(context) {
-		const SCALE = 16;
-
-		context.save();
-		context.strokeStyle = "black";
-		context.lineWidth = 3;
-		context.strokeRect(this.pos.x - 2, this.pos.y - 2, this.width + 4, this.width + 4);
-		this.game.entities.forEach((entity) => {
-			if (entity.hidden || entity instanceof Effect) return;
-			context.fillStyle = entity.mapPipColor;
-			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE;
-			let width = entity.worldBB.width / SCALE;
-			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE;
-			let height = entity.worldBB.height / SCALE;
-			if (x < this.pos.x) {
-				width -= this.pos.x - x;
-				x = this.pos.x;
-			} else if (x > this.pos.x + this.width) {
-				width = 0;
-			} else if (width > this.width - (x - this.pos.x)) {
-				width = this.width - (x - this.pos.x); 
-			}
-			if (y < this.pos.y) {
-				height -= this.pos.y - y;
-				y = this.pos.y;
-			} else if (y > this.pos.y + this.width) {
-				height = 0;
-			} else if (height > this.width - (y - this.pos.y)) {
-				height = this.width - (y - this.pos.y);
-			}
-			if (width < 0) width = 0;
-			if (height < 0) height = 0;
-			if (width > this.width) width = this.width;
-			if (height > this.height) height = this.width;
-			context.fillRect(x, y, width, height);
-		});
-		context.restore();
-	};
-
-	/** @override */
-	update(context) {
-		// Do nothing
-	}
-};
-
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 
  * scrolling effect, we use three images leftImage, midImage, rightImage.
@@ -621,7 +570,7 @@ class Background extends Entity {
 	constructor(game, spriteSheetName, spriteWidth, spriteHeight, speedRate) {
 		super(game, game.camera.pos.x, game.camera.pos.y, spriteSheetName);
 		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
-		
+
 		this.speed = 0;
 		/** Picture width (different backgrounds might have different ratios) */
 		this.spriteWidth = spriteWidth;
@@ -672,15 +621,15 @@ class Background extends Entity {
 			this.midImagePos = this.rightImagePos;
 			this.rightImagePos = {
 				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
-				y: this.midImagePos.y 
-			};	
+				y: this.midImagePos.y
+			};
 		} else if (this.game.camera.pos.x <= this.leftImagePos.x) {
 			this.rightImagePos = this.midImagePos;
 			this.midImagePos = this.leftImagePos;
 			this.leftImagePos = {
 				x: this.midImagePos.x - PARAMS.CANVAS_WIDTH,
 				y: this.midImagePos.y
-			};	
+			};
 		}
 	}
 
@@ -689,7 +638,7 @@ class Background extends Entity {
 		// leftImage:
 		context.drawImage(this.spritesheet, 0, 0,
 			this.spriteWidth, this.spriteLength,
-			this.leftImagePos.x - this.game.camera.pos.x + this.speed, 
+			this.leftImagePos.x - this.game.camera.pos.x + this.speed,
 			this.leftImagePos.y,
 			this.dim.x, this.dim.y + 300);
 		// midImage:

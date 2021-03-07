@@ -276,7 +276,7 @@ class TornadoAttack extends Agent {
 			entity.takeDamage(this.attack);
 			this.damagedEnemies.push(entity);
 			entity.knockback(this, -Math.PI / 2);
-			this.playHitAnimation(entity.pos.x, entity.pos.y + entity.dim.y);
+			this.playHitAnimation(entity.pos.x, entity.pos.y);
 		}
 	}
 

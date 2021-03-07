@@ -4,10 +4,14 @@ const AUDIO_PLAYER = new AudioPlayer();
 const IMAGE_PATHS = [
 	"./Sprites/Fly.png",
 	"./Sprites/Snail.png",
+	"./Sprites/SnailAngry.png",
 	"./Sprites/Bee.png",
 	"./Sprites/HopperStart.png",
 	"./Sprites/HopperJump.png",
+	"./Sprites/Hopper.png",
+	"./Sprites/Mantis.png",
 	"./Sprites/druid.png",
+	"./Sprites/DruidJumpEffect.png",
 	"./Sprites/ground.png",
 	"./Sprites/ball.png",
 	"./Sprites/sword.png",
@@ -15,6 +19,7 @@ const IMAGE_PATHS = [
 	"./Sprites/door.png",
 	"./Sprites/key.png",
 	"./Sprites/TestEnemyAttack.png",
+	"./Sprites/TestEnemyHomingAttack.png",
 	"./Sprites/layer1.png",
 	"./Sprites/layer2.png",
 	"./Sprites/layer3.png",
@@ -23,13 +28,20 @@ const IMAGE_PATHS = [
 	"./Sprites/bluegem.png",
 	"./Sprites/yellowgem.png",
 	"./Sprites/greygem.png",
+	"./Sprites/HealthPowerup.png",
 	"./Sprites/energyball.png",
+	"./Sprites/EnergyBallExplosion.png",
 	"./Sprites/tornado.png",
 	"./Sprites/thunder.png",
+	"./Sprites/HitEffect.png",
+	"./Sprites/ThunderHitEffect.png",
+	"./Sprites/TornadoHitEffect.png",
+	"./Sprites/EnergyBallHitEffect.png",
 	"./Sprites/crack.png",
 	"./Sprites/druidmerge.png",
 	"./Sprites/potions.png",
 	"./Sprites/powerupsUI.png",
+	"./Sprites/puffBoom.png",
 	"./Sprites/select.png",
 	"./Sprites/transparency.png",
 	"./Sprites/tree.png"
@@ -45,8 +57,12 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/EnemyDamage.mp3", players: 4 },
 	{ path: "./Audio/Hopper.mp3", players: 4 },
 	{ path: "./Audio/EnemyProjectile.mp3", players: 4 },
+	{ path: "./Audio/EnemyHoming.mp3", players: 4},
 	{ path: "./Audio/EnemyBounce.mp3", players: 4 },
-	{ path: "./Audio/FlyBuzz.mp3", players: 2 }
+	{ path: "./Audio/FlyBuzz.mp3", players: 2 },
+	{ path: "./Audio/PuffBoom.mp3", players: 2 },
+	{ path: "./Audio/MantisCackle.mp3", players: 2 },
+	{ path: "./Audio/Key.mp3", players: 1 }
 ]
 
 // ENTRY POINT

@@ -50,7 +50,9 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/EnemyProjectile.mp3", players: 4 },
 	{ path: "./Audio/EnemyHoming.mp3", players: 4},
 	{ path: "./Audio/EnemyBounce.mp3", players: 4 },
-	{ path: "./Audio/FlyBuzz.mp3", players: 2 }
+	{ path: "./Audio/FlyBuzz.mp3", players: 2 },
+	{ path: "./Audio/PuffBoom.mp3", players: 2 },
+	{ path: "./Audio/MantisCackle.mp3", players: 2 }
 ]
 
 // ENTRY POINT

@@ -678,10 +678,11 @@ class Mantis extends Enemy {
 				this.game.addEntity(new EnemyPuff(this.game, this.pos.x + this.worldBB.width, this.pos.y, this.facing));
 			}
 			this.animations = this.hitDruid;
-			this.animationTimer = 1;
-			this.puffCooldown = 2;
-			this.cooldown = 2;
+			this.animationTimer = 2;
+			this.puffCooldown = 2.5;
+			this.cooldown = 2.5;
 			this.xOffset = 20;
+			AUDIO_PLAYER.playSound("./Audio/MantisCackle.mp3");
 		}
 		this.sightRange = this.sightRangeMid;
 		if (this.canSee(this.game.druid) && this.cooldown < 0) {

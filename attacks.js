@@ -479,6 +479,7 @@ class EnemyPuff extends Agent {
 		this.force = 1200;
 		this.attack = 10;
 		this.facing = facing;
+		AUDIO_PLAYER.playSound("./Audio/PuffBoom.mp3");
 	}
 
 	loadAnimations() {

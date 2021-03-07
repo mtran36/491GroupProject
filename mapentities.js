@@ -213,6 +213,18 @@ class Ground extends Block {
 	};
 
 	static construct(game, params) {
+		if (params.height > 1) {
+			game.addEntity(new Mesh(game,
+				(params.x + 0.1) * PARAMS.TILE_WIDTH,
+				params.y * PARAMS.TILE_WIDTH,
+				0.9, 0.5));
+			game.addEntity(new Mesh(game,
+				params.x * PARAMS.TILE_WIDTH
+					+ params.width * PARAMS.TILE_WIDTH
+					- 1.1 * PARAMS.TILE_WIDTH,
+				params.y * PARAMS.TILE_WIDTH,
+				1, 0.5));
+		}
 		game.addEntity(new Ground(game,
 			params.x * PARAMS.TILE_WIDTH,
 			params.y * PARAMS.TILE_WIDTH,

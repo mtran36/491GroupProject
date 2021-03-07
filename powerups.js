@@ -7,6 +7,7 @@ class PowerUp extends Agent {
 		super(game, x, y, spritesheet);
 		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
 		this.cooldown = 0;
+		this.cost = 0;
 	} 
 
 	/** Update the coodown of this powerup. */
@@ -23,12 +24,17 @@ class PowerUp extends Agent {
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Druid) {
 			this.removeFromWorld = true;
-			this.game.druid.attacks.push(this);
-			if (this.game.druid.attackSelection == null) {
-				this.game.druid.attackSelection = 0;
+			if (this instanceof HealthPowerup) {
+				entity.maxHealth += 20;
+				entity.health += 20;
 			} else {
-				this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
-            }
+				this.game.druid.attacks.push(this);
+				if (this.game.druid.attackSelection == null) {
+					this.game.druid.attackSelection = 0;
+				} else {
+					this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
+				}
+			}
 		}
 	}
 
@@ -56,6 +62,7 @@ class PowerUp extends Agent {
 class RangedPowerUp extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/greengem.png");
+		this.cost = 20;
 	}
 
 	static construct(game, params) {
@@ -69,7 +76,8 @@ class RangedPowerUp extends PowerUp {
 	 * @param {any} DRUID the main character.
 	 */
 	attack(DRUID) {
-		if (this.cooldown <= 0 && this.game.A) {
+		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
+			DRUID.mana -= this.cost;
 			if (DRUID.facing === 0) { // shoot left
 				// basic ranged attack:
 				this.game.addEntity(new BasicRangedAttack(
@@ -88,7 +96,7 @@ class RangedPowerUp extends PowerUp {
 					600, 1, true));
 			}
 			this.game.A = false;
-			this.cooldown = 1;
+			this.cooldown = 0.1;
 		}
 	}
 }
@@ -99,6 +107,7 @@ class RangedPowerUp extends PowerUp {
 class WindElement extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/bluegem.png");
+		this.cost = 35;
 	}
 
 	static construct(game, params) {
@@ -112,7 +121,8 @@ class WindElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		if (this.cooldown <= 0 && this.game.A) {
+		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
+			DRUID.mana -= this.cost;
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new TornadoAttack(
 					DRUID.game,
@@ -125,7 +135,7 @@ class WindElement extends PowerUp {
 					DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 2;
+			this.cooldown = 1;
 		}
 	}
 }
@@ -136,6 +146,7 @@ class WindElement extends PowerUp {
 class LightElement extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/yellowgem.png");
+		this.cost = 50;
 	}
 
 	static construct(game, params) {
@@ -149,7 +160,8 @@ class LightElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		if (this.cooldown <= 0 && this.game.A) {
+		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
+			DRUID.mana -= this.cost;
 			if (DRUID.facing === 0) { // shoot left
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
@@ -162,7 +174,19 @@ class LightElement extends PowerUp {
 					DRUID.pos.y + PARAMS.TILE_WIDTH, 1));
 			}
 			this.game.A = false;
-			this.cooldown = 3;
+			this.cooldown = 0.5;
 		}
 	}
+}
+
+class HealthPowerup extends PowerUp {
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/greengem.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new HealthPowerup(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
+    }
 }

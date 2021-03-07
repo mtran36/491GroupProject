@@ -23,16 +23,22 @@ class Druid extends Agent {
 
 		this.loadAnimations();
 		this.isJumping = false;
-		this.health = 100;
-		this.maxHealth = 100;
+
+		this.maxHealth = 60;		
+		this.maxMana = 60;
+		this.health = this.maxHealth;
+		this.mana = this.maxMana;
+
 		this.damage = 0;
 		this.invincTime = 0;
 		this.flashing = false;
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
+
 		this.potionCounter = 0;
 		this.maxPotions = 10;
 		this.keyCounter = 0;
+
 		this.xOffset = 45;
 		this.currentOffset = this.xOffset;
 		this.attackSelection = null;
@@ -46,11 +52,10 @@ class Druid extends Agent {
 		this.meleeAttackCooldown -= this.game.clockTick;
 		let druidCenter = this.worldBB.centerPoint();
 		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			// stab
 			this.game.addEntity(new SwordAttack(
 				this.game, druidCenter.x, druidCenter.y, this.facing));
 			this.game.C = false;
-			this.meleeAttackCooldown = 1;
+			this.meleeAttackCooldown = 0.5;
 		}
 	}
 
@@ -171,6 +176,17 @@ class Druid extends Agent {
 		const TICK = this.game.clockTick;
 		let i, remainder = this.maxHealth - this.health;
 
+		// Mana regen
+		if (this.mana < this.maxMana) {
+			if (this.vel.x != 0 || this.vel.y != 0) {
+				this.mana += 0.07;
+			} else {
+				this.mana += 0.21;
+            }
+		}
+		if (this.mana > this.maxMana) {
+			this.mana = this.maxMana;
+        }
 		// Check if player is moving
 		if (this.game.right) {
 			this.animations[0][0] = this.storedAnimations.walkingRight;
@@ -250,37 +266,50 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
-		HUD.drawBar(
-			context, 10, 10, 30, 3,
-			{ 
+		const ORIGIN_X = 117;
+		const ORIGIN_Y = 7;
+		const OFFSET = 2;
+		const WIDTH = 20;
+
+		// Draw hud elements
+		context.save();
+		context.fillStyle = "black";
+		context.fillRect(
+			ORIGIN_X, ORIGIN_Y,
+			this.maxHealth * 5 + OFFSET * 5,
+			WIDTH * 2 + OFFSET * 7);
+		context.fillStyle = COLORS.FRAME_BROWN;
+		context.fillRect(
+			ORIGIN_X + OFFSET, ORIGIN_Y + OFFSET,
+			this.maxHealth * 5 + OFFSET * 3,
+			WIDTH * 2 + OFFSET * 5);
+		HUD.drawBar(context,
+			ORIGIN_X + OFFSET * 2,
+			ORIGIN_Y + OFFSET * 2,
+			WIDTH, OFFSET, { 
 				current: this.health,
 				max: this.maxHealth,
 				name: "",
 				tickWidth: 5
-			},
-			"DRUID", this.health / this.maxHealth <= 0.2 ? "red" : "green");
-		HUD.drawBar(
-			context, 10, 45, 30, 3,
-			{
-				current: this.potionCounter,
-				max: this.maxPotions,
-				name: "",
-				tickWidth: 40
-			},
-			"POTIONS", "teal");
-
-		context.fillStyle = "black";
-		context.font = "italic bold 16px Castellar";
-		context.fillText(
-			"Key: " + this.keyCounter,
-			10, 100);
-		context.restore();
-		// powerups UI
-		HUD.drawPowerupUI(context,
-			PARAMS.CANVAS_WIDTH - 288, PARAMS.CANVAS_HEIGHT - 48,
-			this.attacks, this.attackSelection);
-
+			}, "DRUID",
+			this.health / this.maxHealth <= 0.2 ? "darkred" : "green",
+			this.health / this.maxHealth <= 0.2 ? "brown" : "#006600");
+		if (this.attacks[this.attackSelection]) {
+			HUD.drawBar(context,
+				ORIGIN_X + OFFSET * 2,
+				ORIGIN_Y + OFFSET * 4 + WIDTH,
+				WIDTH, OFFSET, {
+					current: this.mana,
+					max: this.maxMana,
+					name: "",
+					tickWidth: 5
+				}, "MANA",
+				this.mana < this.attacks[this.attackSelection].cost - 1 ? "purple" : "teal",
+				this.mana < this.attacks[this.attackSelection].cost - 1 ? "indigo" : COLORS.LAPIS);
+			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
+		}
 		if (this.flashing) return;
+		// Draw druid
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,
 			this.pos.x, this.pos.y,
@@ -289,5 +318,6 @@ class Druid extends Agent {
 		this.agentBB.forEach((BB) => {
 			BB.display(this.game);
 		});
+		context.restore();
 	}
 }

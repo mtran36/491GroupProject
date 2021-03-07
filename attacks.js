@@ -21,7 +21,6 @@ class SwordAttack extends Agent {
 				this.pos.x + this.scaleDim.x * 5 / 6,
 				this.pos.y + this.scaleDim.y / 2, this.scaleDim.y / 2)];
 		
-		this.updatePos();
 		AUDIO_PLAYER.playSound("./Audio/SwordAttack.mp3");
 		this.updatePos();
 	}
@@ -164,9 +163,9 @@ class BasicRangedAttack extends Agent {
 	/** @override */
 	loadAnimations() {
 		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 64, 64, 2, 0.3, 0, false, true, false);
+			this.spritesheet, 0, 0, 64, 64, 2, 0.05, 0, false, true, false);
 		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 64, 64, 2, 0.3, 0, false, true, false);
+			this.spritesheet, 0, 0, 64, 64, 2, 0.05, 0, false, true, false);
 	}
 
 	/**
@@ -262,7 +261,7 @@ class TornadoAttack extends Agent {
 	}
 
 	/** @override */
-	defineWorldCollisions(entity, collisions) {
+	defineWorldCollisions(entity, _collisions) {
 		if (entity instanceof Ground) {
 			this.removeFromWorld = true;
 		} else if (entity instanceof HitBreakBlock) {

@@ -23,7 +23,7 @@ class Druid extends Agent {
 
 		this.loadAnimations();
 		this.isJumping = false;
-		this.health = 50;
+		this.health = 100;
 		this.maxHealth = 100;
 		this.damage = 0;
 		this.invincTime = 0;

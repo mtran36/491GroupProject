@@ -143,10 +143,14 @@ class MenuScreen {
     constructor(game) {
         this.game = game;
         this.camera = new Object();
-        this.camera.pos = {x: 0, y: 0};
-        //this.items = this.game.druid.items;
+        this.camera.pos = { x: 0, y: 0 };
         this.style = { fill: 'beige', stroke: 'darkgreen' };
         this.menuPressed = false;
+        this.selectLeft = false;
+        this.selectRight = false;
+        this.selectUp = false;
+        this.selectDown = false;
+
         this.game.canvas.addEventListener('keydown', (e) => {
             switch (e.code) {
                 case "KeyI":
@@ -159,15 +163,52 @@ class MenuScreen {
                         }
                     }
                     break;
-                case "ShiftLeft":
-                case "ShiftRight":
-                    
+                case "ArrowLeft":
+                    this.selectLeft = true;
+                    if (this.selectLeft == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
+                        this.selectLeft = false;
+                    }
+                    break;
+                case "ArrowRight":
+                    this.selectRight = true;
+                    if (this.selectRight == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
+                        this.selectRight = false;
+                    }
+                    break;
+                case "ArrowUp":
+                    this.selectUp = true;
+                    if (this.selectUp == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 2) % this.game.druid.items.length;
+                        this.selectUp = false;
+                    }
+                    break;
+                case "ArrowDown":
+                    this.selectDown = true;
+                    if (this.selectDown == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 2) % this.game.druid.items.length;
+                        this.selectDown = false;
+                    }
+                    break;
             }
         })
         this.game.canvas.addEventListener('keyup', (e) => {
             switch (e.code) {
                 case "KeyI":
                     this.menuPressed = false;
+                    break;
+                case "ArrowLeft":
+                    this.selectLeft = false;
+                    break;
+                case "ArrowRight":
+                    this.selectRight = false;
+                    break;
+                case "ArrowLeft":
+                    this.selectUp = false;
+                    break;
+                case "ArrowRight":
+                    this.selectDown = false;
                     break;
             }
         });

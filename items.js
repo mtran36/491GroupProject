@@ -92,8 +92,10 @@ class Potion extends Items {
                     DRUID.health += DRUID.maxHealth;
                     break;
             }
+            this.game.druid.items.pop(this);
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
+                //this.game.druid.items.pop(this);
             }
         } else {
             DRUID.health = DRUID.maxHealth;

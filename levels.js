@@ -209,7 +209,7 @@ var levelOne = {
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
 		// A1:
-		{ x: 40, y: 118, prizeRate: 1, prize: 'Key' },
+		{ x: 40, y: 118, prizeRate: 1, prize: 'PotionMid' },
 		{ x: 50, y: 118, prizeRate: 1, prize: 'PotionMid' },
 		{ x: 70, y: 118, prizeRate: 1, prize: 'PotionMid' },
 		// A3:

@@ -150,6 +150,7 @@ class MenuScreen {
         this.selectRight = false;
         this.selectUp = false;
         this.selectDown = false;
+        this.selectEnter = false;
 
         this.game.canvas.addEventListener('keydown', (e) => {
             switch (e.code) {
@@ -192,6 +193,11 @@ class MenuScreen {
                         this.selectDown = false;
                     }
                     break;
+                case "KeyR":
+                    this.selectEnter = true;
+                    this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
+                    this.selectEnter = false;
+                    break;
             }
         })
         this.game.canvas.addEventListener('keyup', (e) => {
@@ -210,6 +216,9 @@ class MenuScreen {
                     break;
                 case "ArrowRight":
                     this.selectDown = false;
+                    break;
+                case "KeyR":
+                    this.selectEnter = false;
                     break;
             }
         });

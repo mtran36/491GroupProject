@@ -437,7 +437,9 @@ class Beetle extends Enemy{
 			}
 		}
 		this.move(this.game.clockTick);
-		this.avoidLedge();
+		if (!this.angry) {
+			this.avoidLedge();
+		}
 	}
 
 	/** @override */

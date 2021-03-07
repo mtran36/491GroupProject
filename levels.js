@@ -251,7 +251,8 @@ var levelOne = {
 	],
 	mantis: [
 		(game, params) => Mantis.construct(game, params),
-		{ x: 30, y: 115, prizeRate: 0 }
+		{ x: 30, y: 115, prizeRate: 0 },
+		{ x: 42, y: 54, prizeRate: 0 }
 	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),

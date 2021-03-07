@@ -12,6 +12,13 @@ class Items extends Agent {
         if (entity instanceof Druid) {
             this.removeFromWorld = true;
             this.game.druid.items.push(this);
+
+            if (this.game.druid.itemSelection == null) {
+                this.game.druid.itemSelection = 0;
+            } else {
+                this.game.druid.itemSelection = this.game.druid.items.length - 1;
+            }
+
             this.addItemsToDruid(entity);
         }
     }
@@ -33,9 +40,14 @@ class Items extends Agent {
 class Potion extends Items {
     constructor(game, x, y, type = 0) {
         super(game, x, y - 100, "./Sprites/potions.png");
-        this.setDimensions(1, 45, 55);
+        this.setDimensions(1, 40, 55);
+        //this.worldBB.display(this.game);
         this.type = type;
         this.loadAnimations();
+    }
+
+    static construct(game, params) {
+        game.addEntity(new Potion(game, params.x, params.y));
     }
 
     /** @override */
@@ -67,12 +79,8 @@ class Potion extends Items {
 
     addItemsToDruid(DRUID) {
         AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
-        if (DRUID.health === DRUID.maxHealth) {
-            DRUID.potionCounter += 1;
-            if (DRUID.potionCounter >= DRUID.maxPotions) {
-                DRUID.potionCounter = DRUID.maxPotions;
-            }
-        } else {
+
+        if (DRUID.health != DRUID.maxHealth) {
             switch (this.type) {
                 case 0:
                     DRUID.health += 20;
@@ -81,12 +89,14 @@ class Potion extends Items {
                     DRUID.health += 50;
                     break;
                 case 2:
-                    DRUID.health += 100;
+                    DRUID.health += DRUID.maxHealth;
                     break;
             }
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
             }
+        } else {
+            DRUID.health = DRUID.maxHealth;
         }
     }
 }

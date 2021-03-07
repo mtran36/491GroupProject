@@ -159,6 +159,9 @@ class MenuScreen {
                         }
                     }
                     break;
+                case "ShiftLeft":
+                case "ShiftRight":
+                    
             }
         })
         this.game.canvas.addEventListener('keyup', (e) => {
@@ -177,9 +180,10 @@ class MenuScreen {
     display(context) {
         const imageY = (PARAMS.CANVAS_HEIGHT - 48) + 12;
         let i, imageX;
+        const MULTIPLE = 10;
 
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
-            155, 100, PARAMS.CANVAS_WIDTH / 1.5, PARAMS.CANVAS_HEIGHT / 1.5);
+            PARAMS.CANVAS_WIDTH / 5, 40, 122 * 5, 137 * 5);
         context.save();
         if (this.style.fill) {
             context.fillStyle = this.style.fill;
@@ -187,12 +191,16 @@ class MenuScreen {
         if (this.style.stroke) {
             context.strokeStyle = this.style.stroke;
         }
-        context.font = "bold 32px sans-serif";
-        context.fillText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
-        context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 90, PARAMS.CANVAS_HEIGHT / 3 - 100);
+        context.font = "bold 64px sans-serif";
+        context.fillText("Inventory", PARAMS.CANVAS_WIDTH / 2 - (MULTIPLE * 15), PARAMS.CANVAS_HEIGHT / 3 - (MULTIPLE * 13.5));
+        context.strokeText("Inventory", PARAMS.CANVAS_WIDTH / 2 - 150, PARAMS.CANVAS_HEIGHT / 3 - 135);
 
         for (i = 0; i < this.game.druid.items.length; i++) {
-            this.game.druid.items[i].animations[0].drawFrame(0, context, (i * 86) + 215, (Math.floor(i/7) * 72) + 185, 0.9, this.camera);
+            this.game.druid.items[i].animations[0].drawFrame(0, context, ((i % 2) * 80) + 255, (Math.floor(i / 2) * 80) + 164, 0.9, this.camera);
+            if (i === this.game.druid.itemSelection) {
+                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    (i * 80) + 235, (Math.floor(i / 7) * 80) + 155, 32 * 2.4, 32 * 2.4);
+            }
         }
 
         context.restore();

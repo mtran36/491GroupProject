@@ -23,7 +23,7 @@ class Druid extends Agent {
 
 		this.loadAnimations();
 		this.isJumping = false;
-		this.health = 100;
+		this.health = 50;
 		this.maxHealth = 100;
 		this.damage = 0;
 		this.invincTime = 0;
@@ -38,6 +38,7 @@ class Druid extends Agent {
 		this.attackSelection = null;
 		this.attacks = [];
 		this.items = [];
+		this.itemSelection = null;
 	}
 
 	/** 

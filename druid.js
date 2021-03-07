@@ -21,7 +21,6 @@ class Druid extends Agent {
 			)
 		];
 		this.game.druid = this;
-
 		this.loadAnimations();
 		this.isJumping = false;
 
@@ -296,7 +295,43 @@ class Druid extends Agent {
 		const ORIGIN_Y = 7;
 		const OFFSET = 2;
 		const WIDTH = 20;
+		let gradient = context.createLinearGradient(
+			ORIGIN_X, ORIGIN_Y,
+			ORIGIN_X + this.maxHealth * 5 + OFFSET * 3,
+			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
+		let healthGradient = context.createLinearGradient(
+			ORIGIN_X, ORIGIN_Y,
+			ORIGIN_X + this.health * 5 + OFFSET * 3,
+			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
+		let lowHealthGradient = context.createLinearGradient(
+			ORIGIN_X, ORIGIN_Y,
+			ORIGIN_X + this.health * 5 + OFFSET * 3,
+			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
+		let manaGradient = context.createLinearGradient(
+			ORIGIN_X, ORIGIN_Y,
+			ORIGIN_X + this.mana * 5 + OFFSET * 3,
+			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
+		let lowManaGradient = context.createLinearGradient(
+			ORIGIN_X, ORIGIN_Y,
+			ORIGIN_X + this.mana * 5 + OFFSET * 3,
+			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
 
+		// Setup gradient
+		gradient.addColorStop(0, COLORS.FRAME_BROWN);
+		gradient.addColorStop(0.5, COLORS.FRAME_TAN);
+		gradient.addColorStop(1, COLORS.FRAME_BROWN);
+
+		healthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_GREEN);
+		healthGradient.addColorStop(1, COLORS.HEALTH_GREEN);
+
+		lowHealthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_RED);
+		lowHealthGradient.addColorStop(1, COLORS.HEALTH_RED);
+
+		manaGradient.addColorStop(0, COLORS.LIGHT_LAPIS);
+		manaGradient.addColorStop(1, COLORS.LAPIS);
+
+		lowManaGradient.addColorStop(0, COLORS.MANA_PURPLE);
+		lowManaGradient.addColorStop(1, "indigo");
 		// Draw hud elements
 		context.save();
 		context.fillStyle = "black";
@@ -304,7 +339,7 @@ class Druid extends Agent {
 			ORIGIN_X, ORIGIN_Y,
 			this.maxHealth * 5 + OFFSET * 5,
 			WIDTH * 2 + OFFSET * 7);
-		context.fillStyle = COLORS.FRAME_BROWN;
+		context.fillStyle = gradient;
 		context.fillRect(
 			ORIGIN_X + OFFSET, ORIGIN_Y + OFFSET,
 			this.maxHealth * 5 + OFFSET * 3,
@@ -312,25 +347,25 @@ class Druid extends Agent {
 		HUD.drawBar(context,
 			ORIGIN_X + OFFSET * 2,
 			ORIGIN_Y + OFFSET * 2,
-			WIDTH, OFFSET, {
-			current: this.health,
-			max: this.maxHealth,
-			name: "",
-			tickWidth: 5
+			WIDTH, OFFSET, { 
+				current: this.health,
+				max: this.maxHealth,
+				name: "",
+				tickWidth: 5
 		}, "DRUID",
-			this.health / this.maxHealth <= 0.2 ? "darkred" : "green",
-			this.health / this.maxHealth <= 0.2 ? "brown" : "#006600");
+			this.health / this.maxHealth <= 0.2 ? lowHealthGradient : healthGradient,
+			this.health / this.maxHealth <= 0.2 ? COLORS.HEALTH_RED : COLORS.HEALTH_GREEN);
 		if (this.attacks[this.attackSelection]) {
 			HUD.drawBar(context,
 				ORIGIN_X + OFFSET * 2,
 				ORIGIN_Y + OFFSET * 4 + WIDTH,
 				WIDTH, OFFSET, {
-				current: this.mana,
-				max: this.maxMana,
-				name: "",
-				tickWidth: 5
-			}, "MANA",
-				this.mana < this.attacks[this.attackSelection].cost - 1 ? "purple" : "teal",
+					current: this.mana,
+					max: this.maxMana,
+					name: "",
+					tickWidth: 5
+				}, "MANA",
+				this.mana < this.attacks[this.attackSelection].cost - 1 ? lowManaGradient : manaGradient,
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? "indigo" : COLORS.LAPIS);
 			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
 		}

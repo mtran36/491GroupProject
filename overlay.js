@@ -215,7 +215,6 @@ class HUD {
     static drawBar(context, xOffset, yOffset, width, borderOffset, resource, name, color, tabColor) {
         const X_TEXT_NUDGE = 8;
         const Y_TEXT_NUDGE = 17;
-        const TAB_WIDTH = 6;
 
         context.save();
         // Draw Bars
@@ -234,21 +233,14 @@ class HUD {
             xOffset + borderOffset, yOffset + borderOffset,
             resource.current * resource.tickWidth - borderOffset,
             width - borderOffset);
-        context.fillStyle = tabColor;
-        context.fillRect(
-            xOffset + borderOffset + resource.current * resource.tickWidth - borderOffset - TAB_WIDTH,
-            yOffset + borderOffset,
-            TAB_WIDTH, width - borderOffset);
         // Draw Text
         context.font = "bold 15px Castellar";
         context.fillStyle = tabColor;
-        context.fillText(
-            name,
+        context.fillText(name,
             xOffset + X_TEXT_NUDGE + 1,
             yOffset + Y_TEXT_NUDGE + 1);
         context.fillStyle = "black";
-        context.fillText(
-            name,
+        context.fillText(name,
             xOffset + X_TEXT_NUDGE,
             yOffset + Y_TEXT_NUDGE);
         context.restore();
@@ -312,13 +304,20 @@ class Minimap extends Entity {
         const ORIGIN_X = this.pos.x;
         const ORIGIN_Y = this.pos.y;
         const WIDTH = this.width + OFFSET * 4;
-
+        let gradient = context.createLinearGradient(
+            ORIGIN_X, ORIGIN_Y,
+            ORIGIN_X + WIDTH,
+            ORIGIN_Y);
+        // Setup gradient
+        gradient.addColorStop(0, COLORS.FRAME_BROWN);
+        gradient.addColorStop(0.5, COLORS.FRAME_TAN);
+        gradient.addColorStop(1, COLORS.FRAME_BROWN);
         // Draw minimap frame
         context.save();
         context.lineWidth = OFFSET;
         context.fillStyle = "black";
         context.fillRect(ORIGIN_X, ORIGIN_Y, WIDTH, WIDTH);
-        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillStyle = gradient;
         context.fillRect(
             ORIGIN_X + OFFSET, ORIGIN_Y + OFFSET,
             WIDTH - OFFSET * 2, WIDTH - OFFSET * 2);

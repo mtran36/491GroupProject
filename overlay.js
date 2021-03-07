@@ -123,13 +123,14 @@ class WinScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
-                setTimeout(() => {this.game.screen = this.game.camera.startScreen;}, 100);
-                setTimeout(() => { console.log(this.game.screen);}, 200);
+                AUDIO_PLAYER.stopAll();
+                setTimeout(() => { this.game.screen = this.game.camera.startScreen; }, 100);
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this && e.code == 'KeyR') {
                 this.game.camera.pos = { x: 0, y: 0 };
+                AUDIO_PLAYER.stopAll();
                 setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
             }
         });
@@ -165,13 +166,14 @@ class LoseScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
+                AUDIO_PLAYER.stopAll();
                 setTimeout(() => { this.game.screen = this.game.camera.startScreen }, 100);
-                console.log(this.game.screen);
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this && e.code == 'KeyR') {
                 this.game.camera.pos = { x: 0, y: 0 };
+                AUDIO_PLAYER.stopAll();
                 setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
             }
         });

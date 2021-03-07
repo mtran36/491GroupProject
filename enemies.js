@@ -281,7 +281,6 @@ class RangedFly extends Fly {
 					thisCenter.x, thisCenter.y,
 					druidCenter.x - thisCenter.x,
 					druidCenter.y - thisCenter.y));
-				AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
 				this.canShoot = false;
 			}
 			this.move(this.game.clockTick);
@@ -621,7 +620,7 @@ class Mantis extends Enemy {
 			new BoundingCircle(this.pos.x + this.scaleDim.x / 2, this.pos.y + 3 * this.scaleDim.y / 4, this.worldBB.width / 2)];
 		this.sightRangeFar = 1500;
 		this.sightRangeMid = 600;
-		this.sightRangeClose = 150;
+		this.sightRangeClose = 130;
 		this.ACC = { y: 2000, x: 500 };
 		this.health = 5;
 		this.cooldown = 0;

@@ -348,6 +348,7 @@ class EnemyRangedAttack extends Agent {
 			this.vel.y = this.force * Math.sin(angle);
 			this.vel.x = this.force * Math.cos(angle);
 		}
+		AUDIO_PLAYER.playSound("./Audio/EnemyProjectile.mp3");
 	}
 
 	/** @override */
@@ -407,6 +408,7 @@ class EnemyHomingAttack extends Agent {
 		this.vel.y = this.force * Math.sin(this.angle);
 		this.vel.x = this.force * Math.cos(this.angle);
 		this.turnAmount = Math.PI / 2;
+		AUDIO_PLAYER.playSound("./Audio/EnemyHoming.mp3");
 	}
 
 	loadAnimations() {

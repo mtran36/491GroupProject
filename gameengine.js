@@ -207,7 +207,6 @@ class GameEngine {
         // Author: tommy
         // temporary winning condition checking:
         if (!this.entities.includes(this.camera.temporaryBoss)) {
-            AUDIO_PLAYER.stopAll();
             this.screen = this.camera.winScreen;
         }
     };

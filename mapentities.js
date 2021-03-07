@@ -69,9 +69,9 @@ class Tree extends Block {
 				context.drawImage(this.spritesheet,
 					col * this.dim.x, row * this.dim.y, this.dim.x, this.dim.y,
 					this.pos.x + col * this.scaleDim.x -
-						this.game.camera.pos.x - this.xOffset * PARAMS.TILE_WIDTH,
+					this.game.camera.pos.x - this.xOffset * PARAMS.TILE_WIDTH,
 					this.pos.y + row * this.scaleDim.y -
-						this.game.camera.pos.y - this.yOffset * PARAMS.TILE_WIDTH,
+					this.game.camera.pos.y - this.yOffset * PARAMS.TILE_WIDTH,
 					this.scaleDim.x, this.scaleDim.y);
 			}
 		}
@@ -89,7 +89,7 @@ class TreeTrunk extends Tree {
 			params.x * PARAMS.TILE_WIDTH,
 			params.y * PARAMS.TILE_WIDTH,
 			params.width, params.height));
-    }
+	}
 }
 
 class Branch extends Tree {
@@ -148,7 +148,7 @@ class Branch extends Tree {
 		}
 		if (!this.isDark) {
 			this.yOffset += 3;
-        }
+		}
 	}
 }
 
@@ -199,7 +199,7 @@ class Leaves extends Tree {
 				this.xOffset = 9;
 				this.yOffset = 6;
 				break;
-        }
+		}
 	}
 }
 
@@ -208,7 +208,7 @@ class Ground extends Block {
 		super(game, x, y, width, height, "./Sprites/ground.png");
 		this.setSize(width, height, 32);
 		this.setBoundingBox();
-		
+
 		this.look = { x: 0, y: 0 };
 	};
 
@@ -220,8 +220,8 @@ class Ground extends Block {
 				0.9, 0.5));
 			game.addEntity(new Mesh(game,
 				params.x * PARAMS.TILE_WIDTH
-					+ params.width * PARAMS.TILE_WIDTH
-					- 1.1 * PARAMS.TILE_WIDTH,
+				+ params.width * PARAMS.TILE_WIDTH
+				- 1.1 * PARAMS.TILE_WIDTH,
 				params.y * PARAMS.TILE_WIDTH,
 				1, 0.5));
 		}
@@ -355,7 +355,7 @@ class Mesh extends Ground {
 	/** @override */
 	setBoundingBox() {
 		// Do nothing
-    }
+	}
 
 	/** @override */
 	pickLook(row, col) {
@@ -420,10 +420,10 @@ class BreakBlock extends Entity {
 		let drawX = this.worldBB.x + (this.worldBB.width - drawWidth) / 2;
 		let drawY = this.worldBB.y + (this.worldBB.height - drawHeight) / 2;
 		context.drawImage(this.spritesheet, sourcePosX, sourcePosY,
-				sourceWidth, sourceHeight,
-				drawX - this.game.camera.pos.x,
-				drawY - this.game.camera.pos.y,
-				drawWidth, drawHeight);
+			sourceWidth, sourceHeight,
+			drawX - this.game.camera.pos.x,
+			drawY - this.game.camera.pos.y,
+			drawWidth, drawHeight);
 	}
 
 	/** @override */
@@ -488,7 +488,7 @@ class StandingBreakBlock extends BreakBlock {
 			params.blockType);
 		game.addEntity(standingBreakBlock);
 		standingBreakBlock.addBlock();
-    }
+	}
 }
 
 /**
@@ -544,7 +544,7 @@ class Door extends Entity {
 	static construct(game, params) {
 		game.addEntity(new Door(game,
 			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH,));
+			params.y * PARAMS.TILE_WIDTH));
 	}
 
 	/** @override */
@@ -570,7 +570,7 @@ class Background extends Entity {
 	constructor(game, spriteSheetName, spriteWidth, spriteHeight, speedRate) {
 		super(game, game.camera.pos.x, game.camera.pos.y, spriteSheetName);
 		this.setDimensions(1, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
-		
+
 		this.speed = 0;
 		/** Picture width (different backgrounds might have different ratios) */
 		this.spriteWidth = spriteWidth;
@@ -621,15 +621,15 @@ class Background extends Entity {
 			this.midImagePos = this.rightImagePos;
 			this.rightImagePos = {
 				x: this.midImagePos.x + PARAMS.CANVAS_WIDTH,
-				y: this.midImagePos.y 
-			};	
+				y: this.midImagePos.y
+			};
 		} else if (this.game.camera.pos.x <= this.leftImagePos.x) {
 			this.rightImagePos = this.midImagePos;
 			this.midImagePos = this.leftImagePos;
 			this.leftImagePos = {
 				x: this.midImagePos.x - PARAMS.CANVAS_WIDTH,
 				y: this.midImagePos.y
-			};	
+			};
 		}
 	}
 
@@ -638,7 +638,7 @@ class Background extends Entity {
 		// leftImage:
 		context.drawImage(this.spritesheet, 0, 0,
 			this.spriteWidth, this.spriteLength,
-			this.leftImagePos.x - this.game.camera.pos.x + this.speed, 
+			this.leftImagePos.x - this.game.camera.pos.x + this.speed,
 			this.leftImagePos.y,
 			this.dim.x, this.dim.y + 300);
 		// midImage:
@@ -654,4 +654,27 @@ class Background extends Entity {
 			this.rightImagePos.y,
 			this.dim.x, this.dim.y + 300);
 	}
+}
+
+class Effect {
+	constructor(game, x, y, animation, existTime = 1, scale) {
+		this.game = game;
+		this.pos = {
+			x: x,
+			y: y
+		};
+		this.animation = animation;
+		this.existTime = existTime;
+		this.scale = scale;
+	}
+
+	update() {
+		this.existTime -= this.game.clockTick;
+		if (this.existTime <= 0) this.removeFromWorld = true;
+	}
+
+	draw(context) {
+		this.animation.drawFrame(
+			this.game.clockTick, context, this.pos.x, this.pos.y, this.scale, this.game.camera);
+    }
 }

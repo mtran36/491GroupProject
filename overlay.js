@@ -268,7 +268,7 @@ class Minimap extends Entity {
             WIDTH - OFFSET * 6, WIDTH - OFFSET * 6);
         // Draw each pip
         this.game.entities.forEach((entity) => {
-            if (entity.hidden) return;
+            if (entity.hidden || entity instanceof Effect) return;
             context.fillStyle = entity.mapPipColor;
             let pip = {
                 x: this.pos.x + 25 + (entity.pos.x - this.game.camera.pos.x) / SCALE,

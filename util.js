@@ -37,9 +37,15 @@ window.requestAnimFrame = (function () {
  * Add custom color codes here.
  */
 var COLORS = {
+    MANA_PURPLE: "#9933FF",
+    LIGHT_LAPIS: "#66FFFF",
     LAPIS: "#345E83",
     FRAME_BROWN: "#795548",
-    FRAME_TAN: "#D7CCC8"
+    FRAME_TAN: "#D7CCC8",
+    LIGHT_HEALTH_GREEN: "#99CC66",
+    HEALTH_GREEN: "#006600",
+    LIGHT_HEALTH_RED: "#FF0000",
+    HEALTH_RED: "#660000"
 }
 
 /** 

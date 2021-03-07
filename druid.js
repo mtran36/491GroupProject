@@ -24,7 +24,7 @@ class Druid extends Agent {
 		this.loadAnimations();
 		this.isJumping = false;
 
-		this.maxHealth = 60;		
+		this.maxHealth = 60;
 		this.maxMana = 60;
 		this.health = this.maxHealth;
 		this.mana = this.maxMana;
@@ -85,8 +85,8 @@ class Druid extends Agent {
 			if (this.keyCounter > 0) {
 				entity.removeFromWorld = true;
 				this.keyCounter -= 1;
-            }
-        }
+			}
+		}
 	}
 
 	/** @override */
@@ -124,7 +124,7 @@ class Druid extends Agent {
 			}
 		}
 		this.worldBB.shift(x, y);
-    }
+	}
 
 	/** @override */
 	loadAnimations() {
@@ -182,11 +182,11 @@ class Druid extends Agent {
 				this.mana += 0.07;
 			} else {
 				this.mana += 0.21;
-            }
+			}
 		}
 		if (this.mana > this.maxMana) {
 			this.mana = this.maxMana;
-        }
+		}
 		// Check if player is moving
 		if (this.game.right) {
 			this.animations[0][0] = this.storedAnimations.walkingRight;
@@ -219,19 +219,18 @@ class Druid extends Agent {
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
-			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
-			// Jump effect
-			this.game.addEntity(
-				new Effect(this.game,
-					this.pos.x,
-					this.pos.y + this.dim.y / 2,
-					this.animations[1][2], 0.4, 2));
 			this.game.B = false;
 			this.animations[0][1] = this.storedAnimations.jumpingRight;
 			this.animations[1][1] = this.storedAnimations.jumpingLeft;
 			this.animations[0][1].restart();
 			this.animations[1][1].restart();
 			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
+			// Jump effect
+			this.game.addEntity(
+				new Effect(this.game,
+					this.pos.x + PARAMS.TILE_WIDTH,
+					this.pos.y + this.dim.y / 2,
+					this.animations[1][2], 0.4, 2));
 		} else {
 			if (this.animations[0][1].isDone() || this.animations[1][1].isDone) {
 				this.animations[0][1] = this.storedAnimations.airHangRight;
@@ -246,15 +245,15 @@ class Druid extends Agent {
 		if (this.game.SHIFT == true && this.attackSelection != null) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
-        }
+		}
 		// check if any special attack if made
 		if (this.attackSelection != null) {
 			for (i = 0; i < this.attacks.length; i++) {
 				this.attacks[i].updateCooldown();
-            }
+			}
 			this.attacks[this.attackSelection].attack(this);
-        }
-		if (this.game.right) { 
+		}
+		if (this.game.right) {
 			this.vel.x = WALK_SPEED;
 		} else if (this.game.left) {
 			this.vel.x = -WALK_SPEED;
@@ -286,12 +285,12 @@ class Druid extends Agent {
 		HUD.drawBar(context,
 			ORIGIN_X + OFFSET * 2,
 			ORIGIN_Y + OFFSET * 2,
-			WIDTH, OFFSET, { 
-				current: this.health,
-				max: this.maxHealth,
-				name: "",
-				tickWidth: 5
-			}, "DRUID",
+			WIDTH, OFFSET, {
+			current: this.health,
+			max: this.maxHealth,
+			name: "",
+			tickWidth: 5
+		}, "DRUID",
 			this.health / this.maxHealth <= 0.2 ? "darkred" : "green",
 			this.health / this.maxHealth <= 0.2 ? "brown" : "#006600");
 		if (this.attacks[this.attackSelection]) {
@@ -299,11 +298,11 @@ class Druid extends Agent {
 				ORIGIN_X + OFFSET * 2,
 				ORIGIN_Y + OFFSET * 4 + WIDTH,
 				WIDTH, OFFSET, {
-					current: this.mana,
-					max: this.maxMana,
-					name: "",
-					tickWidth: 5
-				}, "MANA",
+				current: this.mana,
+				max: this.maxMana,
+				name: "",
+				tickWidth: 5
+			}, "MANA",
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? "purple" : "teal",
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? "indigo" : COLORS.LAPIS);
 			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);

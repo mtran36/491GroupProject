@@ -151,6 +151,9 @@ class Druid extends Agent {
 			jumpingLeft: new Animator(this.spritesheet,
 				0, 128, this.dim.x, this.dim.y,
 				6, 0.3, 0, false, false, false),
+			jumpEffect: new Animator(
+				ASSET_LOADER.getImageAsset("./Sprites/DruidJumpEffect.png"),
+				0, 0, 32, 32, 4, 0.1, 0, false, true, false),
 			airHangRight: new Animator(this.spritesheet,
 				this.dim.x * 4, 128, this.dim.x, this.dim.y,
 				1, 1, 0, false, true, true),
@@ -162,6 +165,7 @@ class Druid extends Agent {
 		this.animations[1][0] = this.storedAnimations.walkingLeft;
 		this.animations[0][1] = this.storedAnimations.jumpingRight;
 		this.animations[1][1] = this.storedAnimations.jumpingLeft;
+		this.animations[1][2] = this.storedAnimations.jumpEffect;
 	}
 
 	/** @override */
@@ -215,6 +219,13 @@ class Druid extends Agent {
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
 			this.isJumping = true;
+			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
+			// Jump effect
+			this.game.addEntity(
+				new Effect(this.game,
+					this.pos.x,
+					this.pos.y + this.dim.y / 2,
+					this.animations[1][2], 0.4, 2));
 			this.game.B = false;
 			this.animations[0][1] = this.storedAnimations.jumpingRight;
 			this.animations[1][1] = this.storedAnimations.jumpingLeft;

@@ -562,6 +562,57 @@ class Door extends Entity {
 	}
 }
 
+class Minimap extends Entity {
+	constructor(game, x, y, width) {
+		super(game, x, y);
+		this.width = width;
+	};
+
+	draw(context) {
+		const SCALE = 16;
+
+		context.save();
+		context.strokeStyle = "black";
+		context.lineWidth = 3;
+		context.strokeRect(this.pos.x - 2, this.pos.y - 2, this.width + 4, this.width + 4);
+		this.game.entities.forEach((entity) => {
+			if (entity.hidden || entity instanceof Effect) return;
+			context.fillStyle = entity.mapPipColor;
+			let x = this.pos.x + (entity.pos.x - this.game.camera.pos.x) / SCALE;
+			let width = entity.worldBB.width / SCALE;
+			let y = this.pos.y + (entity.pos.y - this.game.camera.pos.y) / SCALE;
+			let height = entity.worldBB.height / SCALE;
+			if (x < this.pos.x) {
+				width -= this.pos.x - x;
+				x = this.pos.x;
+			} else if (x > this.pos.x + this.width) {
+				width = 0;
+			} else if (width > this.width - (x - this.pos.x)) {
+				width = this.width - (x - this.pos.x); 
+			}
+			if (y < this.pos.y) {
+				height -= this.pos.y - y;
+				y = this.pos.y;
+			} else if (y > this.pos.y + this.width) {
+				height = 0;
+			} else if (height > this.width - (y - this.pos.y)) {
+				height = this.width - (y - this.pos.y);
+			}
+			if (width < 0) width = 0;
+			if (height < 0) height = 0;
+			if (width > this.width) width = this.width;
+			if (height > this.height) height = this.width;
+			context.fillRect(x, y, width, height);
+		});
+		context.restore();
+	};
+
+	/** @override */
+	update(context) {
+		// Do nothing
+	}
+};
+
 /**
  * Background entity with parallax scrolling. To make the horizontal parallax 
  * scrolling effect, we use three images leftImage, midImage, rightImage.
@@ -654,4 +705,27 @@ class Background extends Entity {
 			this.rightImagePos.y,
 			this.dim.x, this.dim.y + 300);
 	}
+}
+
+class Effect {
+	constructor(game, x, y, animation, existTime = 1, scale) {
+		this.game = game;
+		this.pos = {
+			x: x,
+			y: y
+		};
+		this.animation = animation;
+		this.existTime = existTime;
+		this.scale = scale;
+	}
+
+	update() {
+		this.existTime -= this.game.clockTick;
+		if (this.existTime <= 0) this.removeFromWorld = true;
+	}
+
+	draw(context) {
+		this.animation.drawFrame(
+			this.game.clockTick, context, this.pos.x, this.pos.y, this.scale, this.game.camera);
+    }
 }

@@ -303,10 +303,11 @@ class RangedFly extends Fly {
 class Beetle extends Enemy{
 	constructor(game, x, y, prize, prizeRate) {
 		super(game, x, y, "./Sprites/Snail.png", prize, prizeRate);
-		this.setDimensions(3.3, 32, 24);
+		this.setDimensions(3.3, 32, 24)
+		this.loadAnimations();
+
 		this.velMax.x = 200;
 		this.vel.x = -200;
-		this.loadAnimations();
 		this.farLeft = -1;
 		this.farRight = -1;
 		this.groundCheckLeft = new BoundingBox(

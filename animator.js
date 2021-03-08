@@ -54,8 +54,8 @@ class Animator {
             this.width, this.height,
             x + xOffset, y + yOffset,
             this.width * scale,
-            this.height * scale); 
-        // Restore canvas context to previous settings.
+            this.height * scale);
+
         if (this.flip) {
             context.restore();
         }

@@ -4,8 +4,47 @@
 class Druid extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
-		this.mapPipColor = 'green'
 		this.setDimensions(1, 176, 128);
+		// Jump fields
+		this.isJumping = false; 
+		// Resource fields
+		this.maxHealth = 60;
+		this.maxMana = 60;
+		this.health = this.maxHealth;
+		this.mana = this.maxMana;
+		this.lastHealth = this.health;
+		// Taking damage fields
+		this.flashing = false;
+		this.invincDuration = 0;
+		// Item counting fields
+		this.keyCounter = 0;
+		this.potionCounter = 0;
+		this.maxPotions = 10;
+		// UI data fields
+		this.mapPipColor = "green";
+		this.origin = {
+			x: 117,
+			y: 7,
+			offset: 2,
+			width: 20
+		};
+		this.xFrameOffset = 45;
+		this.currentOffset = this.xFrameOffset;
+		// Attack data fields
+		this.knockbackDuration = 0;
+		this.meleeCooldown = 0;
+		this.meleeDuration = 0;
+		this.attackSelection = null;
+		this.attacks = [];
+		// Finish initialization
+		this.loadAnimations();
+		this.setupBoundingShapes();
+		this.updateGradient();
+		this.updateHealthGradient();
+		this.updateManaGradient();
+	}
+
+	setupBoundingShapes() {
 		this.worldBB = new BoundingBox(
 			this.pos.x + 65, this.pos.y + 23,
 			this.scaleDim.x - 120, this.scaleDim.y - 23);
@@ -20,52 +59,73 @@ class Druid extends Agent {
 				this.worldBB.width / 2
 			)
 		];
+    }
 
-		this.game.druid = this;
-		this.loadAnimations();
-		this.isJumping = false;
-
-		this.maxHealth = 60;
-		this.maxMana = 60;
-		this.health = this.maxHealth;
-		this.mana = this.maxMana;
-		this.lastHealth = this.health;
-
-		this.updateGradient();
-		this.updateHealthGradient();
-		this.updateManaGradient();
-
-		this.damage = 0;
-		this.invincTime = 0;
-		this.flashing = false;
-		this.meleeAttackCooldown = 0;
-		this.meleeAttackDuration = 0;
-
-		this.potionCounter = 0;
-		this.maxPotions = 10;
-		this.keyCounter = 0;
-
-		this.xOffset = 45;
-		this.currentOffset = this.xOffset;
-		this.attackSelection = null;
-		this.attacks = [];
-		this.knockbackTime = 0;
+	/**
+	 * Uses an attack agent to knock this the druid in a direction. The angle of the collision
+	 * is determined and then the force is used as a force vector with that angle to 
+	 * detemine the x and y components of the force vector. The x and y components of the 
+	 * force vector are then applied to the druids x and y velocities respectively.
+	 * @param {Agent} attack Agent that has a knockback force value defined.
+	 */
+	knockback(attack, angle) {
+		let thisCenter = this.worldBB.centerPoint();
+		let attackCenter = attack.worldBB.centerPoint();
+		if (!angle) {
+			angle = Math.atan2(
+				thisCenter.y - attackCenter.y,
+				thisCenter.x - attackCenter.x);
+		}
+		this.vel.y = attack.force * Math.sin(angle);
+		this.vel.x = attack.force * Math.cos(angle);
+		this.knockbackDuration = 2;
 	}
 
-	meleeAttack() {
-		this.meleeAttackCooldown -= this.game.clockTick;
-		let druidCenter = this.worldBB.centerPoint();
-		if (this.meleeAttackCooldown <= 0 && this.game.C) {
-			this.game.addEntity(new SwordAttack(
-				this.game, druidCenter.x, druidCenter.y, this.facing));
-			this.game.C = false;
-			this.meleeAttackCooldown = 0.5;
-		}
+	updateGradient() {
+		this.gradient = this.game.context.createLinearGradient(
+			this.origin.x, this.origin.y,
+			this.origin.x + this.maxHealth * 5 + this.origin.offset * 3,
+			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
+		this.gradient.addColorStop(0, COLORS.FRAME_BROWN);
+		this.gradient.addColorStop(0.5, COLORS.FRAME_TAN);
+		this.gradient.addColorStop(1, COLORS.FRAME_BROWN);
+    }
+
+	updateHealthGradient() {
+		this.healthGradient = this.game.context.createLinearGradient(
+			this.origin.x, this.origin.y,
+			this.origin.x + this.health * 5 + this.origin.offset * 3,
+			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
+		this.healthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_GREEN);
+		this.healthGradient.addColorStop(1, COLORS.HEALTH_GREEN);
+
+		this.lowHealthGradient = this.game.context.createLinearGradient(
+			this.origin.x, this.origin.y,
+			this.origin.x + this.health * 5 + this.origin.offset * 3,
+			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
+		this.lowHealthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_RED);
+		this.lowHealthGradient.addColorStop(1, COLORS.HEALTH_RED);
+	}
+
+	updateManaGradient() {
+		this.manaGradient = this.game.context.createLinearGradient(
+			this.origin.x, this.origin.y,
+			this.origin.x + this.mana * 5 + this.origin.offset * 3,
+			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
+		this.manaGradient.addColorStop(0, COLORS.LIGHT_LAPIS);
+		this.manaGradient.addColorStop(1, COLORS.LAPIS);
+
+		this.lowManaGradient = this.game.context.createLinearGradient(
+			this.origin.x, this.origin.y,
+			this.origin.x + this.mana * 5 + this.origin.offset * 3,
+			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
+		this.lowManaGradient.addColorStop(0, COLORS.MANA_PURPLE);
+		this.lowManaGradient.addColorStop(1, "indigo");
 	}
 
 	/** @override */
 	takeDamage(damage) {
-		if (!PARAMS.DEBUG && this.invincTime <= 0) {
+		if (!PARAMS.DEBUG && this.invincDuration <= 0) {
 			this.health -= damage;
 			if (this.health <= 0) {
 				this.health = 0;
@@ -77,90 +137,13 @@ class Druid extends Agent {
 				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
-		this.invincTime = 1;
+		this.invincDuration = 1;
 		this.flashing = true;
 	}
 
-/**
- * Uses an attack agent to knock this the druid in a direction. The angle of the collision
- * is determined and then the force is used as a force vector with that angle to 
- * detemine the x and y components of the force vector. The x and y components of the 
- * force vector are then applied to the druids x and y velocities respectively.
- * @param {Agent} attack Agent that has a knockback force value defined.
- */
-	knockback(attack, angle) {
-		let thisCenter = this.worldBB.centerPoint();
-		let attackCenter = attack.worldBB.centerPoint();
-		if (!angle) {
-			angle = Math.atan2(
-				thisCenter.y - attackCenter.y,
-				thisCenter.x - attackCenter.x);
-		}
-		this.vel.y = attack.force * Math.sin(angle);
-		this.vel.x = attack.force * Math.cos(angle);
-		this.knockbackTime = 2;
-	}
-
-	updateGradient() {
-		const ORIGIN_X = 117;
-		const ORIGIN_Y = 7;
-		const OFFSET = 2;
-		const WIDTH = 20;
-
-		this.gradient = this.game.context.createLinearGradient(
-			ORIGIN_X, ORIGIN_Y,
-			ORIGIN_X + this.maxHealth * 5 + OFFSET * 3,
-			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
-		this.gradient.addColorStop(0, COLORS.FRAME_BROWN);
-		this.gradient.addColorStop(0.5, COLORS.FRAME_TAN);
-		this.gradient.addColorStop(1, COLORS.FRAME_BROWN);
-    }
-
-	updateHealthGradient() {
-		const ORIGIN_X = 117;
-		const ORIGIN_Y = 7;
-		const OFFSET = 2;
-		const WIDTH = 20;
-
-		this.healthGradient = this.game.context.createLinearGradient(
-			ORIGIN_X, ORIGIN_Y,
-			ORIGIN_X + this.health * 5 + OFFSET * 3,
-			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
-		this.healthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_GREEN);
-		this.healthGradient.addColorStop(1, COLORS.HEALTH_GREEN);
-
-		this.lowHealthGradient = this.game.context.createLinearGradient(
-			ORIGIN_X, ORIGIN_Y,
-			ORIGIN_X + this.health * 5 + OFFSET * 3,
-			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
-		this.lowHealthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_RED);
-		this.lowHealthGradient.addColorStop(1, COLORS.HEALTH_RED);
-	}
-
-	updateManaGradient() {
-		const ORIGIN_X = 117;
-		const ORIGIN_Y = 7;
-		const OFFSET = 2;
-		const WIDTH = 20;
-
-		this.manaGradient = this.game.context.createLinearGradient(
-			ORIGIN_X, ORIGIN_Y,
-			ORIGIN_X + this.mana * 5 + OFFSET * 3,
-			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
-		this.manaGradient.addColorStop(0, COLORS.LIGHT_LAPIS);
-		this.manaGradient.addColorStop(1, COLORS.LAPIS);
-
-		this.lowManaGradient = this.game.context.createLinearGradient(
-			ORIGIN_X, ORIGIN_Y,
-			ORIGIN_X + this.mana * 5 + OFFSET * 3,
-			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
-		this.lowManaGradient.addColorStop(0, COLORS.MANA_PURPLE);
-		this.lowManaGradient.addColorStop(1, "indigo");
-    }
-
 	/** @override */
 	defineAgentCollisions(entity) {
-		if (entity instanceof Enemy && this.invincTime <= 0) {
+		if (entity instanceof Enemy && this.invincDuration <= 0) {
 			this.takeDamage(entity.attack);
 		}
 		if (entity instanceof Door) {
@@ -199,7 +182,7 @@ class Druid extends Agent {
 				entity.removeFromWorld = true;
 				this.keyCounter--;
 			}
-			this.knockbackTime = 0;
+			this.knockbackDuration = 0;
 		}
 		if (entity instanceof StandingBreakBlock) {
 			if (collisions.down) {
@@ -259,11 +242,18 @@ class Druid extends Agent {
 		const TICK = this.game.clockTick;
 		let i, remainder = this.maxHealth - this.health;
 
+		// Change health bar
+		if (this.invincDuration > 0) {
+			this.invincDuration -= this.game.clockTick;
+			this.flashing = !this.flashing;
+		} else {
+			this.flashing = false;
+		}
 		if (this.lastHealth != this.health) {
 			this.updateHealthGradient();
 		}
 		this.lastHealth = this.health;
-		// Mana regen
+		// Mana regeneration
 		if (this.mana < this.maxMana) {
 			if (this.vel.x != 0 || this.vel.y != 0) {
 				this.mana += 0.07;
@@ -274,35 +264,31 @@ class Druid extends Agent {
 		if (this.mana > this.maxMana) {
 			this.mana = this.maxMana;
 		}
-
-		this.knockbackTime -= TICK;
-		// Check if player is moving
-		if (this.game.right && this.knockbackTime < 0) {
+		if (this.mana != this.maxMana) {
+			this.updateManaGradient();
+		}
+		// Knockback
+		this.knockbackDuration -= TICK;
+		// Movement
+		if (this.game.right && this.knockbackDuration < 0) {
 			this.animations[0][0] = this.storedAnimations.walkingRight;
 			this.animations[1][0] = this.storedAnimations.walkingLeft;
 			this.vel.x = WALK_SPEED;
 		}
-		if (this.game.left && this.knockbackTime < 0) {
+		if (this.game.left && this.knockbackDuration < 0) {
 			this.animations[0][0] = this.storedAnimations.walkingRight;
 			this.animations[1][0] = this.storedAnimations.walkingLeft;
 			this.vel.x = -WALK_SPEED;
 		}
-		if (!this.game.left && !this.game.right && this.knockbackTime < 0) {
+		if (!this.game.left && !this.game.right && this.knockbackDuration < 0) {
 			this.animations[0][0] = this.storedAnimations.standingRight;
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
 		}
-		// Update potion counter
+		// Potion counter
 		if (this.potionCounter > 0 && remainder > 20) {
 			this.health += 20;
 			this.potionCounter -= 1;
-		}
-		// Damage flashing 
-		if (this.invincTime > 0) {
-			this.invincTime -= this.game.clockTick;
-			this.flashing = !this.flashing;
-		} else {
-			this.flashing = false;
 		}
 		// Jump handling
 		if (!this.isJumping && this.game.B) {
@@ -314,7 +300,6 @@ class Druid extends Agent {
 			this.animations[0][1].restart();
 			this.animations[1][1].restart();
 			AUDIO_PLAYER.playSound("./Audio/DruidJump.mp3");
-			// Jump effect
 			this.game.addEntity(
 				new Effect(this.game,
 					this.pos.x + PARAMS.TILE_WIDTH,
@@ -328,83 +313,91 @@ class Druid extends Agent {
 			this.isJumping = true;
 			this.vel.y += FALL_ACC * TICK;
 		}
-		// check if melee attack is made
-		this.meleeAttack();
-		// for spell upgrade testing:
-		if (this.game.Q == true) {
-			if (this.attacks[this.attackSelection].canLevelUp == true) {
-				this.attacks[this.attackSelection].levelUp();
-			}
-			this.game.Q = false;
-        }
-		// check if switch attack
-		if (this.game.SHIFT == true && this.attackSelection != null) {
-			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
-			this.game.SHIFT = false;
+		// Melee attack
+		this.meleeCooldown -= this.game.clockTick;
+		let druidCenter = this.worldBB.centerPoint();
+		if (this.meleeCooldown <= 0 && this.game.C) {
+			this.game.addEntity(new SwordAttack(
+				this.game, druidCenter.x, druidCenter.y, this.facing));
+			this.game.C = false;
+			this.meleeCooldown = 0.5;
 		}
-		// check if any special attack if made
+		// Check if player is casting spells
 		if (this.attackSelection != null) {
 			for (i = 0; i < this.attacks.length; i++) {
 				this.attacks[i].updateCooldown();
 			}
 			this.attacks[this.attackSelection].attack(this);
-        }
+		}
+		// Check if player is switching spells
+		if (this.game.SHIFT === true && this.attackSelection != null) {
+			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
+			this.game.SHIFT = false;
+		}
+		// Spell upgrade for testing
+		if (this.game.Q === true && PARAMS.DEBUG === true) {
+			if (this.attacks[this.attackSelection].canLevelUp === true) {
+				this.attacks[this.attackSelection].levelUp();
+			}
+			this.game.Q = false;
+		}
 		this.move(TICK);
 	}
 
 	/** @override */
 	draw(context) {
-		const ORIGIN_X = 117;
-		const ORIGIN_Y = 7;
-		const OFFSET = 2;
-		const WIDTH = 20;
-		
-		// Draw hud elements
-		if (this.mana != this.maxMana) {
-			this.updateManaGradient();
-        }
 		context.save();
+		// Outer black border of bars
 		context.fillStyle = "black";
-		context.fillRect(
-			ORIGIN_X, ORIGIN_Y,
-			this.maxHealth * 5 + OFFSET * 5,
-			WIDTH * 2 + OFFSET * 7);
+		context.fillRect( 
+			this.origin.x, this.origin.y,
+			this.maxHealth * 5 + this.origin.offset * 5,
+			this.origin.width * 2 + this.origin.offset * 7);
+		// Bars background gradient
 		context.fillStyle = this.gradient;
-		context.fillRect(
-			ORIGIN_X + OFFSET, ORIGIN_Y + OFFSET,
-			this.maxHealth * 5 + OFFSET * 3,
-			WIDTH * 2 + OFFSET * 5);
-		HUD.drawBar(context,
-			ORIGIN_X + OFFSET * 2,
-			ORIGIN_Y + OFFSET * 2,
-			WIDTH, OFFSET, { 
+		context.fillRect( 
+			this.origin.x + this.origin.offset, this.origin.y + this.origin.offset,
+			this.maxHealth * 5 + this.origin.offset * 3,
+			this.origin.width * 2 + this.origin.offset * 5);
+		// Health bar
+		HUD.drawBar(context, 
+			this.origin.x + this.origin.offset * 2,
+			this.origin.y + this.origin.offset * 2,
+			this.origin.width, this.origin.offset, { 
 				current: this.health,
 				max: this.maxHealth,
 				name: "",
 				tickWidth: 5
-		}, "DRUID",
-			this.health / this.maxHealth <= 0.2 ? this.lowHealthGradient : this.healthGradient,
-			this.health / this.maxHealth <= 0.2 ? COLORS.HEALTH_RED : COLORS.HEALTH_GREEN);
+			}, "DRUID",
+			this.health / this.maxHealth <= 0.2 ?
+				this.lowHealthGradient : this.healthGradient,
+			this.health / this.maxHealth <= 0.2 ?
+				COLORS.HEALTH_RED : COLORS.HEALTH_GREEN);
 		if (this.attacks[this.attackSelection]) {
+			// Mana bar
 			HUD.drawBar(context,
-				ORIGIN_X + OFFSET * 2,
-				ORIGIN_Y + OFFSET * 4 + WIDTH,
-				WIDTH, OFFSET, {
+				this.origin.x + this.origin.offset * 2,
+				this.origin.y + this.origin.offset * 4 + this.origin.width,
+				this.origin.width, this.origin.offset, {
 					current: this.mana,
 					max: this.maxMana,
 					name: "",
 					tickWidth: 5
 				}, "MANA",
-				this.mana < this.attacks[this.attackSelection].cost - 1 ? this.lowManaGradient : this.manaGradient,
-				this.mana < this.attacks[this.attackSelection].cost - 1 ? "indigo" : COLORS.LAPIS);
+				this.mana < this.attacks[this.attackSelection].cost - 1 ?
+					this.lowManaGradient : this.manaGradient,
+				this.mana < this.attacks[this.attackSelection].cost - 1 ?
+					"indigo" : COLORS.LAPIS);
+			// Powerup UI
 			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
 		}
 		if (this.flashing) return;
-		// Draw druid
+		// Druid frame selection
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,
 			this.pos.x, this.pos.y,
-			this.scale, this.game.camera, this.xOffset);
+			this.scale, this.game.camera, this.xFrameOffset);
+		// Draw bounding shapes
 		this.worldBB.display(this.game);
 		this.agentBB.forEach((BB) => {
 			BB.display(this.game);

@@ -105,7 +105,7 @@ class Agent extends Entity {
         this.facing = 0; // Left = 0, Right = 1
         this.agentBB = this.makeDefaultBoundingCircle();
         this.lastAgentBB = this.makeDefaultBoundingCircle();
-        this.mapPipColor = 'red';
+        this.mapPipColor = "red";
         this.loadAnimations();
     }
 
@@ -348,12 +348,12 @@ class BoundingBox {
 
     /**
      * Displays the bounding box for testing purposes.
-     * @param {CanvasImageSource} game.context Canvas to draw on.
+     * @param {CanvasImageSource} game Canvas to draw on.
      */
     display(game) {
         if (PARAMS.DEBUG) {
             game.context.save();
-            game.context.strokeStyle = 'red';
+            game.context.strokeStyle = "red";
             game.context.lineWidth = PARAMS.BB_LINE_WIDTH;
             game.context.strokeRect(
                 this.x - game.camera.pos.x,
@@ -379,10 +379,10 @@ class BoundingBox {
     }
 
     /**
-     * Shift the BoundingBox to the new (x, y) position. Update all other stored values
-     * based on this new position;
-     * @param {Number} x
-     * @param {Number} y
+     * Shift the BoundingBox to the new coordinate position. Update all other stored 
+     * values based on this new position.
+     * @param {Number} x New horizontal coordinate.
+     * @param {Number} y New vertical coordinate.
      */
     shift(x, y) {
         this.x = x;
@@ -394,7 +394,10 @@ class BoundingBox {
     }
 
     centerPoint() {
-        return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
+        return {
+            x: this.x + this.width / 2,
+            y: this.y + this.height / 2
+        };
     }
 }
 
@@ -408,7 +411,7 @@ class BoundingCircle {
 
     /**
      * Checks if this bounding circle is colliding with another.
-     * @param {BoundingCircle} other
+     * @param {BoundingCircle} other Circle to collide with.
      */
     collide(other) {
         let dx = this.x - other.x;
@@ -419,12 +422,12 @@ class BoundingCircle {
 
     /**
      * Displays the bounding cicle for testing purposes.
-     * @param {CanvasImageSource} game.context Canvas to draw on.
+     * @param {CanvasImageSource} game Canvas to draw on.
      */
     display(game) {
         if (PARAMS.DEBUG) {
             game.context.save();
-            game.context.strokeStyle = 'green';
+            game.context.strokeStyle = "green";
             game.context.lineWidth = PARAMS.BB_LINE_WIDTH;
             game.context.beginPath();
             game.context.arc(
@@ -436,21 +439,21 @@ class BoundingCircle {
         }
     }
 
-/**
-* Copy the stored values of otherCircle into this BoundingCircle.
-* @param {BoundingCircle} otherBox
-*/
+    /**
+    * Copy the stored values of otherCircle into this BoundingCircle.
+    * @param {BoundingCircle} otherCircle Circle to copy values from.
+    */
     copy(otherCircle) {
         this.x = otherCircle.x;
         this.y = otherCircle.y;
         this.radius = otherCircle.radius;
     }
 
-/**
-* Shift the BoundingCircle to the new (x, y) position.
-* @param {Number} x
-* @param {Number} y
-*/
+    /**
+    * Shift the BoundingCircle to the new coordinate position.
+    * @param {Number} x New horizontal coordinate.
+    * @param {Number} y New vertical coordinate.
+    */
     shift(x, y) {
         this.x = x;
         this.y = y;

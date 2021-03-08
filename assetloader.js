@@ -65,9 +65,9 @@ class AssetLoader {
                     callback();
                 }
             });
-            image.addEventListener("error", function () {
+            image.addEventListener("error", () => {
                 console.log("Error loading " + this.src);
-                that.errorCount++;
+                this.errorCount++;
                 if (that.isDone()) {
                     callback();
                 }

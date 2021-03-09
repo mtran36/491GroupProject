@@ -295,6 +295,13 @@ class Minimap extends Entity {
     constructor(game, x, y, width) {
         super(game, x, y);
         this.width = width;
+        this.gradient = this.game.context.createLinearGradient(
+            this.pos.x, this.pos.y,
+            this.pos.x + this.width + 2 * 4,
+            this.pos.y);
+        this.gradient.addColorStop(0, COLORS.FRAME_BROWN);
+        this.gradient.addColorStop(0.5, COLORS.FRAME_TAN);
+        this.gradient.addColorStop(1, COLORS.FRAME_BROWN);
     };
 
     draw(context) {
@@ -304,20 +311,13 @@ class Minimap extends Entity {
         const ORIGIN_X = this.pos.x;
         const ORIGIN_Y = this.pos.y;
         const WIDTH = this.width + OFFSET * 4;
-        let gradient = context.createLinearGradient(
-            ORIGIN_X, ORIGIN_Y,
-            ORIGIN_X + WIDTH,
-            ORIGIN_Y);
-        // Setup gradient
-        gradient.addColorStop(0, COLORS.FRAME_BROWN);
-        gradient.addColorStop(0.5, COLORS.FRAME_TAN);
-        gradient.addColorStop(1, COLORS.FRAME_BROWN);
+        
         // Draw minimap frame
         context.save();
         context.lineWidth = OFFSET;
         context.fillStyle = "black";
         context.fillRect(ORIGIN_X, ORIGIN_Y, WIDTH, WIDTH);
-        context.fillStyle = gradient;
+        context.fillStyle = this.gradient;
         context.fillRect(
             ORIGIN_X + OFFSET, ORIGIN_Y + OFFSET,
             WIDTH - OFFSET * 2, WIDTH - OFFSET * 2);

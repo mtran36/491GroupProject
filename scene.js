@@ -14,7 +14,7 @@ class Scene {
 		this.loseScreen = new LoseScreen(this.game);
 	}
 
-	loadLevel(level) {
+	loadLevel(level, x, y) {
 		this.game.entities = [];
 		AUDIO_PLAYER.stopAll();
 		let entry, construct, entityArr;
@@ -36,7 +36,7 @@ class Scene {
 		this.temporaryBoss.attack = 10;
 		this.game.addEntity(this.temporaryBoss);*/
 
-		this.game.druid = new Druid(this.game, PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
+		this.game.druid = new Druid(this.game, PARAMS.TILE_WIDTH * x, PARAMS.TILE_WIDTH * y);
 		this.game.addEntity(this.game.druid);
 		this.game.addEntity(new Minimap(this.game, 7, 7, 100));
 	};

@@ -272,7 +272,7 @@ var levelOne = {
 	],
 	boss: [
 		(game, params) => LionBoss.construct(game, params),
-		{x: 20, y: 114}
+		{x: 70, y: 30}
 	]
 }
 

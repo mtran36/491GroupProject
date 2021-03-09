@@ -68,7 +68,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.canvas.removeEventListener('keydown', clickStart);
-            this.game.camera.loadLevel(levelOne);
+            this.game.camera.loadLevel(levelOne, 50, 31);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
@@ -76,14 +76,14 @@ class StartScreen {
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne);
+                this.game.camera.loadLevel(levelOne, 15, 115);
                 this.game.screen = null;
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(
-                    levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
+                    levelOne, 15, 115);
                 this.game.screen = null;
             }
         });

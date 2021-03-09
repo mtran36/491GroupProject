@@ -28,13 +28,13 @@ class Scene {
 			});
 			entityArr.splice(0, 0, construct);
 		}
-		// Author: tommy
+/*		// Author: tommy
 		// temporary boss:
 		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 28 * PARAMS.TILE_WIDTH);
 		this.temporaryBoss.setDimensions(2, this.temporaryBoss.dim.x, this.temporaryBoss.dim.y);
 		this.temporaryBoss.health = 10;
 		this.temporaryBoss.attack = 10;
-		this.game.addEntity(this.temporaryBoss);
+		this.game.addEntity(this.temporaryBoss);*/
 
 		this.game.druid = new Druid(this.game, PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
 		this.game.addEntity(this.game.druid);

@@ -269,6 +269,10 @@ var levelOne = {
 	healthPowerup: [
 		(game, params) => HealthPowerup.construct(game, params),
 		{ x: 20, y: 119 }
+	],
+	boss: [
+		(game, params) => LionBoss.construct(game, params),
+		{x: 20, y: 114}
 	]
 }
 

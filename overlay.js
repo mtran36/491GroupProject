@@ -5,10 +5,12 @@
 class PauseScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'white', stroke: 'red' };
+        this.style = {
+            fill: "black", shadow: COLORS.FRAME_BROWN
+        };
         this.pausePressed = false;
         this.screen = false;
-        this.game.canvas.addEventListener('keydown', (e) => {
+        this.game.canvas.addEventListener("keydown", (e) => {
             switch (e.code) {
                 case "KeyP":
                 case "Escape":
@@ -24,7 +26,7 @@ class PauseScreen {
                     break;
             }
         })
-        this.game.canvas.addEventListener('keyup', (e) => {
+        this.game.canvas.addEventListener("keyup", (e) => {
             switch (e.code) {
                 case "KeyP":
                 case "Escape":
@@ -39,19 +41,23 @@ class PauseScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        const ORIGIN_X = PARAMS.CANVAS_WIDTH / 2 - 140;
+        const ORIGIN_Y = PARAMS.CANVAS_HEIGHT / 2 + 20;
+        const TEXT_NUDGE_X = 48;
+        const TEXT_NUDGE_Y = -7;
+        const HEIGHT = 96;
+        const WIDTH = 384;
+
         AUDIO_PLAYER.pauseMusic();
         AUDIO_PLAYER.pauseSounds();
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
+            ORIGIN_X - 53, ORIGIN_Y - 70, WIDTH, HEIGHT);
         context.save();
-        context.fillStyle = 'black';
-        if (this.style.fill) {
-            context.fillStyle = this.style.fill;
-        }
-        if (this.style.stroke) {
-            context.strokeStyle = this.style.stroke;
-        }
-        context.font = "bold 64px sans-serif";
-        context.fillText("Paused", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText("Paused", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.font = "bold 38px sans-serif";
+        context.fillStyle = this.style.shadow;
+        context.fillText("- PAUSE -", ORIGIN_X + TEXT_NUDGE_X + 2, ORIGIN_Y + TEXT_NUDGE_Y + 2);
+        context.fillStyle = this.style.fill;
+        context.fillText("- PAUSE -", ORIGIN_X + TEXT_NUDGE_X, ORIGIN_Y + TEXT_NUDGE_Y);
         context.restore();
     }
 }
@@ -63,27 +69,27 @@ class PauseScreen {
 class StartScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'white', stroke: 'red' };
+        this.style = { fill: COLORS.FRAME_TAN, stroke: COLORS.FRAME_BROWN };
+        this.titleTree = ASSET_LOADER.getImageAsset("./Sprites/titleTree.png");
         // Start upon first load.
         let clickStart = (e) => {
-            this.game.canvas.removeEventListener('click', clickStart);
-            this.game.canvas.removeEventListener('keydown', clickStart);
+            this.game.canvas.removeEventListener("click", clickStart);
+            this.game.canvas.removeEventListener("keydown", clickStart);
             this.game.camera.loadLevel(levelOne);
             this.game.start();
         };
-        this.game.canvas.addEventListener('click', clickStart);
-        this.game.canvas.addEventListener('keydown', clickStart);
+        this.game.canvas.addEventListener("click", clickStart);
+        this.game.canvas.addEventListener("keydown", clickStart);
         // Start after reset, win, or lose.
-        this.game.canvas.addEventListener('click', (e) => {
+        this.game.canvas.addEventListener("click", () => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(levelOne);
                 this.game.screen = null;
             }
         });
-        this.game.canvas.addEventListener('keydown', (e) => {
+        this.game.canvas.addEventListener("keydown", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(
-                    levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
+                this.game.camera.loadLevel(levelOne);
                 this.game.screen = null;
             }
         });
@@ -95,18 +101,30 @@ class StartScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        const SCALE = 1.5;
+
         context.save();
-        this.fillStyle = 'black';
+        context.fillStyle = "black";
         context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+        context.drawImage(this.titleTree, 25, 25, 500 * SCALE, 477 * SCALE);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
         context.font = "bold 32px sans-serif";
-        context.fillText(
-            "Click or press any key to Start",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText(
-            "Click or press any key to Start",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.fillText("- Click to Begin -",
+            PARAMS.CANVAS_WIDTH / 2 + 185, PARAMS.CANVAS_HEIGHT / 2 + 175);
+        context.strokeText("- Click to Begin -",
+            PARAMS.CANVAS_WIDTH / 2 + 185, PARAMS.CANVAS_HEIGHT / 2 + 175);
+        context.font = "bold 47px castellar";
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100 + 4, PARAMS.CANVAS_HEIGHT / 2 + 30 + 4);
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100 + 4, PARAMS.CANVAS_HEIGHT / 2 + 30 + 4);
+        context.fillStyle = COLORS.FRAME_TAN;
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100, PARAMS.CANVAS_HEIGHT / 2 + 30);
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100, PARAMS.CANVAS_HEIGHT / 2 + 30);
         context.restore();
     }
 }
@@ -117,16 +135,16 @@ class StartScreen {
 class WinScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'white', stroke: 'blue' };
-        this.game.canvas.addEventListener('click', (e) => {
+        this.style = { fill: "white", stroke: "blue" };
+        this.game.canvas.addEventListener("click", (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => { this.game.screen = this.game.camera.startScreen; }, 100);
             }
         });
-        this.game.canvas.addEventListener('keydown', (e) => {
-            if (this.game.screen === this && e.code == 'KeyR') {
+        this.game.canvas.addEventListener("keydown", (e) => {
+            if (this.game.screen === this && e.code == "KeyR") {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
@@ -139,37 +157,32 @@ class WinScreen {
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
         context.font = "bold 32px sans-serif";
-        context.fillText(
-            "You Win!",
+        context.fillText("You Win!",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText(
-            "You Win!",
+        context.strokeText("You Win!",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.font = "bold 20px sans-serif";
-        context.fillText(
-            "Click or press R to restart.",
+        context.fillText("Click or press R to restart.",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
-        context.strokeText(
-            "Click or press R to restart",
+        context.strokeText("Click or press R to restart",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.restore();
     }
 }
 
-
 class LoseScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'red', stroke: 'black' };
-        this.game.canvas.addEventListener('click', (e) => {
+        this.style = { fill: "red", stroke: "black" };
+        this.game.canvas.addEventListener("click", (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => { this.game.screen = this.game.camera.startScreen }, 100);
             }
         });
-        this.game.canvas.addEventListener('keydown', (e) => {
-            if (this.game.screen === this && e.code == 'KeyR') {
+        this.game.canvas.addEventListener("keydown", (e) => {
+            if (this.game.screen === this && e.code == "KeyR") {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
@@ -197,7 +210,6 @@ class LoseScreen {
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.restore();
     }
-    
 }
 
 class HUD {
@@ -253,7 +265,7 @@ class HUD {
      * @param {number} xOffset Horizontal distance from origin.
      * @param {number} yOffset Vertical distance from origin.
      * @param {Array} powerups List of powerups.
-     * @param {number} attackSelection Druid's attack selection.
+     * @param {number} attackSelection Druid"s attack selection.
      */
     static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection) {
         const imageY = yOffset + 12;
@@ -307,6 +319,7 @@ class Minimap extends Entity {
     draw(context) {
         const SCALE = 16;
         const OFFSET = 2;
+        const CENTER_OFFSET = 25;
         const PIP_OFFSET = OFFSET * 3;
         const ORIGIN_X = this.pos.x;
         const ORIGIN_Y = this.pos.y;
@@ -334,8 +347,10 @@ class Minimap extends Entity {
             if (entity.hidden || entity instanceof Effect) return;
             context.fillStyle = entity.mapPipColor;
             let pip = {
-                x: this.pos.x + 25 + (entity.pos.x - this.game.camera.pos.x) / SCALE,
-                y: this.pos.y + 25 + (entity.pos.y - this.game.camera.pos.y) / SCALE,
+                x: this.pos.x + CENTER_OFFSET
+                    + Math.floor((entity.pos.x - this.game.camera.pos.x) / SCALE),
+                y: this.pos.y + CENTER_OFFSET
+                    + Math.floor((entity.pos.y - this.game.camera.pos.y) / SCALE),
                 width: entity.worldBB.width / SCALE,
                 height: entity.worldBB.height / SCALE
             };

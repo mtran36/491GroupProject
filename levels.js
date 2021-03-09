@@ -4,26 +4,22 @@ var levelOne = {
 		"./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3"
 	],
 	parallax: [
-		(game, params) => Background.construct(game, params),
-		{
+		(game, params) => Background.construct(game, params), {
 			spriteSheetName: "./Sprites/layer1.png",
 			spriteWidth: 592,
 			spriteHeight: 272,
 			speedRate: -60
-		},
-		{
+		}, {
 			spriteSheetName: "./Sprites/layer2.png",
 			spriteWidth: 592,
 			spriteHeight: 272,
 			speedRate: -40
-		},
-		{
+		}, {
 			spriteSheetName: "./Sprites/layer3.png",
 			spriteWidth: 592,
 			spriteHeight: 272,
 			speedRate: -20
-		},
-		{
+		}, {
 			spriteSheetName: "./Sprites/layer4.png",
 			spriteWidth: 592,
 			spriteHeight: 272,
@@ -152,102 +148,102 @@ var levelOne = {
 	standingBreakBlock: [
 		(game, params) => StandingBreakBlock.construct(game, params),
 		// A2:
-		{ x: 48, y: 97, width: 2, blockType: 'Ground' },
-		{ x: 55, y: 94, width: 2, blockType: 'Ground' },
-		{ x: 60, y: 94, width: 2, blockType: 'Ground' },
-		{ x: 65, y: 94, width: 2, blockType: 'Ground' },
-		{ x: 69, y: 97, width: 2, blockType: 'Ground' },
-		{ x: 72, y: 97, width: 2, blockType: 'Ground' },
+		{ x: 48, y: 97, width: 2, blockType: "Ground" },
+		{ x: 55, y: 94, width: 2, blockType: "Ground" },
+		{ x: 60, y: 94, width: 2, blockType: "Ground" },
+		{ x: 65, y: 94, width: 2, blockType: "Ground" },
+		{ x: 69, y: 97, width: 2, blockType: "Ground" },
+		{ x: 72, y: 97, width: 2, blockType: "Ground" },
 		// breaking ground:
-		{ x: 53, y: 100, width: 3, blockType: 'Ground' },
-		{ x: 56, y: 100, width: 3, blockType: 'Ground' },
-		{ x: 59, y: 100, width: 3, blockType: 'Ground' },
-		{ x: 62, y: 100, width: 3, blockType: 'Ground' },
-		{ x: 65, y: 100, width: 3, blockType: 'Ground' },
-		{ x: 68, y: 100, width: 3, blockType: 'Ground' },
+		{ x: 53, y: 100, width: 3, blockType: "Ground" },
+		{ x: 56, y: 100, width: 3, blockType: "Ground" },
+		{ x: 59, y: 100, width: 3, blockType: "Ground" },
+		{ x: 62, y: 100, width: 3, blockType: "Ground" },
+		{ x: 65, y: 100, width: 3, blockType: "Ground" },
+		{ x: 68, y: 100, width: 3, blockType: "Ground" },
 		// A4:
-		{ x: 62, y: 74, width: 5, blockType: 'Ground' },
+		{ x: 62, y: 74, width: 5, blockType: "Ground" },
 		// A5:
-		{ x: 89, y: 50, width: 2, blockType: 'Ground' },
-		{ x: 84, y: 49, width: 2, blockType: 'Ground' },
-		{ x: 79, y: 50, width: 2, blockType: 'Ground' },
-		{ x: 74, y: 50, width: 2, blockType: 'Ground' },
-		{ x: 69, y: 50, width: 2, blockType: 'Ground' },
-		{ x: 64, y: 50, width: 2, blockType: 'Ground' },
-		{ x: 56, y: 50, width: 3, blockType: 'Ground' },
-		{ x: 53, y: 55, width: 6, blockType: 'Ground' },
+		{ x: 89, y: 50, width: 2, blockType: "Ground" },
+		{ x: 84, y: 49, width: 2, blockType: "Ground" },
+		{ x: 79, y: 50, width: 2, blockType: "Ground" },
+		{ x: 74, y: 50, width: 2, blockType: "Ground" },
+		{ x: 69, y: 50, width: 2, blockType: "Ground" },
+		{ x: 64, y: 50, width: 2, blockType: "Ground" },
+		{ x: 56, y: 50, width: 3, blockType: "Ground" },
+		{ x: 53, y: 55, width: 6, blockType: "Ground" },
 	],
 	hitBreakBlock: [
 		(game, params) => HitBreakBlock.construct(game, params),
 		// secret room:
-		{ x: 35, y: 56, width: 4, height: 4, blockType: 'Ground' },
+		{ x: 35, y: 56, width: 4, height: 4, blockType: "Ground" },
 
 	],
 	door: [
 		(game, params) => Door.construct(game, params),
-		{ x: 47, y: 22},
+		{ x: 47, y: 22 },
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
 		// A2:
-		{ x: 80, y: 87, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 85, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 60, y: 85, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 50, y: 85, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 45, y: 85, prizeRate: 0.1, prize: 'PotionMid' }
+		{ x: 80, y: 87, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 70, y: 85, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 60, y: 85, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 50, y: 85, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 45, y: 85, prizeRate: 0.1, prize: "PotionMid" }
 	],
 	rangedFlies: [
 		(game, params) => RangedFly.construct(game, params),
 		// A2:
-		{ x: 40, y: 90, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 40, y: 90, prizeRate: 0.1, prize: "PotionMid" },
 		// A3:
-		{ x: 25, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 25, y: 72, prizeRate: 0.1, prize: "PotionMid" },
 		// A4:
-		{ x: 60, y: 65, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 65, prizeRate: 0.1, prize: 'PotionMid' }
+		{ x: 60, y: 65, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 70, y: 65, prizeRate: 0.1, prize: "PotionMid" }
 	],
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
 		// A1:
-		{ x: 40, y: 118, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 50, y: 118, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 118, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 40, y: 118, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 50, y: 118, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 70, y: 118, prizeRate: 0.1, prize: "PotionMid" },
 		// A3:
-		{ x: 15, y: 93, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 10, y: 90, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 6, y: 81, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 15, y: 93, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 10, y: 90, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 6, y: 81, prizeRate: 0.1, prize: "PotionMid" },
 		// A4:
-		{ x: 50, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 50, y: 72, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 70, y: 72, prizeRate: 0.1, prize: "PotionMid" },
 		// A5:
-		{ x: 40, y: 45, prizeRate: 1, prize: 'Key' }
+		{ x: 40, y: 45, prizeRate: 1, prize: "Key" }
 	],
 	flyBeetles: [
 		(game, params) => FlyBeetle.construct(game, params),
 		// A1:
-		{ x: 60, y: 115, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 117, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 75, y: 115, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 60, y: 115, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 70, y: 117, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 75, y: 115, prizeRate: 0.1, prize: "PotionMid" },
 		// A3:
-		{ x: 6, y: 80, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 6, y: 80, prizeRate: 0.1, prize: "PotionMid" },
 		// A4:
-		{ x: 90, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 90, y: 64, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 90, y: 61, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 90, y: 72, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 90, y: 64, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 90, y: 61, prizeRate: 0.1, prize: "PotionMid" },
 		// A5:
-		{ x: 60, y: 44, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 60, y: 45, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 46, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 80, y: 47, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 60, y: 44, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 60, y: 45, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 70, y: 46, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 80, y: 47, prizeRate: 0.1, prize: "PotionMid" },
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),
 		// A4:
-		{ x: 40, y: 75, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 40, y: 75, prizeRate: 0.1, prize: "PotionMid" },
 		// A5:
-		{ x: 75, y: 50, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 65, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 40, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 75, y: 50, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 65, y: 55, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 40, y: 55, prizeRate: 0.1, prize: "PotionMid" },
 	],
 	mantis: [
 		(game, params) => Mantis.construct(game, params),
@@ -269,8 +265,12 @@ var levelOne = {
 	healthPowerup: [
 		(game, params) => HealthPowerup.construct(game, params),
 		{ x: 20, y: 119 }
+	],
+	druid: [
+		(game, params) => Druid.construct(game, params),
+		{ x: 16, y: 115 }
 	]
-}
+};
 
 var levelTwo = {
 	ground: [
@@ -357,8 +357,8 @@ var levelTwo = {
 	],
 	standingBreakBlock: [
 		(game, params) => StandingBreakBlock.construct(game, params),
-		{ x: -84, y: -6, width: 2, blockType: 'Ground' },
-		{ x: -70, y: 2, width: 2, blockType: 'Ground' }
+		{ x: -84, y: -6, width: 2, blockType: "Ground" },
+		{ x: -70, y: 2, width: 2, blockType: "Ground" }
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
@@ -370,11 +370,11 @@ var levelTwo = {
 	],
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
-		{ x: -110, y: -5, prizeRate: 1, prize: 'PotionMid' }
+		{ x: -110, y: -5, prizeRate: 1, prize: "PotionMid" }
 	],
 	flyBeetles: [
 		(game, params) => FlyBeetle.construct(game, params),
-		{ x: -92, y: 5, prizeRate: 1, prize: 'PotionHigh' }
+		{ x: -92, y: 5, prizeRate: 1, prize: "PotionHigh" }
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),
@@ -392,4 +392,4 @@ var levelTwo = {
 		(game, params) => LightElement.construct(game, params),
 		{ x: 29, y: 5 }
 	]
-}
+};

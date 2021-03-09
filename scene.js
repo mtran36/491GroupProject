@@ -2,8 +2,7 @@ class Scene {
 	constructor(game) {
 		this.game = game;
 		this.game.camera = this;
-		this.game.druid = new Druid(this.game,
-			PARAMS.TILE_WIDTH * 16, PARAMS.TILE_WIDTH * 115);
+		this.game.druid = new Druid(game);
 		this.pos = { x: 0, y: 0 };
 
 		this.createScreens();
@@ -18,34 +17,36 @@ class Scene {
 
 	loadLevel(level) {
 		this.game.entities = [];
-		AUDIO_PLAYER.stopAll();
 		let entry, construct, entityArr;
-		document.getElementById("gameWorld").setAttribute('style', 'background: black');
+
+		AUDIO_PLAYER.stopAll();
+		document.getElementById("gameWorld").setAttribute("style", "background: black");
 		// Add all entities from level data
 		for ([entry, entityArr] of Object.entries(level)) {
-			console.log("Loading", entry);
+			console.log("Loading level array", entry);
 			construct = entityArr.shift();
 			entityArr.forEach((params) => {
 				construct(this.game, params);
 			});
 			entityArr.splice(0, 0, construct);
 		}
-
+		// TODO: Temporary, remove when final boss is added.
 		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 28 * PARAMS.TILE_WIDTH);
 		this.temporaryBoss.setDimensions(2, this.temporaryBoss.dim.x, this.temporaryBoss.dim.y);
 		this.temporaryBoss.health = 10;
 		this.temporaryBoss.attack = 10;
 		this.game.addEntity(this.temporaryBoss);
-
-		this.game.addEntity(this.game.druid);
-		this.game.addEntity(new Minimap(this.game, 7, 7, 100));
 	};
 
+	/** @override */
 	update() {
+		let centerPoint;
 		PARAMS.DEBUG = document.getElementById("debug").checked;
+		PARAMS.MUTE = document.getElementById("mute").checked;
 		if (this.game.druid) {
-			this.pos.x = this.game.druid.worldBB.x - PARAMS.CANVAS_WIDTH / 2;
-			this.pos.y = this.game.druid.worldBB.y - PARAMS.CANVAS_HEIGHT / 1.75;
+			centerPoint = this.game.druid.worldBB.centerPoint();
+			this.pos.x = centerPoint.x - PARAMS.CANVAS_WIDTH / 2;
+			this.pos.y = centerPoint.y - PARAMS.CANVAS_HEIGHT / 2 - 50;
 			this.pos.x = Math.floor(this.pos.x);
 			this.pos.y = Math.floor(this.pos.y);
 		}
@@ -59,9 +60,9 @@ class Scene {
 		if (PARAMS.DEBUG) {
 			context.save();
 			context.font = "bold 16px sans-serif";
-			context.fillStyle = 'grey';
+			context.fillStyle = "grey";
 			context.fillRect(ORIGIN_X - 10, ORIGIN_Y - 17, 300, 25);
-			context.fillStyle = 'black';
+			context.fillStyle = "black";
 			context.fillText(
 				"Druid Location: (x = "
 				+ Math.floor(this.game.druid.pos.x / PARAMS.TILE_WIDTH)

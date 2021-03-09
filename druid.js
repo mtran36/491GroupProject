@@ -2,7 +2,7 @@
  * Player character 
  */
 class Druid extends Agent {
-	constructor(game, x, y) {
+	constructor(game, x = 0, y = 0) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
 		// Jump fields
@@ -30,6 +30,7 @@ class Druid extends Agent {
 		};
 		this.xFrameOffset = 45;
 		this.currentOffset = this.xFrameOffset;
+		this.minimap = new Minimap(game, this.origin.y, this.origin.y, 100);
 		// Attack data fields
 		this.knockbackDuration = 0;
 		this.meleeCooldown = 0;
@@ -38,13 +39,20 @@ class Druid extends Agent {
 		this.attacks = [];
 		// Finish initialization
 		this.loadAnimations();
-		this.setupBoundingShapes();
-		this.updateGradient();
+		this.updateBoundingShapes();
+		this.updateBackgroundGradient();
 		this.updateHealthGradient();
 		this.updateManaGradient();
 	}
 
-	setupBoundingShapes() {
+	static construct(game, params) {
+		let x = params.x * PARAMS.TILE_WIDTH, y = params.y * PARAMS.TILE_WIDTH;
+		game.addEntity(game.druid);
+		game.druid.pos = { x: x, y: y };
+		game.druid.updateBoundingShapes();
+    }
+
+	updateBoundingShapes() {
 		this.worldBB = new BoundingBox(
 			this.pos.x + 65, this.pos.y + 23,
 			this.scaleDim.x - 120, this.scaleDim.y - 23);
@@ -81,14 +89,14 @@ class Druid extends Agent {
 		this.knockbackDuration = 2;
 	}
 
-	updateGradient() {
-		this.gradient = this.game.context.createLinearGradient(
+	updateBackgroundGradient() {
+		this.backgroundGradient = this.game.context.createLinearGradient(
 			this.origin.x, this.origin.y,
 			this.origin.x + this.maxHealth * 5 + this.origin.offset * 3,
 			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
-		this.gradient.addColorStop(0, COLORS.FRAME_BROWN);
-		this.gradient.addColorStop(0.5, COLORS.FRAME_TAN);
-		this.gradient.addColorStop(1, COLORS.FRAME_BROWN);
+		this.backgroundGradient.addColorStop(0, COLORS.FRAME_BROWN);
+		this.backgroundGradient.addColorStop(0.5, COLORS.FRAME_TAN);
+		this.backgroundGradient.addColorStop(1, COLORS.FRAME_BROWN);
     }
 
 	updateHealthGradient() {
@@ -240,7 +248,7 @@ class Druid extends Agent {
 		const WALK_SPEED = 300;
 		const JUMP_VEL = 900;
 		const TICK = this.game.clockTick;
-		let i, remainder = this.maxHealth - this.health;
+		let i, druidCenter;
 
 		// Change health bar
 		if (this.invincDuration > 0) {
@@ -286,7 +294,7 @@ class Druid extends Agent {
 			this.vel.x = 0;
 		}
 		// Potion counter
-		if (this.potionCounter > 0 && remainder > 20) {
+		if (this.potionCounter > 0 && this.maxHealth - this.health > 20) {
 			this.health += 20;
 			this.potionCounter -= 1;
 		}
@@ -315,7 +323,7 @@ class Druid extends Agent {
 		}
 		// Melee attack
 		this.meleeCooldown -= this.game.clockTick;
-		let druidCenter = this.worldBB.centerPoint();
+		druidCenter = this.worldBB.centerPoint();
 		if (this.meleeCooldown <= 0 && this.game.C) {
 			this.game.addEntity(new SwordAttack(
 				this.game, druidCenter.x, druidCenter.y, this.facing));
@@ -347,6 +355,8 @@ class Druid extends Agent {
 	/** @override */
 	draw(context) {
 		context.save();
+		// Draw minimap
+		this.minimap.draw(context);
 		// Outer black border of bars
 		context.fillStyle = "black";
 		context.fillRect( 
@@ -354,7 +364,7 @@ class Druid extends Agent {
 			this.maxHealth * 5 + this.origin.offset * 5,
 			this.origin.width * 2 + this.origin.offset * 7);
 		// Bars background gradient
-		context.fillStyle = this.gradient;
+		context.fillStyle = this.backgroundGradient;
 		context.fillRect( 
 			this.origin.x + this.origin.offset, this.origin.y + this.origin.offset,
 			this.maxHealth * 5 + this.origin.offset * 3,
@@ -391,6 +401,7 @@ class Druid extends Agent {
 			// Powerup UI
 			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
 		}
+		// Damage flashing
 		if (this.flashing) return;
 		// Druid frame selection
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(

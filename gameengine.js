@@ -115,6 +115,7 @@ class GameEngine {
                 case "KeyM":
                     if (!that.mutePressed) {
                         AUDIO_PLAYER.mute = !AUDIO_PLAYER.mute;
+                        PARAMS.MUTE = AUDIO_PLAYER.mute;
                         that.mutePressed = true;
                     }
                     break;

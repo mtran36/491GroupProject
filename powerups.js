@@ -37,7 +37,7 @@ class PowerUp extends Agent {
 			if (this instanceof HealthPowerup) {
 				entity.maxHealth += 20;
 				entity.health += 20;
-				entity.updateGradient();
+				entity.updateBackgroundGradient();
 			} else {
 				this.game.druid.attacks.push(this);
 				if (this.game.druid.attackSelection == null) {

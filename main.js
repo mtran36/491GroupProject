@@ -44,7 +44,8 @@ const IMAGE_PATHS = [
 	"./Sprites/puffBoom.png",
 	"./Sprites/select.png",
 	"./Sprites/transparency.png",
-	"./Sprites/tree.png"
+	"./Sprites/tree.png",
+	"./Sprites/titleTree.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
@@ -82,3 +83,4 @@ ASSET_LOADER.downloadAll(function () {
 	GAME_ENGINE.init(canvas);
 	new Scene(GAME_ENGINE);
 });
+

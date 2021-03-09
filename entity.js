@@ -7,7 +7,7 @@ class Entity {
     constructor(game, x, y, spritesheet) {
         Object.assign(this, { game });
         this.spritesheet = ASSET_LOADER.getImageAsset(spritesheet);
-        this.mapPipColor = 'Sienna';
+        this.mapPipColor = COLORS.FRAME_BROWN;
         this.scale = 1;
         this.pos = {
             x: x,
@@ -105,7 +105,7 @@ class Agent extends Entity {
         this.facing = 0; // Left = 0, Right = 1
         this.agentBB = this.makeDefaultBoundingCircle();
         this.lastAgentBB = this.makeDefaultBoundingCircle();
-        this.mapPipColor = "red";
+        this.mapPipColor = COLORS.LIGHT_HEALTH_RED;
         this.loadAnimations();
     }
 

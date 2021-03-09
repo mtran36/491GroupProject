@@ -65,10 +65,6 @@ class Enemy extends Agent {
 		}
 	}
 
-	/**
-	 * 
-	 * @param {any} DRUID
-	 */
 	canSee(DRUID) {
 		let thisCenter = this.worldBB.centerPoint();
 		let result = false;
@@ -81,10 +77,6 @@ class Enemy extends Agent {
 		return result;
 	}
 
-	/**
-	 * 
-	 * @param {any} damage
-	 */
 	takeDamage(entity) {
 		super.takeDamage(entity.attack);
 		if (this.removeFromWorld) {
@@ -134,7 +126,7 @@ class Fly extends Enemy {
 
 	/** @override */
 	update() {
-		let druidCenter = this.game.druid.worldBB.centerPoint();
+		let velChangeX, velChangeY, druidCenter = this.game.druid.worldBB.centerPoint();
 		if (this.canSee(this.game.druid)) {
 			if (!this.seesDruid) {
 				AUDIO_PLAYER.playSound("./Audio/FlyBuzz.mp3");
@@ -147,36 +139,24 @@ class Fly extends Enemy {
 			this.seesDruid = false;
 			this.accelerate = false;
 		}
-		var velChangeX = this.ACC.x * this.game.clockTick;
-		var velChangeY = this.ACC.y * this.game.clockTick;
+		velChangeX = this.ACC.x * this.game.clockTick;
+		velChangeY = this.ACC.y * this.game.clockTick;
 		if (this.accelerate) {
-			if (this.left) {
-				this.vel.x = Math.max(-this.velMax.x, this.vel.x - velChangeX);
-			} else {
+			this.vel.x = this.left ?
+				this.vel.x = Math.max(-this.velMax.x, this.vel.x - velChangeX):
 				this.vel.x = Math.min(this.velMax.x, this.vel.x + velChangeX);
-			}
-			if (this.up) {
-				this.vel.y = Math.max(-this.velMax.y, this.vel.y - velChangeY);
-			} else {
+			this.vel.y = this.up ?
+				this.vel.y = Math.max(-this.velMax.y, this.vel.y - velChangeY):
 				this.vel.y = Math.min(this.velMax.y, this.vel.y + velChangeY);
-			}
 		} else {
-			if (this.vel.x > 0) {
-				this.vel.x = Math.max(0, this.vel.x - velChangeX);
-			} else {
+			this.vel.x = this.vel.x > 0 ?
+				this.vel.x = Math.max(0, this.vel.x - velChangeX):
 				this.vel.x = Math.min(0, this.vel.x + velChangeX);
-			}
-			if (this.vel.y > 0) {
-				this.vel.y = Math.max(0, this.vel.y - velChangeY);
-			} else {
+			this.vel.y = this.vel.y > 0 ?
+				this.vel.y = Math.max(0, this.vel.y - velChangeY):
 				this.vel.y = Math.min(0, this.vel.y + velChangeY);
-			}
 		}
-		if (this.left) {
-			this.xOffset = 5;
-		} else {
-			this.xOffset = -5;
-		}
+		this.xOffset = this.left ? 5 : -5;
 		this.move(this.game.clockTick);
 	}
 
@@ -185,7 +165,10 @@ class Fly extends Enemy {
 		let bounce = false;
 		let x = this.worldBB.x;
 		let y = this.worldBB.y;
-		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+		if (entity instanceof Ground
+			|| entity instanceof Enemy
+			|| entity instanceof Door
+			|| entity instanceof Wood) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
 				if (this.vel.y > 100) {
@@ -262,20 +245,12 @@ class RangedFly extends Fly {
 		let druidCenter = this.game.druid.worldBB.centerPoint();
 
 		if (this.canShoot) {
-			if (this.vel.x > 0) {
-				this.vel.x = Math.max(
-					0, this.vel.x - this.ACC.x * this.game.clockTick);
-			} else {
-				this.vel.x = Math.min(
-					0, this.vel.x + this.ACC.x * this.game.clockTick);
-			}
-			if (this.vel.y > 0) {
-				this.vel.y = Math.max(
-					0, this.vel.y - this.ACC.y * this.game.clockTick);
-			} else {
-				this.vel.y = Math.min(
-					0, this.vel.y + this.ACC.y * this.game.clockTick);
-			}
+			this.vel.x = this.vel.x > 0 ?
+				this.vel.x = Math.max(0, this.vel.x - this.ACC.x * this.game.clockTick):
+				this.vel.x = Math.min(0, this.vel.x + this.ACC.x * this.game.clockTick);
+			this.vel.y = this.vel.y > 0 ?
+				this.vel.y = Math.max(0, this.vel.y - this.ACC.y * this.game.clockTick):
+				this.vel.y = Math.min(0, this.vel.y + this.ACC.y * this.game.clockTick);
 			if (this.vel.x === 0 && this.vel.y === 0) {
 				this.game.addEntity(new EnemyRangedAttack(this.game,
 					thisCenter.x, thisCenter.y,
@@ -321,6 +296,13 @@ class Beetle extends Enemy{
 		this.druidLeft = false;
 	}
 
+	static construct(game, params) {
+		game.addEntity(new Beetle(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.prize, params.prizeRate));
+	}
+
 	/**
 	 * If the beetles leftmost position is not on ground and it is moving in the left
 	 * direction and it is not moving vertically, then it will start moving right.
@@ -360,14 +342,7 @@ class Beetle extends Enemy{
 			this.angryTimer = 3.5;
 		}
 	}
-
-	static construct(game, params) {
-		game.addEntity(new Beetle(game,
-			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH,
-			params.prize, params.prizeRate));
-	}
-
+	
 	/** @override */
 	loadAnimations() {
 		this.idleAnim = [];
@@ -390,11 +365,12 @@ class Beetle extends Enemy{
 
 	/** @override */
 	update() {
+		let thisCenter, druidCenter;
 		if (!this.angry && this.angryTimer == 3.5) {
 			this.velMax.x *= 2.5;
 			this.animations = this.angryAnim;
 			this.angry = true;
-		} else if ( this.angry && this.angryTimer < 0 ) {
+		} else if (this.angry && this.angryTimer < 0) {
 			this.velMax.x /= 2.5;
 			this.animations = this.idleAnim;
 			this.angry = false;
@@ -402,26 +378,15 @@ class Beetle extends Enemy{
 		this.angryTimer -= this.game.clockTick;
 
 		// Cap speed to return beetle to normal speed after being hit
-		if (this.facing === 0) { // Facing left
-			if (this.vel.x > this.velMax.x) {
-				this.vel.x = Math.max(
-					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
-			} else {
-				this.vel.x = Math.min(
-					this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x);
-			}
-		} else { // Facing right
-			if (this.vel.x > this.velMax.x) {
-				this.vel.x = Math.max(
-					this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x);
-			} else {
-				this.vel.x = Math.min(
-					this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
-			}
-		}
+		this.vel.x = this.facing === 0 ? 
+			this.vel.x > this.velMax.x ? // Facing left
+				Math.max(this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x):
+				Math.min(this.vel.x + this.ACC.x * this.game.clockTick, -this.velMax.x)
+			: this.vel.x > this.velMax.x ? // Facing right
+				Math.max(this.vel.x - this.ACC.x * this.game.clockTick, this.velMax.x):
+				Math.min(this.vel.x + this.ACC.x * this.game.clockTick, this.velMax.x);
 		this.vel.y = Math.min(
-			this.vel.y + this.game.clockTick * this.ACC.y,
-			this.velMax.y);
+			this.vel.y + this.game.clockTick * this.ACC.y, this.velMax.y);
 		this.groundCheckLeft = new BoundingBox(
 			this.worldBB.left - 4, this.worldBB.bottom, 1, 5);
 		this.groundCheckRight = new BoundingBox(
@@ -429,11 +394,11 @@ class Beetle extends Enemy{
 		this.leftGround = false;
 		this.rightGround = false;
 		if (this.angry) {
-			let thisCenter = this.worldBB.centerPoint();
-			let druidCenter = this.game.druid.worldBB.centerPoint();
+			thisCenter = this.worldBB.centerPoint();
+			druidCenter = this.game.druid.worldBB.centerPoint();
 			this.druidLeft = thisCenter.x > druidCenter.x;
-			if (thisCenter.x < druidCenter.x - PARAMS.TILE_WIDTH * 3 && this.vel.x < 0 ||
-				thisCenter.x > druidCenter.x + PARAMS.TILE_WIDTH * 3 && this.vel.x > 0) {
+			if (thisCenter.x < druidCenter.x - PARAMS.TILE_WIDTH * 3 && this.vel.x < 0
+				|| thisCenter.x > druidCenter.x + PARAMS.TILE_WIDTH * 3 && this.vel.x > 0) {
 				this.vel.x = -this.vel.x;
 			}
 		}
@@ -447,7 +412,10 @@ class Beetle extends Enemy{
 	defineWorldCollisions(entity, collisions) {
 		let x = this.worldBB.x;
 		let y = this.worldBB.y;
-		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+		if (entity instanceof Ground
+			|| entity instanceof Enemy
+			|| entity instanceof Door
+			|| entity instanceof Wood) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;

@@ -45,7 +45,8 @@ const IMAGE_PATHS = [
 	"./Sprites/select.png",
 	"./Sprites/transparency.png",
 	"./Sprites/tree.png",
-	"./Sprites/titleTree.png"
+	"./Sprites/titleTree.png",
+	"./Sprites/woods.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },

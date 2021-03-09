@@ -134,16 +134,15 @@ var levelOne = {
 		{ x: 86, y: 108, width: 3, height: 1 },
 		{ x: 88, y: 80, width: 4, height: 42 },
 		// ground:
-		{ x: 0, y: 105, width: 15, height: 20 },
 		{ x: 0, y: 120, width: 92, height: 15 },
 		// celling:
 		{ x: 0, y: 105, width: 30, height: 9 },
 		{ x: 20, y: 100, width: 34, height: 8 },
-		{ x: 70, y: 100, width: 15, height: 8 },
+		{ x: 70, y: 100, width: 15, height: 8 }
 	],
-	mask: [
-		(game, params) => Mask.construct(game, params),
-		{ x: 6, y: 113, width: 7, height: 10 }
+	wood: [
+		(game, params) => Wood.construct(game, params),
+		{ x: 0, y: 118, length: 200, type: 4, isVertical: 1 }
 	],
 	standingBreakBlock: [
 		(game, params) => StandingBreakBlock.construct(game, params),
@@ -171,17 +170,16 @@ var levelOne = {
 		{ x: 69, y: 50, width: 2, blockType: "Ground" },
 		{ x: 64, y: 50, width: 2, blockType: "Ground" },
 		{ x: 56, y: 50, width: 3, blockType: "Ground" },
-		{ x: 53, y: 55, width: 6, blockType: "Ground" },
+		{ x: 53, y: 55, width: 6, blockType: "Ground" }
 	],
 	hitBreakBlock: [
 		(game, params) => HitBreakBlock.construct(game, params),
 		// secret room:
-		{ x: 35, y: 56, width: 4, height: 4, blockType: "Ground" },
-
+		{ x: 35, y: 56, width: 4, height: 4, blockType: "Ground" }
 	],
 	door: [
 		(game, params) => Door.construct(game, params),
-		{ x: 47, y: 22 },
+		{ x: 47, y: 22 }
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
@@ -234,7 +232,7 @@ var levelOne = {
 		{ x: 60, y: 44, prizeRate: 0.1, prize: "PotionMid" },
 		{ x: 60, y: 45, prizeRate: 0.1, prize: "PotionMid" },
 		{ x: 70, y: 46, prizeRate: 0.1, prize: "PotionMid" },
-		{ x: 80, y: 47, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 80, y: 47, prizeRate: 0.1, prize: "PotionMid" }
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),
@@ -243,20 +241,19 @@ var levelOne = {
 		// A5:
 		{ x: 75, y: 50, prizeRate: 0.1, prize: "PotionMid" },
 		{ x: 65, y: 55, prizeRate: 0.1, prize: "PotionMid" },
-		{ x: 40, y: 55, prizeRate: 0.1, prize: "PotionMid" },
+		{ x: 40, y: 55, prizeRate: 0.1, prize: "PotionMid" }
 	],
 	mantis: [
 		(game, params) => Mantis.construct(game, params),
-		{ x: 30, y: 115, prizeRate: 0 },
 		{ x: 42, y: 54, prizeRate: 0 }
 	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),
-		{ x: 15, y: 119 },
+		{ x: 15, y: 119 }
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
-		{ x: 80, y: 99 },
+		{ x: 80, y: 99 }
 	],
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
@@ -314,7 +311,7 @@ var levelTwo = {
 		{ x: -54, y: 2, width: 3 },
 		{ x: -50, y: 0, width: 3 },
 		{ x: -54, y: -3, width: 3 },
-		{ x: -50, y: -6, width: 3 },
+		{ x: -50, y: -6, width: 3 }
 	],
 	tree: [
 		(game, params) => Tree.construct(game, params),

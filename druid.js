@@ -21,7 +21,7 @@ class Druid extends Agent {
 		this.potionCounter = 0;
 		this.maxPotions = 10;
 		// UI data fields
-		this.mapPipColor = "green";
+		this.mapPipColor = COLORS.HEALTH_GREEN;
 		this.origin = {
 			x: 117,
 			y: 7,
@@ -167,7 +167,10 @@ class Druid extends Agent {
 		let x = this.worldBB.x;
 		let y = this.worldBB.y;
 
-		if (entity instanceof Ground || entity instanceof Door) {
+		if (entity instanceof Ground
+			|| entity instanceof Wood
+			|| entity instanceof Door
+			|| entity instanceof Leaves) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;

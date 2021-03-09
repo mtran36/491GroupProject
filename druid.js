@@ -102,7 +102,7 @@ class Druid extends Agent {
 	}
 
 	updateGradient() {
-/*		const ORIGIN_X = 117;
+		const ORIGIN_X = 117;
 		const ORIGIN_Y = 7;
 		const OFFSET = 2;
 		const WIDTH = 20;
@@ -113,11 +113,11 @@ class Druid extends Agent {
 			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
 		this.gradient.addColorStop(0, COLORS.FRAME_BROWN);
 		this.gradient.addColorStop(0.5, COLORS.FRAME_TAN);
-		this.gradient.addColorStop(1, COLORS.FRAME_BROWN);*/
+		this.gradient.addColorStop(1, COLORS.FRAME_BROWN);
     }
 
 	updateHealthGradient() {
-/*		const ORIGIN_X = 117;
+		const ORIGIN_X = 117;
 		const ORIGIN_Y = 7;
 		const OFFSET = 2;
 		const WIDTH = 20;
@@ -134,7 +134,7 @@ class Druid extends Agent {
 			ORIGIN_X + this.health * 5 + OFFSET * 3,
 			ORIGIN_Y + WIDTH * 2 + OFFSET * 5);
 		this.lowHealthGradient.addColorStop(0, COLORS.LIGHT_HEALTH_RED);
-		this.lowHealthGradient.addColorStop(1, COLORS.HEALTH_RED);*/
+		this.lowHealthGradient.addColorStop(1, COLORS.HEALTH_RED);
 	}
 
 	updateManaGradient() {
@@ -160,9 +160,6 @@ class Druid extends Agent {
 
 	/** @override */
 	defineAgentCollisions(entity) {
-		if (entity instanceof Enemy && this.invincTime <= 0) {
-			this.takeDamage(entity.attack);
-		}
 		if (entity instanceof Door) {
 			if (this.keyCounter > 0) {
 				entity.removeFromWorld = true;

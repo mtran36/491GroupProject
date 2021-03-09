@@ -159,7 +159,9 @@ class LionBoss extends Enemy{
             let thisCenter = this.worldBB.centerPoint();
             let druidCenter = this.game.druid.worldBB.centerPoint();
             let left = thisCenter.x > druidCenter.x;
+            console.log(entity.health)
             entity.takeDamage(this.attack[this.state]);
+            console.log(entity.health, this.attack[this.state]);
             entity.knockback(this, left ? -7 * Math.PI / 8 : -Math.PI / 8);
         }
     }

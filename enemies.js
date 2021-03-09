@@ -16,7 +16,11 @@ class Enemy extends Agent {
 		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
 	}
 
-	defineAgentCollisions() { };
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			entity.takeDamage(this.attack);
+		}
+	}
 
 	/**
 	 * Uses an attack agent to knock this enemy in a direction. The angle of the collision

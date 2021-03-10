@@ -183,6 +183,9 @@ class EnergyBallAttack extends Agent {
 			entity.takeDamage(this);
 			this.removeFromWorld = true;
 			this.playHitAnimation();
+		} else if (entity instanceof LionBossAttack) {
+			this.playHitAnimation();
+			this.removeFromWorld = true;
 		}
 	}
 
@@ -274,6 +277,8 @@ class TornadoAttack extends Agent {
 			this.damagedEnemies.push(entity);
 			entity.knockback(this, -Math.PI / 2);
 			this.playHitAnimation(entity.pos.x, entity.pos.y, false); // knockup animation
+		} else if (entity instanceof LionBossAttack) {
+			this.removeFromWorld = true;
 		}
 	}
 
@@ -371,6 +376,8 @@ class ThunderAttack extends Agent{
 			entity.takeDamage(this);
 			this.removeFromWorld = true;
 			this.playHitAnimation();
+		} else if (entity instanceof LionBossAttack) {
+			this.removeFromWorld = true;
 		}
 	}
 

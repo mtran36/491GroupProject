@@ -15,6 +15,7 @@ class LionBoss extends Enemy{
         this.stateChange = 0;
         this.runCount = 0;
         this.velMax = { x: 500, y: 1200 };
+        this.hasAttacked = false;
     } 
 
     static construct(game, params) {
@@ -87,9 +88,6 @@ class LionBoss extends Enemy{
                 return;
             }
         }
-        if ( this.agentBB.length === 2 && this.stateChange < 0.5) {
-            this.agentBB.pop();
-        }
         this.stateChange -= this.game.clockTick;
         let druidCenter = this.game.druid.worldBB.centerPoint();
         let thisCenter = this.worldBB.centerPoint();
@@ -99,6 +97,7 @@ class LionBoss extends Enemy{
                 this.facing = thisCenter.x > druidCenter.x ? 0 : 1;
                 this.runCount++;
                 this.stateChange = Math.random() + 0.5;
+                this.hasAttacked = false;
             } else if (this.state === 1) {
                 this.state = 2;
                 this.stateChange = 1.7;
@@ -117,9 +116,17 @@ class LionBoss extends Enemy{
                 this.vel.x = this.facing === 0 ? -this.velMax.x : this.velMax.x;
                 break;
             case 2:
-                if (this.agentBB.length === 1 && this.stateChange < 1.1) {
+                if (this.stateChange < 1.1 & !this.hasAttacked) {
                     let x = thisCenter.x + (this.facing === 0 ? -30 : 30);
-                    this.agentBB.push(new BoundingCircle(x, thisCenter.y, this.scaleDim.x / 2.3));
+                    this.game.addEntity(
+                        new LionBossAttack(
+                            this.game,
+                            x,
+                            thisCenter.y,
+                            this.scaleDim.x / 2.3
+                        )
+                    );
+                    this.hasAttacked = true;
                 }
                 this.vel.x = 0;
                 break;
@@ -159,9 +166,7 @@ class LionBoss extends Enemy{
             let thisCenter = this.worldBB.centerPoint();
             let druidCenter = this.game.druid.worldBB.centerPoint();
             let left = thisCenter.x > druidCenter.x;
-            console.log(entity.health)
             entity.takeDamage(this.attack[this.state]);
-            console.log(entity.health, this.attack[this.state]);
             entity.knockback(this, left ? -7 * Math.PI / 8 : -Math.PI / 8);
         }
     }
@@ -177,4 +182,41 @@ class LionBoss extends Enemy{
             BB.display(this.game);
         });
     }
+}
+
+class LionBossAttack extends Agent {
+    constructor(game, x, y, radius) {
+        super(game, x, y);
+        this.worldBB = new BoundingBox(0, 0, 0, 0);
+        this.agentBB = [new BoundingCircle(x, y, radius)];
+        this.time = 0.7;
+        this.attack = 10;
+        this.force = 1000;
+    }
+
+    update() {
+        this.time -= this.game.clockTick;
+        if (this.time < 0) {
+            this.removeFromWorld = true;
+        }
+
+        this.move(this.game.clockTick);
+    }
+
+    loadAnimations() { };
+
+    defineWorldCollisions(entity, collisions) { };
+
+    defineAgentCollisions(entity) {
+        if (entity instanceof Druid) {
+            let druidCenter = this.game.druid.worldBB.centerPoint();
+            let left = this.agentBB[0].x > druidCenter.x;
+            entity.takeDamage(this.attack);
+            entity.knockback(this, left ? -7 * Math.PI / 8 : -Math.PI / 8);
+        }
+    }
+
+    draw(context) {
+        this.agentBB[0].display(this.game);
+    };
 }

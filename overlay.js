@@ -334,8 +334,8 @@ class Minimap extends Entity {
             if (entity.hidden || entity instanceof Effect) return;
             context.fillStyle = entity.mapPipColor;
             let pip = {
-                x: this.pos.x + 25 + (entity.pos.x - this.game.camera.pos.x) / SCALE,
-                y: this.pos.y + 25 + (entity.pos.y - this.game.camera.pos.y) / SCALE,
+                x: this.pos.x + 25 + (entity.worldBB.x - this.game.camera.pos.x) / SCALE,
+                y: this.pos.y + 25 + (entity.worldBB.y - this.game.camera.pos.y) / SCALE,
                 width: entity.worldBB.width / SCALE,
                 height: entity.worldBB.height / SCALE
             };

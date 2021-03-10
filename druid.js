@@ -49,6 +49,8 @@ class Druid extends Agent {
 		this.currentOffset = this.xOffset;
 		this.attackSelection = null;
 		this.attacks = [];
+		this.items = [];
+		this.itemSelection = null;
 		this.knockbackTime = 0;
 	}
 
@@ -290,7 +292,7 @@ class Druid extends Agent {
 			this.vel.x = 0;
 		}
 		// Update potion counter
-		if (this.potionCounter > 0 && remainder > 20) {
+		if (this.potionCounter > 0 && remainder > 30) {
 			this.health += 20;
 			this.potionCounter -= 1;
 		}

@@ -3,7 +3,7 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate) {
+	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 0.1) {
 		super(game, x, y, spritesheet);
 		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.

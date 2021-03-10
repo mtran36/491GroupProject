@@ -13,6 +13,7 @@ class Druid extends Agent {
 		this.health = this.maxHealth;
 		this.mana = this.maxMana;
 		this.lastHealth = this.health;
+		this.casting = false;
 		// Taking damage fields
 		this.flashing = false;
 		this.invincDuration = 0;
@@ -20,6 +21,8 @@ class Druid extends Agent {
 		this.keyCounter = 0;
 		this.potionCounter = 0;
 		this.maxPotions = 10;
+		this.items = [];
+		this.itemSelection = -1;
 		// UI data fields
 		this.mapPipColor = COLORS.HEALTH_GREEN;
 		this.origin = {
@@ -158,6 +161,7 @@ class Druid extends Agent {
 			}
 		}
 	}
+	defineAgentCollisions(entity) { }
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
@@ -189,6 +193,9 @@ class Druid extends Agent {
 			if (entity instanceof Door && this.keyCounter > 0) {
 				entity.removeFromWorld = true;
 				this.keyCounter--;
+				this.items.splice(this.items.findIndex((a) => {
+					return a instanceof Key;
+				}), 1);
 			}
 			this.knockbackDuration = 0;
 		}
@@ -298,6 +305,13 @@ class Druid extends Agent {
 			this.health += 20;
 			this.potionCounter -= 1;
 		}
+		// Damage flashing 
+		if (this.invincTime > 0) {
+			this.invincTime -= this.game.clockTick;
+			this.flashing = !this.flashing;
+		} else {
+			this.flashing = false;
+		}
 		// Jump handling
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
@@ -342,12 +356,12 @@ class Druid extends Agent {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
 		}
-		// Spell upgrade for testing
-		if (this.game.Q === true && PARAMS.DEBUG === true) {
-			if (this.attacks[this.attackSelection].canLevelUp === true) {
-				this.attacks[this.attackSelection].levelUp();
+		// Check if any special attacks are made
+		if (this.attackSelection != null) {
+			for (i = 0; i < this.attacks.length; i++) {
+				this.attacks[i].updateCooldown();
 			}
-			this.game.Q = false;
+			this.attacks[this.attackSelection].attack(this);
 		}
 		this.move(TICK);
 	}
@@ -399,7 +413,7 @@ class Druid extends Agent {
 				this.mana < this.attacks[this.attackSelection].cost - 1 ?
 					"indigo" : COLORS.LAPIS);
 			// Powerup UI
-			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
+			HUD.drawPowerupUI(context, 118, 62, this.attackSelection, this);
 		}
 		// Damage flashing
 		if (this.flashing) return;

@@ -18,6 +18,7 @@ class PauseScreen {
                         this.pausePressed = true;
                         if (this.game.screen === this) {
                             this.game.screen = this.screen;
+                            this.screen = false;
                         } else {
                             this.screen = this.game.screen;
                             this.game.screen = this;
@@ -84,13 +85,13 @@ class StartScreen {
         this.game.canvas.addEventListener("click", () => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(levelOne, 15, 115);
-                this.game.screen = null;
+                this.game.screen = false;
             }
         });
         this.game.canvas.addEventListener("keydown", () => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(levelOne);
-                this.game.screen = null;
+                this.game.screen = false;
             }
         });
         this.display(this.game.context);
@@ -140,14 +141,14 @@ class WinScreen {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => { this.game.screen = this.game.camera.startScreen; }, 100);
+                setTimeout(() => { this.game.screen = this.game.camera.StartScreen; }, 100);
             }
         });
         this.game.canvas.addEventListener("keydown", (e) => {
             if (this.game.screen === this && e.code == "KeyR") {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         });
     }
@@ -178,14 +179,14 @@ class LoseScreen {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => { this.game.screen = this.game.camera.startScreen }, 100);
+                setTimeout(() => { this.game.screen = this.game.camera.StartScreen }, 100);
             }
         });
         this.game.canvas.addEventListener("keydown", (e) => {
-            if (this.game.screen === this && e.code == "KeyR") {
+            if (this.game.screen === this && e.code === "KeyR") {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         });
     }
@@ -209,6 +210,288 @@ class LoseScreen {
             "Click or press R to restart",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.restore();
+    }
+    
+}
+
+class MenuScreen {
+    constructor(game) {
+        this.game = game;
+        this.camera = new Object();
+        this.camera.pos = { x: 0, y: 0 };
+        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.menuPressed = false;
+        this.selectLeft = false;
+        this.selectRight = false;
+        this.selectUp = false;
+        this.selectDown = false;
+        this.selectEnter = false;
+
+        this.game.canvas.addEventListener('keydown', (e) => {
+            if (!this.game.druid) return;
+            switch (e.code) {
+                case "KeyI":
+                    if (!this.menuPressed) {
+                        this.menuPressed = true;
+                        if (this.game.screen === this) {
+                            this.game.screen = false;
+                        } else if (this.game.screen === false) {
+                            this.game.screen = this;
+                        }
+                    }
+                    if (this.game.druid.itemSelection >= this.game.druid.items.length ||
+                        this.game.druid.itemSelection === -1) {
+                        this.game.druid.itemSelection = this.game.druid.items.length - 1;
+                    }
+                    console.log(this.game.druid.itemSelection);
+                    break;
+                case "ArrowLeft":
+                case "KeyA":
+                    this.selectLeft = true;
+                    if (this.selectLeft == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
+                        //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
+                        this.selectLeft = false;
+                    }
+                    break;
+                case "ArrowRight":
+                case "KeyD":
+                    this.selectRight = true;
+                    if (this.selectRight == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
+                        this.selectRight = false;
+                    }
+                    break;
+                case "ArrowUp":
+                case "KeyW":
+                    this.selectUp = true;
+                    if (this.selectUp == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
+                        this.selectUp = false;
+                    }
+                    break;
+                case "ArrowDown":
+                case "KeyS":
+                    this.selectDown = true;
+                    if (this.selectDown == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
+                        this.selectDown = false;
+                    }
+                    break;
+                case "KeyR":
+                    this.selectEnter = true;
+                    this.game.druid.items[this.game.druid.itemSelection].useItemOnDruid(this.game.druid);
+                    this.selectEnter = false;
+                    break;
+            }
+        })
+        this.game.canvas.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case "KeyI":
+                    this.menuPressed = false;
+                    break;
+                case "ArrowLeft":
+                case "KeyA":
+                    this.selectLeft = false;
+                    break;
+                case "ArrowRight":
+                case "KeyD":
+                    this.selectRight = false;
+                    break;
+                case "ArrowUp":
+                case "KeyW":
+                    this.selectUp = false;
+                    break;
+                case "ArrowDown":
+                case "KeyS":
+                    this.selectDown = false;
+                    break;
+                case "KeyR":
+                    this.selectEnter = false;
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Display the pause screen.
+     * @param {CanvasRenderingContext2D} context
+     */
+    display(context) {
+        let i;
+        const OFFSET = 10;
+
+        context.drawImage(
+            ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
+            PARAMS.CANVAS_WIDTH / 5,
+            OFFSET * 4,
+            122 * 5,
+            137 * 5);
+
+        context.save();
+
+        if (this.style.fill) {
+            context.fillStyle = this.style.fill;
+        }
+        if (this.style.stroke) {
+            context.strokeStyle = this.style.stroke;
+        }
+
+        context.font = "bold 64px sans-serif";
+        context.fillText(
+            "Inventory",
+            PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
+            PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
+
+        context.strokeText(
+            "Inventory",
+            PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
+            PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
+
+        for (i = 0; i < this.game.druid.items.length; i++) {
+            this.game.druid.items[i].animations[0].drawFrame(
+                0,
+                context,
+                ((i % 7) * (OFFSET * 8)) + 255,
+                (Math.floor(i / 7) * (OFFSET * 8)) + 164,
+                0.9,
+                this.camera);
+
+            if (i === this.game.druid.itemSelection) {
+                context.drawImage(
+                    ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    ((i % 7) * (OFFSET * 8)) + 235,
+                    (Math.floor(i / 7) * (OFFSET * 8)) + 155,
+                    32 * 2.4,
+                    32 * 2.4);
+            }
+        }
+
+        context.restore();
+    }
+}
+
+class LevelUpScreen {
+    constructor(game) {
+        this.game = game;
+        this.camera = new Object();
+        this.camera.pos = { x: 0, y: 0 };
+        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.screen = false;
+        this.levelUpScreen = false;
+        this.selectLeft = false;
+        this.selectRight = false;
+
+
+        this.game.canvas.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case "ArrowLeft":
+                case "KeyA":
+                    if (!this.left && this.levelUpScreen
+                        && this.game.druid.attacks.length > 0) {
+                        if (this.game.druid.attackSelection == 0) {
+                            this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
+                        } else {
+                            this.game.druid.attackSelection =
+                                (this.game.druid.attackSelection - 1) % this.game.druid.attacks.length;
+                        }
+                        this.left = true;
+                    }
+                    break;
+                case "ArrowRight":
+                case "KeyD":
+                    if (!this.right && this.levelUpScreen
+                        && this.game.druid.attacks.length > 0) {
+                        this.game.druid.attackSelection =
+                            (this.game.druid.attackSelection + 1) % this.game.druid.attacks.length;
+                        this.right = true;
+                    }
+                    break;
+                case "KeyX":
+                case "KeyJ":
+                    if (this.levelUpScreen
+                        && this.game.druid.attacks.length > 0) {
+                        if (this.game.druid.attacks[this.game.druid.attackSelection].canLevelUp) {
+                            this.game.druid.attacks[this.game.druid.attackSelection].levelUp();
+                            this.item.removeFromWorld = true;
+                            this.item = null;
+                            this.levelUpScreen = false;
+                            this.game.A = false;
+                            this.game.screen = false;
+                        }
+                    }
+                    break;
+                case "KeyQ":
+                    if (this.levelUpScreen) {
+                        this.levelUpScreen = false;
+                        this.game.screen = false;
+                    }
+                break;
+            }
+        });
+        this.game.canvas.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case "ArrowLeft":
+                case "KeyA":
+                    this.left = false;
+                    break;
+                case "ArrowRight":
+                case "KeyD":
+                    this.right = false;
+                    break;
+            }
+        });
+    }
+
+    showScreen(item) {
+        this.levelUpScreen = true;
+        this.game.screen = this;
+        this.item = item;
+    }
+
+    /**
+     * Display the level up screen.
+     * @param {CanvasRenderingContext2D} context
+     */
+    display(context) {
+        // draw the interface
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/LevelUpScreen.png"),
+            0, 0, 192, 128, 140, 160, 768, 512);
+        context.save();
+        context.font = "bold 30px Arial";
+        context.fillStyle = "black";
+        context.fillText("Spell Upgrade", 425, 220);
+        context.font = "bold 20px Arial";
+        context.fillText("Select one spell to level up using key [X/J], [Q] to cancel.", 200, 300);
+        context.restore();
+
+        // draw each of the powerups in the interface
+        let powerups = this.game.druid.attacks;
+        for (let i = 0; i < powerups.length; i++) {
+            let imageX = 250 + 220 * i;
+            context.drawImage(powerups[i].spritesheet,
+                    0, 0, 64, 64, imageX, 500, 64, 64);
+            // draw power selection
+            if (i === this.game.druid.attackSelection) {
+                context.save();
+                context.font = "bold 20px Arial";
+                context.fillStyle = "black";
+                let level = powerups[i].level;
+                if (level == 3) {
+                    context.fillText("Max Level.",
+                        200, 350);
+                } else {
+                    context.fillText("Level " + level + " -> Level " + (level + 1) + ":",
+                    200, 350);
+                }
+
+                context.fillText(powerups[i].levelDescription[powerups[i].level - 1],
+                    200, 400);
+                context.restore();
+                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    0, 0, 32, 32, imageX - 8, 500 - 8, 80, 80);
+            }
+        }
     }
 }
 
@@ -267,9 +550,9 @@ class HUD {
      * @param {Array} powerups List of powerups.
      * @param {number} attackSelection Druid"s attack selection.
      */
-    static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection) {
-        const imageY = yOffset + 12;
-        const HEIGHT = 48;
+    static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection, DRUID) {
+        const imageY = yOffset + 9;
+        const HEIGHT = 52;
         const WIDTH = 192;
         let i, imageX;
 
@@ -280,24 +563,31 @@ class HUD {
         context.save();
         context.font = "bold 15px Castellar";
         context.fillStyle = COLORS.FRAME_BROWN;
-        context.fillText("SPELLS", xOffset + 20, yOffset + 31);
+        context.fillText("SPELLS:", xOffset + 15, yOffset + 26);
         context.fillStyle = "black";
-        context.fillText("SPELLS", xOffset + 19, yOffset + 30);
+        context.fillText("SPELLS:", xOffset +14, yOffset + 25);
         context.restore();
         // draw each of the powerups in the interface
         for (i = 0; i < powerups.length; i++) {
-            imageX = xOffset + 85 + 32 * i;
-            if (powerups[i].cooldown > 0) { // if the powerup is on cooldown
+            imageX = xOffset + 85 + 34 * i;
+            if (powerups[i].cost > DRUID.mana && i == attackSelection) { // if the powerup is on cooldown
                 context.drawImage(powerups[i].cooldownSpritesheet,
-                    0, 0, 64, 64, imageX, imageY, 24, 24);
-            } else {                        // not on cooldown
+                    0, 0, 64, 64, imageX, imageY, 26, 26);
+            }else {                        // not on cooldown
                 context.drawImage(powerups[i].spritesheet,
-                    0, 0, 64, 64, imageX, imageY, 24, 24);
+                    0, 0, 64, 64, imageX, imageY, 26, 26);
             }
+
+            // display powerups level
+            context.save();
+            context.font = "bold 10px Arial";
+            context.fillStyle = "black";
+            context.fillText("Lv." + powerups[i].level, imageX, imageY + 36);
+            context.restore();
             // draw power selection
             if (i === attackSelection) {
                 context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select.png"),
-                    0, 0, 32, 32, imageX - 1, imageY - 1, 26, 26);
+                    0, 0, 32, 32, imageX - 1, imageY - 1, 28, 28);
             }
         }
     }
@@ -348,9 +638,9 @@ class Minimap extends Entity {
             context.fillStyle = entity.mapPipColor;
             let pip = {
                 x: this.pos.x + CENTER_OFFSET
-                    + Math.floor((entity.pos.x - this.game.camera.pos.x) / SCALE),
+                    + (entity.pos.x - this.game.camera.pos.x) / SCALE,
                 y: this.pos.y + CENTER_OFFSET
-                    + Math.floor((entity.pos.y - this.game.camera.pos.y) / SCALE),
+                    + (entity.pos.y - this.game.camera.pos.y) / SCALE,
                 width: entity.worldBB.width / SCALE,
                 height: entity.worldBB.height / SCALE
             };

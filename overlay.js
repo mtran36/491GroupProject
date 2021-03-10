@@ -215,6 +215,7 @@ class MenuScreen {
         this.selectEnter = false;
 
         this.game.canvas.addEventListener('keydown', (e) => {
+            if (!this.game.druid) return;
             switch (e.code) {
                 case "KeyI":
                     if (!this.menuPressed) {

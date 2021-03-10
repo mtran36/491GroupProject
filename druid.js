@@ -163,19 +163,7 @@ class Druid extends Agent {
     }
 
 	/** @override */
-	defineAgentCollisions(entity) {
-		let i;
-		if (entity instanceof Door && this.keyCounter > 0) {
-			for (i = 0; i < this.items.length; i++) {
-				if (this.items[i] instanceof Key) {
-					this.keyCounter--;
-					entity.removeFromWorld = true;
-					this.items.splice(i, 1);
-					break;
-				}
-			}
-		}
-	}
+	defineAgentCollisions(entity) { }
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
@@ -204,6 +192,9 @@ class Druid extends Agent {
 			if (entity instanceof Door && this.keyCounter > 0) {
 				entity.removeFromWorld = true;
 				this.keyCounter--;
+				this.items.splice(this.items.findIndex((a) => {
+					return a instanceof Key;
+				}), 1);
 			}
 			this.knockbackTime = 0;
 		}

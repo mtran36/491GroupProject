@@ -268,7 +268,6 @@ var levelOne = {
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
 		{ x: 28, y: 79 },
-		{ x: 45, y: 30 },
 	],
 	healthPowerup: [
 		(game, params) => HealthPowerup.construct(game, params),

@@ -12,6 +12,7 @@ class Items extends Agent {
     defineAgentCollisions(entity) {
         if (entity instanceof Druid) {
             this.removeFromWorld = true;
+            this.game.druid.items.push(this);
             this.addItemsToDruid(entity);
         }
     }
@@ -33,9 +34,14 @@ class Items extends Agent {
 class Potion extends Items {
     constructor(game, x, y, type = 0) {
         super(game, x, y - 100, "./Sprites/potions.png");
-        this.setDimensions(1, 45, 55);
+        this.setDimensions(1, 40, 55);
+        //this.worldBB.display(this.game);
         this.type = type;
         this.loadAnimations();
+    }
+
+    static construct(game, params) {
+        game.addEntity(new Potion(game, params.x, params.y));
     }
 
     /** @override */
@@ -67,12 +73,10 @@ class Potion extends Items {
 
     addItemsToDruid(DRUID) {
         AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
-        if (DRUID.health === DRUID.maxHealth) {
-            DRUID.potionCounter += 1;
-            if (DRUID.potionCounter >= DRUID.maxPotions) {
-                DRUID.potionCounter = DRUID.maxPotions;
-            }
-        } else {
+    }
+
+    useItemOnDruid(DRUID) {
+        if (DRUID.health != DRUID.maxHealth) {
             switch (this.type) {
                 case 0:
                     DRUID.health += 20;
@@ -81,19 +85,31 @@ class Potion extends Items {
                     DRUID.health += 50;
                     break;
                 case 2:
-                    DRUID.health += 100;
+                    DRUID.health += DRUID.maxHealth;
                     break;
             }
+
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
+                //this.game.druid.items.pop(this);
             }
+        } else {
+            DRUID.health = DRUID.maxHealth;
+        }
+        this.game.druid.items.splice(this.game.druid.items.findIndex((a) => {
+            return a === this;
+        }), 1);
+        if (this.game.druid.items.length >= this.game.druid.itemSelection) {
+            this.game.druid.itemSelection = this.game.druid.items.length - 1;
         }
     }
 }
 
 class Key extends Items {
     constructor(game, x, y) {
-        super(game, x, y - 100, "./Sprites/key.png");
+        super(game, x, y - 100, "./Sprites/keyTest.png");
+        this.worldBB.display(this.game);
+        this.loadAnimations();
     };
 
     static construct(game, params) {
@@ -112,12 +128,7 @@ class Key extends Items {
         AUDIO_PLAYER.playSound("./Audio/Key.mp3");
     }
 
-    /** @override */
-	draw(context) {
-		context.drawImage(this.spritesheet, 0, 0, 128, 128,
-            this.pos.x - this.game.camera.pos.x,
-            this.pos.y - this.game.camera.pos.y,
-			this.dim.x, this.dim.y);
-		this.worldBB.display(this.game);
-	}
+    loadAnimations() {
+        this.animations[0] = new Animator(this.spritesheet, 0, 0, 65, 60, 1, 1, 0, false, true, false);
+    }
 }

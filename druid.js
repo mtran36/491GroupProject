@@ -24,6 +24,7 @@ class Druid extends Agent {
 		this.game.druid = this;
 		this.loadAnimations();
 		this.isJumping = false;
+		this.casting = false;
 
 		this.maxHealth = 60;
 		this.maxMana = 60;
@@ -41,14 +42,14 @@ class Druid extends Agent {
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
 
-		this.potionCounter = 0;
-		this.maxPotions = 10;
 		this.keyCounter = 0;
 
 		this.xOffset = 45;
 		this.currentOffset = this.xOffset;
 		this.attackSelection = null;
 		this.attacks = [];
+		this.items = [];
+		this.itemSelection = -1;
 		this.knockbackTime = 0;
 	}
 
@@ -77,8 +78,10 @@ class Druid extends Agent {
 				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
-		this.invincTime = 1;
-		this.flashing = true;
+		if (this.invincTime <= 0) {
+			this.invincTime = 1;
+			this.flashing = true;
+		}
 	}
 
 /**
@@ -159,17 +162,7 @@ class Druid extends Agent {
     }
 
 	/** @override */
-	defineAgentCollisions(entity) {
-		if (entity instanceof Enemy && this.invincTime <= 0) {
-			this.takeDamage(entity.attack);
-		}
-		if (entity instanceof Door) {
-			if (this.keyCounter > 0) {
-				entity.removeFromWorld = true;
-				this.keyCounter -= 1;
-			}
-		}
-	}
+	defineAgentCollisions(entity) { }
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
@@ -198,6 +191,9 @@ class Druid extends Agent {
 			if (entity instanceof Door && this.keyCounter > 0) {
 				entity.removeFromWorld = true;
 				this.keyCounter--;
+				this.items.splice(this.items.findIndex((a) => {
+					return a instanceof Key;
+				}), 1);
 			}
 			this.knockbackTime = 0;
 		}
@@ -292,11 +288,6 @@ class Druid extends Agent {
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
 		}
-		// Update potion counter
-		if (this.potionCounter > 0 && remainder > 20) {
-			this.health += 20;
-			this.potionCounter -= 1;
-		}
 		// Damage flashing 
 		if (this.invincTime > 0) {
 			this.invincTime -= this.game.clockTick;
@@ -330,15 +321,8 @@ class Druid extends Agent {
 		}
 		// check if melee attack is made
 		this.meleeAttack();
-		// for spell upgrade testing:
-		if (this.game.Q == true) {
-			if (this.attacks[this.attackSelection].canLevelUp == true) {
-				this.attacks[this.attackSelection].levelUp();
-			}
-			this.game.Q = false;
-        }
 		// check if switch attack
-		if (this.game.SHIFT == true && this.attackSelection != null) {
+		if (this.game.SHIFT == true && this.attackSelection != null && this.casting == false) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
 		}
@@ -348,7 +332,7 @@ class Druid extends Agent {
 				this.attacks[i].updateCooldown();
 			}
 			this.attacks[this.attackSelection].attack(this);
-        }
+		}
 		this.move(TICK);
 	}
 
@@ -397,7 +381,7 @@ class Druid extends Agent {
 				}, "MANA",
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? this.lowManaGradient : this.manaGradient,
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? "indigo" : COLORS.LAPIS);
-			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
+			HUD.drawPowerupUI(context, 118, 62, this.attacks, this.attackSelection, this);
 		}
 		if (this.flashing) return;
 		// Draw druid

@@ -42,14 +42,14 @@ class Druid extends Agent {
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
 
-		this.potionCounter = 0;
-		this.maxPotions = 10;
 		this.keyCounter = 0;
 
 		this.xOffset = 45;
 		this.currentOffset = this.xOffset;
 		this.attackSelection = null;
 		this.attacks = [];
+		this.items = [];
+		this.itemSelection = -1;
 		this.knockbackTime = 0;
 	}
 
@@ -78,8 +78,10 @@ class Druid extends Agent {
 				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
-		this.invincTime = 1;
-		this.flashing = true;
+		if (this.invincTime <= 0) {
+			this.invincTime = 1;
+			this.flashing = true;
+		}
 	}
 
 /**
@@ -160,17 +162,7 @@ class Druid extends Agent {
     }
 
 	/** @override */
-	defineAgentCollisions(entity) {
-		if (entity instanceof Enemy && this.invincTime <= 0) {
-			this.takeDamage(entity.attack);
-		}
-		if (entity instanceof Door) {
-			if (this.keyCounter > 0) {
-				entity.removeFromWorld = true;
-				this.keyCounter -= 1;
-			}
-		}
-	}
+	defineAgentCollisions(entity) { }
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
@@ -199,6 +191,9 @@ class Druid extends Agent {
 			if (entity instanceof Door && this.keyCounter > 0) {
 				entity.removeFromWorld = true;
 				this.keyCounter--;
+				this.items.splice(this.items.findIndex((a) => {
+					return a instanceof Key;
+				}), 1);
 			}
 			this.knockbackTime = 0;
 		}
@@ -292,11 +287,6 @@ class Druid extends Agent {
 			this.animations[0][0] = this.storedAnimations.standingRight;
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
-		}
-		// Update potion counter
-		if (this.potionCounter > 0 && remainder > 20) {
-			this.health += 20;
-			this.potionCounter -= 1;
 		}
 		// Damage flashing 
 		if (this.invincTime > 0) {

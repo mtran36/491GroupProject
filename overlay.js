@@ -16,6 +16,7 @@ class PauseScreen {
                         this.pausePressed = true;
                         if (this.game.screen === this) {
                             this.game.screen = this.screen;
+                            this.screen = false;
                         } else {
                             this.screen = this.game.screen;
                             this.game.screen = this;
@@ -68,7 +69,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.canvas.removeEventListener('keydown', clickStart);
-            this.game.camera.loadLevel(levelOne);
+            this.game.camera.loadLevel(levelOne, 15, 115);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
@@ -76,15 +77,15 @@ class StartScreen {
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne);
-                this.game.screen = null;
+                this.game.camera.loadLevel(levelOne, 15, 115);
+                this.game.screen = false;
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(
-                    levelOne, PARAMS.TILE_WIDTH * 15, PARAMS.TILE_WIDTH * 115);
-                this.game.screen = null;
+                    levelOne, 15, 115);
+                this.game.screen = false;
             }
         });
         this.display(this.game.context);
@@ -122,14 +123,14 @@ class WinScreen {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => { this.game.screen = this.game.camera.startScreen; }, 100);
+                setTimeout(() => { this.game.screen = this.game.camera.StartScreen; }, 100);
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this && e.code == 'KeyR') {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         });
     }
@@ -165,14 +166,14 @@ class LoseScreen {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => { this.game.screen = this.game.camera.startScreen }, 100);
+                setTimeout(() => { this.game.screen = this.game.camera.StartScreen }, 100);
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
-            if (this.game.screen === this && e.code == 'KeyR') {
+            if (this.game.screen === this && e.code === 'KeyR') {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         });
     }
@@ -198,6 +199,155 @@ class LoseScreen {
         context.restore();
     }
     
+}
+
+class MenuScreen {
+    constructor(game) {
+        this.game = game;
+        this.camera = new Object();
+        this.camera.pos = { x: 0, y: 0 };
+        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.menuPressed = false;
+        this.selectLeft = false;
+        this.selectRight = false;
+        this.selectUp = false;
+        this.selectDown = false;
+        this.selectEnter = false;
+
+        this.game.canvas.addEventListener('keydown', (e) => {
+            if (!this.game.druid) return;
+            switch (e.code) {
+                case "KeyI":
+                    if (!this.menuPressed) {
+                        this.menuPressed = true;
+                        if (this.game.screen === this) {
+                            this.game.screen = false;
+                        } else if (this.game.screen === false) {
+                            this.game.screen = this;
+                        }
+                    }
+                    if (this.game.druid.itemSelection >= this.game.druid.items.length ||
+                        this.game.druid.itemSelection === -1) {
+                        this.game.druid.itemSelection = this.game.druid.items.length - 1;
+                    }
+                    console.log(this.game.druid.itemSelection);
+                    break;
+                case "ArrowLeft":
+                    this.selectLeft = true;
+                    if (this.selectLeft == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
+                        //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
+                        this.selectLeft = false;
+                    }
+                    break;
+                case "ArrowRight":
+                    this.selectRight = true;
+                    if (this.selectRight == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
+                        this.selectRight = false;
+                    }
+                    break;
+                case "ArrowUp":
+                    this.selectUp = true;
+                    if (this.selectUp == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
+                        this.selectUp = false;
+                    }
+                    break;
+                case "ArrowDown":
+                    this.selectDown = true;
+                    if (this.selectDown == true && this.game.druid.itemSelection !== -1) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
+                        this.selectDown = false;
+                    }
+                    break;
+                case "KeyR":
+                    this.selectEnter = true;
+                    this.game.druid.items[this.game.druid.itemSelection].useItemOnDruid(this.game.druid);
+                    this.selectEnter = false;
+                    break;
+            }
+        })
+        this.game.canvas.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case "KeyI":
+                    this.menuPressed = false;
+                    break;
+                case "ArrowLeft":
+                    this.selectLeft = false;
+                    break;
+                case "ArrowRight":
+                    this.selectRight = false;
+                    break;
+                case "ArrowLeft":
+                    this.selectUp = false;
+                    break;
+                case "ArrowRight":
+                    this.selectDown = false;
+                    break;
+                case "KeyR":
+                    this.selectEnter = false;
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Display the pause screen.
+     * @param {CanvasRenderingContext2D} context
+     */
+    display(context) {
+        let i;
+        const OFFSET = 10;
+
+        context.drawImage(
+            ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
+            PARAMS.CANVAS_WIDTH / 5,
+            OFFSET * 4,
+            122 * 5,
+            137 * 5);
+
+        context.save();
+
+        if (this.style.fill) {
+            context.fillStyle = this.style.fill;
+        }
+        if (this.style.stroke) {
+            context.strokeStyle = this.style.stroke;
+        }
+
+        context.font = "bold 64px sans-serif";
+        context.fillText(
+            "Inventory",
+            PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
+            PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
+
+        context.strokeText(
+            "Inventory",
+            PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
+            PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
+
+        for (i = 0; i < this.game.druid.items.length; i++) {
+            this.game.druid.items[i].animations[0].drawFrame(
+                0,
+                context,
+                ((i % 7) * (OFFSET * 8)) + 255,
+                (Math.floor(i / 7) * (OFFSET * 8)) + 164,
+                0.9,
+                this.camera);
+
+            if (i === this.game.druid.itemSelection) {
+                context.drawImage(
+                    ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    ((i % 7) * (OFFSET * 8)) + 235,
+                    (Math.floor(i / 7) * (OFFSET * 8)) + 155,
+                    32 * 2.4,
+                    32 * 2.4);
+            }
+        }
+
+        context.restore();
+    }
 }
 
 class LevelUpScreen {
@@ -459,8 +609,8 @@ class Minimap extends Entity {
             if (entity.hidden || entity instanceof Effect) return;
             context.fillStyle = entity.mapPipColor;
             let pip = {
-                x: this.pos.x + 25 + (entity.pos.x - this.game.camera.pos.x) / SCALE,
-                y: this.pos.y + 25 + (entity.pos.y - this.game.camera.pos.y) / SCALE,
+                x: this.pos.x + 25 + (entity.worldBB.x - this.game.camera.pos.x) / SCALE,
+                y: this.pos.y + 25 + (entity.worldBB.y - this.game.camera.pos.y) / SCALE,
                 width: entity.worldBB.width / SCALE,
                 height: entity.worldBB.height / SCALE
             };

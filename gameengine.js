@@ -25,6 +25,7 @@ class GameEngine {
         this.mute = false;
         this.mutePressed = false;
         this.screen = false;
+        this.menuPressed = false;
     };
 
     /**
@@ -204,11 +205,6 @@ class GameEngine {
             }
         }
         AUDIO_PLAYER.update();
-        // Author: tommy
-        // temporary winning condition checking:
-        if (!this.entities.includes(this.camera.temporaryBoss)) {
-            this.screen = this.camera.winScreen;
-        }
     };
 
     /** 

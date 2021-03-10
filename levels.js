@@ -193,69 +193,69 @@ var levelOne = {
 	flies: [
 		(game, params) => Fly.construct(game, params),
 		// A2:
-		{ x: 80, y: 87, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 85, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 60, y: 85, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 50, y: 85, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 45, y: 85, prizeRate: 0.1, prize: 'PotionMid' }
+		{ x: 80, y: 87 },
+		{ x: 70, y: 85 },
+		{ x: 60, y: 85 },
+		{ x: 50, y: 85 },
+		{ x: 45, y: 85 }
 	],
 	rangedFlies: [
 		(game, params) => RangedFly.construct(game, params),
 		// A2:
-		{ x: 40, y: 90, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 40, y: 90 },
 		// A3:
-		{ x: 25, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 25, y: 72 },
 		// A4:
-		{ x: 60, y: 65, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 65, prizeRate: 0.1, prize: 'PotionMid' }
+		{ x: 60, y: 65, prizeRate: 0.5, prize: "PotionMid" },
+		{ x: 70, y: 65, prizeRate: 0.5, prize: "PotionMid" }
 	],
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
 		// A1:
-		{ x: 40, y: 118, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 50, y: 118, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 118, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 40, y: 118 },
+		{ x: 50, y: 118, prizeRate: 1 },
+		{ x: 70, y: 118 },
 		// A3:
-		{ x: 15, y: 93, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 10, y: 90, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 6, y: 81, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 15, y: 93 },
+		{ x: 10, y: 90, prizeRate: 1 },
+		{ x: 6, y: 81 },
 		// A4:
-		{ x: 50, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 50, y: 72 },
+		{ x: 70, y: 72, prizeRate: 1 },
 		// A5:
-		{ x: 40, y: 45, prizeRate: 1, prize: 'Key' }
+		{ x: 40, y: 45, prizeRate: 1, prize: "Key" }
 	],
 	flyBeetles: [
 		(game, params) => FlyBeetle.construct(game, params),
 		// A1:
-		{ x: 60, y: 115, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 117, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 75, y: 115, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 60, y: 115 },
+		{ x: 70, y: 117 },
+		{ x: 75, y: 115 },
 		// A3:
-		{ x: 6, y: 80, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 6, y: 80 },
 		// A4:
-		{ x: 90, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 90, y: 64, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 90, y: 61, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 90, y: 72 },
+		{ x: 90, y: 64 },
+		{ x: 90, y: 61 },
 		// A5:
-		{ x: 60, y: 44, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 60, y: 45, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 46, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 80, y: 47, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 60, y: 44, prizeRate: 1, prize: "PotionMid" },
+		{ x: 60, y: 45 },
+		{ x: 70, y: 46 },
+		{ x: 80, y: 47 },
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),
 		// A4:
-		{ x: 40, y: 75, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 40, y: 75, prizeRate: 0.3, prize: "PotionMid" },
 		// A5:
-		{ x: 75, y: 50, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 65, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 40, y: 55, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 75, y: 50 },
+		{ x: 65, y: 55 },
+		{ x: 40, y: 55 },
 	],
 	mantis: [
 		(game, params) => Mantis.construct(game, params),
-		{ x: 30, y: 115, prizeRate: 0 },
-		{ x: 42, y: 54, prizeRate: 0 }
+		{ x: 30, y: 115, prizeRate: 0.5, prize: "PotionHigh" },
+		{ x: 42, y: 54, prizeRate: 1, prize: "PotionHigh" }
 	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),
@@ -273,6 +273,10 @@ var levelOne = {
 		(game, params) => HealthPowerup.construct(game, params),
 		{ x: 20, y: 119 }
 	],
+	boss: [
+		(game, params) => LionBoss.construct(game, params),
+		{x: 70, y: 30}
+  ],
 	levelUpStone: [
 		(game, params) => LevelUpStone.construct(game, params),
 		{ x: 53, y: 99 },

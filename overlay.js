@@ -216,19 +216,26 @@ class LoseScreen {
 
 class MenuScreen {
     constructor(game) {
+        const DRUID = game.druid;
+        const ROW = 7;
+        let moveCursor = (amount) => {
+            if (DRUID.itemSelection + amount >= DRUID.items.length) {
+                DRUID.itemSelection = DRUID.items.length - 1;
+            } else if (DRUID.itemSelection + amount < 0) {
+                DRUID.itemSelection = 0;
+            } else {
+                DRUID.itemSelection = (DRUID.itemSelection + amount);
+            }
+        }
+
         this.game = game;
         this.camera = new Object();
         this.camera.pos = { x: 0, y: 0 };
-        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.style = { fill: "beige", stroke: "darkgreen" };
         this.menuPressed = false;
-        this.selectLeft = false;
-        this.selectRight = false;
-        this.selectUp = false;
-        this.selectDown = false;
-        this.selectEnter = false;
 
-        this.game.canvas.addEventListener('keydown', (e) => {
-            if (!this.game.druid) return;
+        this.game.canvas.addEventListener("keydown", (e) => {
+            if (!DRUID) return;
             switch (e.code) {
                 case "KeyI":
                     if (!this.menuPressed) {
@@ -239,53 +246,41 @@ class MenuScreen {
                             this.game.screen = this;
                         }
                     }
-                    if (this.game.druid.itemSelection >= this.game.druid.items.length ||
-                        this.game.druid.itemSelection === -1) {
-                        this.game.druid.itemSelection = this.game.druid.items.length - 1;
+                    if (DRUID.itemSelection >= DRUID.items.length
+                        || DRUID.itemSelection === -1) {
+                        DRUID.itemSelection = DRUID.items.length - 1;
                     }
-                    console.log(this.game.druid.itemSelection);
                     break;
                 case "ArrowLeft":
                 case "KeyA":
-                    this.selectLeft = true;
-                    if (this.selectLeft == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
-                        //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
-                        this.selectLeft = false;
+                    if (DRUID.itemSelection !== -1) {
+                        moveCursor(-1);
                     }
                     break;
                 case "ArrowRight":
                 case "KeyD":
-                    this.selectRight = true;
-                    if (this.selectRight == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
-                        this.selectRight = false;
+                    if (DRUID.itemSelection !== -1) {
+                        moveCursor(1);
                     }
                     break;
                 case "ArrowUp":
                 case "KeyW":
-                    this.selectUp = true;
-                    if (this.selectUp == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
-                        this.selectUp = false;
+                    if (DRUID.itemSelection !== -1) {
+                        moveCursor(-ROW);
                     }
                     break;
                 case "ArrowDown":
                 case "KeyS":
-                    this.selectDown = true;
-                    if (this.selectDown == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
-                        this.selectDown = false;
+                    if (DRUID.itemSelection !== -1) {
+                        moveCursor(ROW);
                     }
                     break;
                 case "KeyR":
-                    this.selectEnter = true;
-                    this.game.druid.items[this.game.druid.itemSelection].useItemOnDruid(this.game.druid);
-                    this.selectEnter = false;
+                      DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
                     break;
             }
-        })
-        this.game.canvas.addEventListener('keyup', (e) => {
+        });
+        this.game.canvas.addEventListener("keyup", (e) => {
             switch (e.code) {
                 case "KeyI":
                     this.menuPressed = false;
@@ -373,27 +368,29 @@ class MenuScreen {
 
 class LevelUpScreen {
     constructor(game) {
+        const DRUID = game.druid;
+
         this.game = game;
         this.camera = new Object();
         this.camera.pos = { x: 0, y: 0 };
-        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.style = { fill: "beige", stroke: "darkgreen" };
         this.screen = false;
         this.levelUpScreen = false;
         this.selectLeft = false;
         this.selectRight = false;
 
 
-        this.game.canvas.addEventListener('keydown', (e) => {
+        this.game.canvas.addEventListener("keydown", (e) => {
             switch (e.code) {
                 case "ArrowLeft":
                 case "KeyA":
                     if (!this.left && this.levelUpScreen
-                        && this.game.druid.attacks.length > 0) {
-                        if (this.game.druid.attackSelection == 0) {
-                            this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
+                        && DRUID.attacks.length > 0) {
+                        if (DRUID.attackSelection == 0) {
+                            DRUID.attackSelection = DRUID.attacks.length - 1;
                         } else {
-                            this.game.druid.attackSelection =
-                                (this.game.druid.attackSelection - 1) % this.game.druid.attacks.length;
+                            DRUID.attackSelection =
+                                (DRUID.attackSelection - 1) % DRUID.attacks.length;
                         }
                         this.left = true;
                     }
@@ -401,18 +398,18 @@ class LevelUpScreen {
                 case "ArrowRight":
                 case "KeyD":
                     if (!this.right && this.levelUpScreen
-                        && this.game.druid.attacks.length > 0) {
-                        this.game.druid.attackSelection =
-                            (this.game.druid.attackSelection + 1) % this.game.druid.attacks.length;
+                        && DRUID.attacks.length > 0) {
+                        DRUID.attackSelection =
+                            (DRUID.attackSelection + 1) % DRUID.attacks.length;
                         this.right = true;
                     }
                     break;
                 case "KeyX":
                 case "KeyJ":
                     if (this.levelUpScreen
-                        && this.game.druid.attacks.length > 0) {
-                        if (this.game.druid.attacks[this.game.druid.attackSelection].canLevelUp) {
-                            this.game.druid.attacks[this.game.druid.attackSelection].levelUp();
+                        && DRUID.attacks.length > 0) {
+                        if (DRUID.attacks[DRUID.attackSelection].canLevelUp) {
+                            DRUID.attacks[DRUID.attackSelection].levelUp();
                             this.item.removeFromWorld = true;
                             this.item = null;
                             this.levelUpScreen = false;
@@ -429,7 +426,7 @@ class LevelUpScreen {
                 break;
             }
         });
-        this.game.canvas.addEventListener('keyup', (e) => {
+        this.game.canvas.addEventListener("keyup", (e) => {
             switch (e.code) {
                 case "ArrowLeft":
                 case "KeyA":
@@ -454,44 +451,36 @@ class LevelUpScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        let powerups, imageX, level;
+
         // draw the interface
+        context.save();
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/LevelUpScreen.png"),
             0, 0, 192, 128, 140, 160, 768, 512);
-        context.save();
         context.font = "bold 30px Arial";
         context.fillStyle = "black";
         context.fillText("Spell Upgrade", 425, 220);
         context.font = "bold 20px Arial";
         context.fillText("Select one spell to level up using key [X/J], [Q] to cancel.", 200, 300);
-        context.restore();
-
         // draw each of the powerups in the interface
-        let powerups = this.game.druid.attacks;
-        for (let i = 0; i < powerups.length; i++) {
-            let imageX = 250 + 220 * i;
-            context.drawImage(powerups[i].spritesheet,
-                    0, 0, 64, 64, imageX, 500, 64, 64);
+        powerups = this.game.druid.attacks;
+        for (i = 0; i < powerups.length; i++) {
+            imageX = 250 + 220 * i;
+            context.drawImage(powerups[i].spritesheet, 0, 0, 64, 64, imageX, 500, 64, 64);
             // draw power selection
             if (i === this.game.druid.attackSelection) {
-                context.save();
                 context.font = "bold 20px Arial";
                 context.fillStyle = "black";
-                let level = powerups[i].level;
-                if (level == 3) {
-                    context.fillText("Max Level.",
-                        200, 350);
-                } else {
-                    context.fillText("Level " + level + " -> Level " + (level + 1) + ":",
-                    200, 350);
-                }
-
-                context.fillText(powerups[i].levelDescription[powerups[i].level - 1],
-                    200, 400);
-                context.restore();
+                level = powerups[i].level;
+                level === 3 ?
+                    context.fillText("Max Level.", 200, 350):
+                    context.fillText("Level " + level + " -> Level " + (level + 1) + ":", 200, 350);
+                context.fillText(powerups[i].levelDescription[powerups[i].level - 1], 200, 400);
                 context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
                     0, 0, 32, 32, imageX - 8, 500 - 8, 80, 80);
             }
         }
+        context.restore();
     }
 }
 
@@ -551,45 +540,38 @@ class HUD {
      * @param {number} attackSelection Druid"s attack selection.
      */
     static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection, DRUID) {
-        const imageY = yOffset + 9;
+        const IMAGE_Y = yOffset + 9;
         const HEIGHT = 52;
         const WIDTH = 192;
         let i, imageX;
 
-        // draw the interface
+        context.save();
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
             0, 0, WIDTH, HEIGHT, xOffset, yOffset, WIDTH, HEIGHT);
-        // draw text
-        context.save();
         context.font = "bold 15px Castellar";
         context.fillStyle = COLORS.FRAME_BROWN;
         context.fillText("SPELLS:", xOffset + 15, yOffset + 26);
         context.fillStyle = "black";
         context.fillText("SPELLS:", xOffset +14, yOffset + 25);
-        context.restore();
-        // draw each of the powerups in the interface
+        // Draw each of the powerups 
         for (i = 0; i < powerups.length; i++) {
             imageX = xOffset + 85 + 34 * i;
-            if (powerups[i].cost > DRUID.mana && i == attackSelection) { // if the powerup is on cooldown
+            (powerups[i].cost > DRUID.mana && i == attackSelection) ?
                 context.drawImage(powerups[i].cooldownSpritesheet,
-                    0, 0, 64, 64, imageX, imageY, 26, 26);
-            }else {                        // not on cooldown
+                    0, 0, 64, 64, imageX, IMAGE_Y, 26, 26):
                 context.drawImage(powerups[i].spritesheet,
-                    0, 0, 64, 64, imageX, imageY, 26, 26);
-            }
-
+                    0, 0, 64, 64, imageX, IMAGE_Y, 26, 26);
             // display powerups level
-            context.save();
             context.font = "bold 10px Arial";
             context.fillStyle = "black";
-            context.fillText("Lv." + powerups[i].level, imageX, imageY + 36);
-            context.restore();
+            context.fillText("Lv." + powerups[i].level, imageX, IMAGE_Y + 36);
             // draw power selection
             if (i === attackSelection) {
                 context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select.png"),
-                    0, 0, 32, 32, imageX - 1, imageY - 1, 28, 28);
+                    0, 0, 32, 32, imageX - 1, IMAGE_Y - 1, 28, 28);
             }
         }
+        context.restore();
     }
 }
 

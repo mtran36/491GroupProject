@@ -148,8 +148,10 @@ class Druid extends Agent {
 				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
-		this.invincDuration = 1;
-		this.flashing = true;
+		if (this.invincDuration <= 0) {
+			this.invincDuration = 1;
+			this.flashing = true;
+		}
 	}
 
 	/** @override */
@@ -161,7 +163,11 @@ class Druid extends Agent {
 			}
 		}
 	}
-	defineAgentCollisions(entity) { }
+
+	/** @override */
+	defineAgentCollisions(entity) {
+		// Do nothing
+	}
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
@@ -306,8 +312,8 @@ class Druid extends Agent {
 			this.potionCounter -= 1;
 		}
 		// Damage flashing 
-		if (this.invincTime > 0) {
-			this.invincTime -= this.game.clockTick;
+		if (this.invincDuration > 0) {
+			this.invincDuration -= this.game.clockTick;
 			this.flashing = !this.flashing;
 		} else {
 			this.flashing = false;
@@ -413,11 +419,11 @@ class Druid extends Agent {
 				this.mana < this.attacks[this.attackSelection].cost - 1 ?
 					"indigo" : COLORS.LAPIS);
 			// Powerup UI
-			HUD.drawPowerupUI(context, 118, 62, this.attackSelection, this);
+			HUD.drawPowerupUI(context, 118, 62, this.attacks, this.attackSelection, this);
 		}
-		// Damage flashing
-		if (this.flashing) return;
 		// Druid frame selection
+		console.warn(this.flashing);
+		if (this.flashing) return;
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,
 			this.pos.x, this.pos.y,

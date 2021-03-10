@@ -60,7 +60,7 @@ var levelOne = {
 		{ x: 38, y: 14, width: 3, height: 1 },
 		{ x: 35, y: 9, width: 4, height: 49 },
 		// ceiling:
-		{ x: 45, y: 35, width: 55, height: 9},
+		{ x: 45, y: 35, width: 55, height: 9 },
 
 		// A4:
 		// left platform:
@@ -233,7 +233,10 @@ var levelOne = {
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
 		// A1:
-		{ x: 40, y: 118 },
+		{ x: 40, y: 118, prizeRate: 1 },
+		{ x: 41, y: 118, prizeRate: 1 },
+		{ x: 42, y: 118, prizeRate: 1 },
+		{ x: 43, y: 118, prizeRate: 1 },
 		{ x: 50, y: 118, prizeRate: 1 },
 		{ x: 70, y: 118 },
 		// A3:

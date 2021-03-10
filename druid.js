@@ -41,8 +41,6 @@ class Druid extends Agent {
 		this.meleeAttackCooldown = 0;
 		this.meleeAttackDuration = 0;
 
-		this.potionCounter = 0;
-		this.maxPotions = 10;
 		this.keyCounter = 0;
 
 		this.xOffset = 45;
@@ -288,11 +286,6 @@ class Druid extends Agent {
 			this.animations[0][0] = this.storedAnimations.standingRight;
 			this.animations[1][0] = this.storedAnimations.standingLeft;
 			this.vel.x = 0;
-		}
-		// Update potion counter
-		if (this.potionCounter > 0 && remainder > 30) {
-			this.health += 20;
-			this.potionCounter -= 1;
 		}
 		// Damage flashing 
 		if (this.invincTime > 0) {

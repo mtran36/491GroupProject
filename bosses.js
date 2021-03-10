@@ -16,6 +16,7 @@ class LionBoss extends Enemy{
         this.runCount = 0;
         this.velMax = { x: 500, y: 1200 };
         this.hasAttacked = false;
+        this.ACC.y = 2000;
     } 
 
     static construct(game, params) {
@@ -46,8 +47,8 @@ class LionBoss extends Enemy{
 
         //Jump Animation
         this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/LionAttack.png");
-        this.animations[3][0] = new Animator(this.spritesheet, 400, 0, 100, 100, 6, 0.1, 0, false, true, true);
-        this.animations[3][1] = new Animator(this.spritesheet, 400, 0, 100, 100, 6, 0.1, 0, false, true, false);
+        this.animations[3][0] = new Animator(this.spritesheet, 400, 0, 100, 100, 6, 0.1, 0, false, true, true, false, true);
+        this.animations[3][1] = new Animator(this.spritesheet, 400, 0, 100, 100, 6, 0.1, 0, false, true, false, false, true);
 
         //Death Animation
         this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/LionDeath.png");
@@ -91,20 +92,30 @@ class LionBoss extends Enemy{
         this.stateChange -= this.game.clockTick;
         let druidCenter = this.game.druid.worldBB.centerPoint();
         let thisCenter = this.worldBB.centerPoint();
+        console.warn(this.stateChange);
         if (this.stateChange < 0) {
-            if (this.state === 0 || this.state === 2) {
-                this.state = 1;
-                this.facing = thisCenter.x > druidCenter.x ? 0 : 1;
-                this.runCount++;
-                this.stateChange = Math.random() + 0.5;
+            if (this.state !== 3 && this.state !== 1 && Math.random() < 0.2) {
+                this.state = 3;
+                this.stateChange = 100;
+                this.vel.y = -900;
+                let diffx = this.game.druid.pos.x - this.pos.x;
+                this.vel.x = diffx * 1.5;
                 this.hasAttacked = false;
-            } else if (this.state === 1) {
-                this.state = 2;
-                this.stateChange = 1.7;
-                if (this.runCount > 3) {
-                    this.runCount = 0;
-                    this.state = 0;
-                    this.stateChange = Math.random() * 2 + 1;
+            } else {
+                if (this.state !== 1) {
+                    this.state = 1;
+                    this.facing = thisCenter.x > druidCenter.x ? 0 : 1;
+                    this.runCount++;
+                    this.stateChange = Math.random() + 0.5;
+                    this.hasAttacked = false;
+                } else if (this.state === 1) {
+                    this.state = 2;
+                    this.stateChange = 1.7;
+                    if (this.runCount > 3) {
+                        this.runCount = 0;
+                        this.state = 0;
+                        this.stateChange = Math.random() * 2 + 1;
+                    }
                 }
             }
         }
@@ -130,6 +141,8 @@ class LionBoss extends Enemy{
                 }
                 this.vel.x = 0;
                 break;
+            case 3:
+                break;
         }
         this.move(this.game.clockTick);
     }
@@ -141,7 +154,11 @@ class LionBoss extends Enemy{
 		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
-				this.vel.y = 0;
+                this.vel.y = 0;
+                if (this.state === 3) {
+                    this.state = 0;
+                    this.stateChange = Math.random() * 2 + 1;
+                }
 			}
 			if (collisions.up) {
 				y = entity.worldBB.bottom;

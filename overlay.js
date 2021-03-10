@@ -68,7 +68,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.canvas.removeEventListener('keydown', clickStart);
-            this.game.camera.loadLevel(levelOne, 50, 31);
+            this.game.camera.loadLevel(levelOne, 15, 115);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);

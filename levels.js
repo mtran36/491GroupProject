@@ -138,11 +138,32 @@ var levelOne = {
 		// celling:
 		{ x: 0, y: 105, width: 30, height: 9 },
 		{ x: 20, y: 100, width: 34, height: 8 },
-		{ x: 70, y: 100, width: 15, height: 8 }
+		{ x: 70, y: 100, width: 15, height: 8 },
+
+		// Pre A1:
+		{ x: -100, y: 120, width: 102, height: 13 }
+	],
+	mask: [
+		(game, params) => Mask.construct(game, params),
+		{ x: -100, y: 114, width: 10, height: 5 }
 	],
 	wood: [
 		(game, params) => Wood.construct(game, params),
-		{ x: 0, y: 118, length: 200, type: 4, isVertical: 1 }
+		// A1
+		// Entrance
+		{ x: 0, y: 18, length: 97, type: 4, isVertical: 1 },
+		{ x: 0, y: 120, length: 10, type: 4, isVertical: 1 },
+		{ x: 0, y: 119, length: 12, type: 0, isVertical: 0 },
+		{ x: 0, y: 114, length: 12, type: 0, isVertical: 0 },
+		{ x: 4, y: 115, length: 3, type: 1, isVertical: 0 },
+		{ x: 3, y: 115, length: 1, type: 0, isVertical: 0 },
+		{ x: 7, y: 115, length: 1, type: 0, isVertical: 0 },
+		// Pre A1
+		{ x: -100, y: 114, length: 5, type: 0, isVertical: 1 },
+		{ x: -91, y: 114, length: 3, type: 0, isVertical: 1 },
+		{ x: -100, y: 119, length: 10, type: 0, isVertical: 0 },
+		{ x: -100, y: 114, length: 10, type: 0, isVertical: 0 }
+
 	],
 	standingBreakBlock: [
 		(game, params) => StandingBreakBlock.construct(game, params),
@@ -179,7 +200,13 @@ var levelOne = {
 	],
 	door: [
 		(game, params) => Door.construct(game, params),
-		{ x: 47, y: 22 }
+		{ x: 47, y: 22 },
+		{ x: 5, y: 117 },
+		//{ x: -91, y: 117 }
+	],
+	key: [
+		(game, params) => Key.construct(game, params),
+		{ x: -80, y: 117 }
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
@@ -265,7 +292,7 @@ var levelOne = {
 	],
 	druid: [
 		(game, params) => Druid.construct(game, params),
-		{ x: 16, y: 115 }
+		{ x: -90, y: 117 }
 	]
 };
 

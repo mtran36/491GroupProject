@@ -160,11 +160,11 @@ class Wood extends Block {
 
 	/** @override */
 	draw(context) {
-		let i;
-		for (i = 0; i < this.length; i++) {
+		let offset;
+		for (offset = 0; offset < this.length; offset++) {
 			this.isVertical ?
-				this.drawOffset(context, 0, i):
-				this.drawOffset(context, i, 0);
+				this.drawOffset(context, 0, offset):
+				this.drawOffset(context, offset, 0);
         }
 	}
 }
@@ -659,7 +659,7 @@ class HitBreakBlock extends BreakBlock {
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");
-		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 3);
+		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 2);
 	};
 
 	static construct(game, params) {

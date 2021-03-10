@@ -123,14 +123,14 @@ class WinScreen {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => { this.game.screen = this.game.camera.startScreen; }, 100);
+                setTimeout(() => { this.game.screen = this.game.camera.StartScreen; }, 100);
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this && e.code == 'KeyR') {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         });
     }

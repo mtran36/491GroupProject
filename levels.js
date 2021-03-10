@@ -290,6 +290,10 @@ var levelOne = {
 		(game, params) => HealthPowerup.construct(game, params),
 		{ x: 20, y: 119 }
 	],
+	boss: [
+		(game, params) => LionBoss.construct(game, params),
+		{x: 70, y: 30}
+	],
 	druid: [
 		(game, params) => Druid.construct(game, params),
 		{ x: -90, y: 117 }

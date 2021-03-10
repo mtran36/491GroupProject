@@ -151,9 +151,6 @@ class Druid extends Agent {
 
 	/** @override */
 	defineAgentCollisions(entity) {
-		if (entity instanceof Enemy && this.invincDuration <= 0) {
-			this.takeDamage(entity.attack);
-		}
 		if (entity instanceof Door) {
 			if (this.keyCounter > 0) {
 				entity.removeFromWorld = true;

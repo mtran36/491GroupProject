@@ -83,7 +83,7 @@ class StartScreen {
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener("click", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne);
+                this.game.camera.loadLevel(levelOne, 15, 115);
                 this.game.screen = null;
             }
         });

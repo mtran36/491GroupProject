@@ -1,9 +1,9 @@
 class Animator {
     constructor(spritesheet, xStart, yStart, width, height, frameCount,
-        frameDuration, framePadding, reverse, loop, flip, bounce) {
+        frameDuration, framePadding, reverse, loop, flip, bounce, stay) {
         Object.assign(this, {
             spritesheet, xStart, yStart, height, width, frameCount,
-            frameDuration, framePadding, reverse, loop, flip, bounce
+            frameDuration, framePadding, reverse, loop, flip, bounce, stay
         });
         this.elapsedTime = 0;
         this.totalTime = this.frameCount * this.frameDuration;
@@ -38,6 +38,8 @@ class Animator {
                     this.reverse = !this.reverse;
                     this.elapsedTime += this.frameDuration;
                 }
+            } else if (this.stay) {
+                this.elapsedTime = this.totalTime - this.frameDuration;
             } else return;
         }
         // Prepare current frame

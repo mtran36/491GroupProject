@@ -14,7 +14,12 @@ class Enemy extends Agent {
 		this.velMax = { x: 400, y: 700 };
 		this.sightRange = 400;
 		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
-		this.defineAgentCollisions = function () { /* Do nothing */ };
+	}
+
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			entity.takeDamage(this.attack);
+		}
 	}
 
 	/**

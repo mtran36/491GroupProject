@@ -45,6 +45,10 @@ const IMAGE_PATHS = [
 	"./Sprites/select.png",
 	"./Sprites/transparency.png",
 	"./Sprites/tree.png",
+	"./Sprites/LionIdle.png",
+	"./Sprites/LionRun.png",
+	"./Sprites/LionAttack.png",
+	"./Sprites/LionDeath.png",
 	"./Sprites/titleTree.png",
 	"./Sprites/woods.png"
 ]

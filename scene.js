@@ -15,7 +15,7 @@ class Scene {
 		this.loseScreen = new LoseScreen(this.game);
 	}
 
-	loadLevel(level) {
+	loadLevel(level, x, y) {
 		this.game.entities = [];
 		let entry, construct, entityArr;
 

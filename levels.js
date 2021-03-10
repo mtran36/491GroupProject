@@ -59,9 +59,12 @@ var levelOne = {
 		{ x: 41, y: 34, width: 2, height: 1 },
 		{ x: 38, y: 30, width: 3, height: 1 },
 		{ x: 43, y: 28, width: 3, height: 1 },
-		{ x: 35, y: 10, width: 4, height: 47 },
+		{ x: 38, y: 22, width: 3, height: 1 },
+		{ x: 43, y: 18, width: 3, height: 1 },
+		{ x: 38, y: 14, width: 3, height: 1 },
+		{ x: 35, y: 9, width: 4, height: 49 },
 		// ceiling:
-		{ x: 45, y: 35, width: 55, height: 9 },
+		{ x: 45, y: 35, width: 55, height: 9},
 
 		// A4:
 		// left platform:
@@ -256,15 +259,15 @@ var levelOne = {
 	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),
-		{ x: 15, y: 119 },
+		{ x: 15, y: 119 }
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
-		{ x: 80, y: 99 },
+		{ x: 80, y: 99 }
 	],
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
-		{ x: -6, y: 57 }
+		{ x: 28, y: 79 }
 	],
 	healthPowerup: [
 		(game, params) => HealthPowerup.construct(game, params),
@@ -273,6 +276,13 @@ var levelOne = {
 	boss: [
 		(game, params) => LionBoss.construct(game, params),
 		{x: 70, y: 30}
+  ],
+	levelUpStone: [
+		(game, params) => LevelUpStone.construct(game, params),
+		{ x: 53, y: 99 },
+		{ x: 93, y: 79 },
+		{ x: -6, y: 57 },
+		{ x: 39, y: 13 }
 	]
 }
 

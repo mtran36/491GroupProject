@@ -24,6 +24,7 @@ class Druid extends Agent {
 		this.game.druid = this;
 		this.loadAnimations();
 		this.isJumping = false;
+		this.casting = false;
 
 		this.maxHealth = 60;
 		this.maxMana = 60;
@@ -320,15 +321,8 @@ class Druid extends Agent {
 		}
 		// check if melee attack is made
 		this.meleeAttack();
-		// for spell upgrade testing:
-		if (this.game.Q == true) {
-			if (this.attacks[this.attackSelection].canLevelUp == true) {
-				this.attacks[this.attackSelection].levelUp();
-			}
-			this.game.Q = false;
-        }
 		// check if switch attack
-		if (this.game.SHIFT == true && this.attackSelection != null) {
+		if (this.game.SHIFT == true && this.attackSelection != null && this.casting == false) {
 			this.attackSelection = (this.attackSelection + 1) % this.attacks.length;
 			this.game.SHIFT = false;
 		}
@@ -338,7 +332,7 @@ class Druid extends Agent {
 				this.attacks[i].updateCooldown();
 			}
 			this.attacks[this.attackSelection].attack(this);
-        }
+		}
 		this.move(TICK);
 	}
 
@@ -387,7 +381,7 @@ class Druid extends Agent {
 				}, "MANA",
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? this.lowManaGradient : this.manaGradient,
 				this.mana < this.attacks[this.attackSelection].cost - 1 ? "indigo" : COLORS.LAPIS);
-			HUD.drawPowerupUI(context, 120, 65, this.attacks, this.attackSelection);
+			HUD.drawPowerupUI(context, 118, 62, this.attacks, this.attackSelection, this);
 		}
 		if (this.flashing) return;
 		// Draw druid

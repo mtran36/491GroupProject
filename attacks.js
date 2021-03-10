@@ -140,16 +140,21 @@ class EnergyBallAttack extends Agent {
 	 * @param {number} attack Attack value to be subtracted from target health.
 	 * @param {boolean} hasAnimation Determines if this ranged attack has an animation.
 	 */
-	constructor(game, x, y, degree, radius, speed) {
-		super(game, x, y, "./Sprites/energyball.png");
-		this.setDimensions(1, radius * 2, radius * 2);
+	constructor(game, x, y, degree, radius, speed, level) {
+		if (level >= 2) {
+			super(game, x, y - PARAMS.TILE_WIDTH / 3, "./Sprites/energyball.png");
+			this.setDimensions(1.5, radius * 2, radius * 2)
+		} else {
+			super(game, x, y, "./Sprites/energyball.png");
+			this.setDimensions(1, radius * 2, radius * 2);
+		}
 		this.radius = radius;
 		let radian = degree * (Math.PI / 180);
 		this.vel.x = Math.round((speed * Math.cos(radian)) * 100) / 100;
 		this.vel.y = Math.round(-(speed * Math.sin(radian)) * 100) / 100;
+		this.level = level;
 		this.attack = 1;
 		this.force = 1500;
-		this.hasExplosion = false;
 	}
 
 	/** @override */
@@ -190,7 +195,7 @@ class EnergyBallAttack extends Agent {
 	}
 
 	playHitAnimation() {
-		if (this.hasExplosion) {
+		if (this.level == 3) {
 			let explosion = new Explosion(this.game, this.pos.x - 48, this.pos.y - 48,
 				PARAMS.TILE_WIDTH * 1.75, 0.75, 1, 0.8);
 			explosion.agentBB[0].x += 20;
@@ -219,15 +224,19 @@ class TornadoAttack extends Agent {
 	 * @param {number} y Vertical coordinate to place attack.
 	 * @param {number} degree Degree the attack is shooting out.
 	 */
-	constructor(game, x, y, facing, attack = 0.8, isLevel3) {
+	constructor(game, x, y, facing, level) {
 		super(game, x, y, "./Sprites/tornado.png");
 		this.setDimensions(1, 96, 192);
 
 		let RADIUS = this.dim.x / 2;
 		this.facing = facing;
 		this.vel.x = facing === 0 ? -400 : 400;
-		this.attack = attack;
-		this.isLevel3 = isLevel3;
+		if (level == 1) {
+			this.attack = 0.8
+		} else {
+		this.attack = 1.6;
+		}
+		this.level = level;
 		this.existTime = 2;
 		this.force = 600;
 		this.agentBB = [
@@ -240,19 +249,19 @@ class TornadoAttack extends Agent {
 		this.damagedEnemies = [];
 	}
 
+	/** 
+	 * Add an attacked enemy to the attacked enemy list. 
+	 */
+	addAttackedEnemy(enemy) {
+		this.damagedEnemies.push(enemy);
+	}
+
 	/** @override */
 	loadAnimations() {
 		this.animations[0] = new Animator(
 			this.spritesheet, 0, 20, 96, 192, 3, 0.15, 0, false, true, false);
 		this.animations[1] = new Animator(
 			this.spritesheet, 0, 20, 96, 192, 3, 0.15, 0, false, true, false);
-	}
-
-	/** 
-	 * Add an attacked enemy to the attacked enemy list. 
-	 */
-	addAttackedEnemy(enemy) {
-		this.damagedEnemies.push(enemy);
 	}
 
 	/** @override */
@@ -265,7 +274,6 @@ class TornadoAttack extends Agent {
 				entity.hitBlock(this.attack);
 				this.playHitAnimation(this.pos.x, this.pos.y + this.scaleDim.y / 2, true);
 				this.removeFromWorld = true;
-
 			}
 		}
 	}
@@ -289,7 +297,7 @@ class TornadoAttack extends Agent {
 			this.playHitAnimation(this.pos.x, this.pos.y + this.scaleDim.y / 2, true);
 			this.removeFromWorld = true;
 		}
-		if (this.isLevel3) {
+		if (this.level == 3) {
 			// move x and y, increase dim x and y
 			this.scale += this.game.clockTick / 2;
 			this.pos = {
@@ -319,22 +327,26 @@ class TornadoAttack extends Agent {
  * A special attack consists of mutiple ranged attack bounding boxes that would deal a
  * one-time damage. 
  */
-class ThunderAttack extends Agent{
+class ThunderAttack extends Agent {
 	/**
 	 * @param {GameEngine} game Instance of the game.
 	 * @param {number} x Horizontal coordinate to place attack.
 	 * @param {number} y Vertical coordinate to place attack.
 	 * @param {number} degree Degree the attack is shooting out.
 	 */
-	constructor(game, x, y, facing, attack = 2) {
+	constructor(game, x, y, facing, level, isEmpowered) {
 		super(game, x, y, "./Sprites/thunder.png");
 		this.facing = facing;
-		this.setDimensions(1, PARAMS.TILE_WIDTH * 2 , PARAMS.TILE_WIDTH / 2);
-		this.vel.x = facing === 0 ? -660 : 660;
-		this.attack = attack;	// attack value
-		this.existTime = 5;	// how long the attack would last
+		this.level = level;
+		this.scale = 1.75
+		if (isEmpowered) this.scale = 3;
+		this.setDimensions(this.scale, PARAMS.TILE_WIDTH * 2, PARAMS.TILE_WIDTH / 2);
+		//this.vel.x = facing === 0 ? -660 : 660;
+		this.attack = 2;
+		if (isEmpowered) this.attack = 3;
+		this.existTime = 1;
 		this.force = 600;
-		let RADIUS = this.dim.y / 2;
+		let RADIUS = this.scaleDim.y / 2;
 		this.agentBB = [
 			new BoundingCircle(
 				this.pos.x + RADIUS,
@@ -348,6 +360,14 @@ class ThunderAttack extends Agent{
 			new BoundingCircle(
 				this.pos.x + RADIUS * 7,
 				this.pos.y + RADIUS, RADIUS)];
+		this.damagedEnemies = [];
+	}
+
+	/** 
+	 * Add an attacked enemy to the attacked enemy list. 
+	 */
+	addAttackedEnemy(enemy) {
+		this.damagedEnemies.push(enemy);
 	}
 
 	/** @override */
@@ -361,51 +381,294 @@ class ThunderAttack extends Agent{
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Ground) {
-			this.removeFromWorld = true;
-			this.playHitAnimation();
 		} else if (entity instanceof HitBreakBlock) {
 			entity.hitBlock(this.attack);
-			this.removeFromWorld = true;
-			this.playHitAnimation();
+			this.damagedEnemies.push(entity);
+			this.playHitAnimation(entity.pos.x + entity.scaleDim.x / 3,
+				entity.pos.y + entity.scaleDim.y / 3);
 		}
 	}
 
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-			entity.takeDamage(this);
-			this.removeFromWorld = true;
-			this.playHitAnimation();
-		} else if (entity instanceof LionBossAttack) {
-			this.removeFromWorld = true;
+				if (!this.damagedEnemies.includes(entity)) {
+				entity.takeDamage(this);
+				this.damagedEnemies.push(entity);
+				this.playHitAnimation(entity.pos.x + entity.scaleDim.x / 4,
+				  	entity.pos.y + entity.scaleDim.y / 4);
+				if (this.level >= 2) {
+					this.game.addEntity(new LightingBolt(this.game,
+						entity.pos.x, entity.pos.y - PARAMS.TILE_WIDTH * 1.5, entity));
+				  }
+		  	}
 		}
 	}
 
 	/** @override */
 	update() {
 		this.existTime -= this.game.clockTick
-		if (this.existTime <= 0) {
+		if (this.existTime <= 0 || this.facing != this.game.druid.facing) {
+			this.game.druid.casting = false;
 			this.removeFromWorld = true;
+		} else {
+			this.updatePos();
 		}
 		this.move(this.game.clockTick);
 	}
 
-	playHitAnimation() {
+	updatePos() {
+		this.vel.y = this.game.druid.vel.y;
+		let druidCenter = this.game.druid.worldBB.centerPoint();
+		if (this.game.druid.facing == 0) {
+			this.pos.x = druidCenter.x - this.scaleDim.x - PARAMS.TILE_WIDTH * 1.2;
+			this.facing = 0;
+		} else {
+			this.pos.x = druidCenter.x + PARAMS.TILE_WIDTH * 1.2;
+			this.facing = 1
+		}
+		this.worldBB.shift(this.pos.x, this.pos.y);
+		let RADIUS = this.scaleDim.y / 2;
+		for (var i = 0; i < this.agentBB.length; i++) {
+			this.agentBB[i].shift(
+				this.pos.x + RADIUS * (1 + i * 2),
+				this.pos.y + RADIUS, RADIUS);
+		}
+    }
+
+	playHitAnimation(x, y) {
 		// hit effect animation
 		let hitAnimation = new Animator(
 			ASSET_LOADER.getImageAsset("./Sprites/ThunderHitEffect.png"),
 			0, 16, 32, 32, 4, 0.1, 0, false, false, false);
-		if (this.facing == 0) {
-			this.game.addEntity(
-				new Effect(this.game, this.pos.x, this.pos.y,
-					hitAnimation, 0.4, 2));
-		} else {
-			this.game.addEntity(
-				new Effect(this.game, this.pos.x + this.dim.x * 0.75, this.pos.y,
-					hitAnimation, 0.4, 2));
-        }
+		this.game.addEntity(new Effect(this.game, x, y, hitAnimation, 0.4, 2));
 	}
 }
+
+class Explosion extends Agent {
+	/**
+	* Creates a new ranged attack to be extended.
+	* @param {GameEngine} game Instance of the game.
+	* @param {number} x Horizontal coordinate to place attack.
+	* @param {number} y Vertical coordinate to place attack.
+	* @param {number} radius Size of the agent bounding box.
+	* @param {number} attack attack value of this explosion.
+	*/
+	constructor(game, x, y, radius, scale, attack, existTime) {
+		super(game, x, y, "./Sprites/EnergyBallExplosion.png");
+		this.setDimensions(scale, radius * 2, radius * 2);
+		this.radius = radius;
+		this.scale = scale;
+		this.vel.x = 0;
+		this.vel.y = 0;
+		this.attack = attack;
+		this.existTime = existTime;
+		this.damagedEnemies = [];
+	}
+
+	/** @override */
+	loadAnimations() {
+		// default animation
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 256, 256, 8, 0.1, 0, false, false, false);
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 0, 256, 256, 8, 0.1, 0, false, false, false);
+	}
+
+	/**
+	 * Change default animation.
+	 * @param {any} leftAnimation animation going left.
+	 * @param {any} rightAnimation animation going right.
+	 */
+	changeAnimations(leftAnimation, rightAnimation) {
+		this.animations[0] = leftAnimation;
+		this.animations[1] = rightAnimation;
+	}
+
+	/** @override */
+	update() {
+		this.existTime -= this.game.clockTick;
+		if (this.existTime <= 0) this.removeFromWorld = true;
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		// do nothing
+	}
+
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
+			entity.takeDamage(this);
+			this.damagedEnemies.push(entity);
+		}
+	}
+}
+
+class LightingBolt extends Agent {
+	/**
+	* Creates a new ranged attack to be extended.
+	* @param {GameEngine} game Instance of the game.
+	* @param {number} x Horizontal coordinate to place attack.
+	* @param {number} y Vertical coordinate to place attack.
+	* @param {number} radius Size of the agent bounding box.
+	* @param {number} attack attack value of this explosion.
+	*/
+	constructor(game, x, y, target) {
+		super(game, x, y, "./Sprites/LightningBolt.png");
+		this.setDimensions(1.5, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 2);
+		this.target = target;
+		this.vel.x = 0;
+		this.vel.y = 0;
+		this.attack = 1;
+		this.existTime = 0.75;
+		this.delayTime = 1.1;
+		this.damagedEnemies = [];
+	}
+
+	/** @override */
+	loadAnimations() {
+		// default animation
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 64, 128, 15, 0.05, 0, false, false, false);
+		this.animations[1] = new Animator(
+			this.spritesheet, 0, 0, 64, 128, 15, 0.05, 0, false, false, false);
+	}
+
+	/** @override */
+	update() {
+		this.delayTime -= this.game.clockTick
+		if (this.delayTime <= 0) this.existTime -= this.game.clockTick;
+		if (this.existTime <= 0) this.removeFromWorld = true;
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		// do nothing
+	}
+
+	/** @override */
+	defineAgentCollisions(entity) {
+		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)
+			&& this.existTime <= 0.70) {
+			entity.takeDamage(this);
+			this.damagedEnemies.push(entity);
+		}
+	}
+
+/** @override */
+	draw(context) {
+		if (this.delayTime <= 0) {
+			this.pos = {
+				x: this.target.pos.x,
+				y: this.target.pos.y + this.target.scaleDim.y - this.scaleDim. y
+			};
+			this.worldBB.shift(this.pos.x, this.pos.y);
+			let RADIUS = this.scaleDim.x / 2;
+			this.agentBB = [
+				new BoundingCircle(
+					this.pos.x + RADIUS,
+					this.pos.y + RADIUS, RADIUS),
+				new BoundingCircle(
+					this.pos.x + RADIUS,
+					this.pos.y + RADIUS * 3, RADIUS)];
+			super.draw(context);
+		}
+	}
+}
+
+///** 
+// * A special attack consists of mutiple ranged attack bounding boxes that would deal a
+// * one-time damage. 
+// */
+//class ThunderAttack extends Agent{
+//	/**
+//	 * @param {GameEngine} game Instance of the game.
+//	 * @param {number} x Horizontal coordinate to place attack.
+//	 * @param {number} y Vertical coordinate to place attack.
+//	 * @param {number} degree Degree the attack is shooting out.
+//	 */
+//	constructor(game, x, y, facing, level) {
+//		super(game, x, y, "./Sprites/thunder.png");
+//		this.facing = facing;
+//		this.level = level;
+//		this.setDimensions(1, PARAMS.TILE_WIDTH * 2 , PARAMS.TILE_WIDTH / 2);
+//		this.vel.x = facing === 0 ? -660 : 660;
+//		this.attack = 2;
+//		this.existTime = 5;
+//		this.force = 600;
+//		let RADIUS = this.dim.y / 2;
+//		this.agentBB = [
+//			new BoundingCircle(
+//				this.pos.x + RADIUS,
+//				this.pos.y + RADIUS, RADIUS),
+//			new BoundingCircle(
+//				this.pos.x + RADIUS * 3,
+//				this.pos.y + RADIUS, RADIUS),
+//			new BoundingCircle(
+//				this.pos.x + RADIUS * 5,
+//				this.pos.y + RADIUS, RADIUS),
+//			new BoundingCircle(
+//				this.pos.x + RADIUS * 7,
+//				this.pos.y + RADIUS, RADIUS)];
+//	}
+
+//	/** @override */
+//	loadAnimations() {
+//		this.animations[0] = new Animator(
+//			this.spritesheet, 150, 35, 130, 35, 4, 0.2, 20, false, true, false);
+//		this.animations[1] = new Animator(
+//			this.spritesheet, 150, 35, 130, 35, 4, 0.2, 20, false, true, true);
+//	}
+
+//	/** @override */
+//	defineWorldCollisions(entity, collisions) {
+//		if (entity instanceof Ground) {
+//			this.removeFromWorld = true;
+//			this.playHitAnimation();
+//		} else if (entity instanceof HitBreakBlock) {
+//			entity.hitBlock(this.attack);
+//			this.removeFromWorld = true;
+//			this.playHitAnimation();
+//		}
+//	}
+
+//	/** @override */
+//	defineAgentCollisions(entity) {
+//		if (entity instanceof Enemy) {
+//			entity.takeDamage(this);
+//			this.removeFromWorld = true;
+//			this.playHitAnimation();
+//		}
+//	}
+
+//	/** @override */
+//	update() {
+//		this.existTime -= this.game.clockTick
+//		if (this.existTime <= 0) {
+//			this.removeFromWorld = true;
+//		}
+//		this.move(this.game.clockTick);
+//	}
+
+//	playHitAnimation() {
+//		// hit effect animation
+//		let hitAnimation = new Animator(
+//			ASSET_LOADER.getImageAsset("./Sprites/ThunderHitEffect.png"),
+//			0, 16, 32, 32, 4, 0.1, 0, false, false, false);
+//		if (this.facing == 0) {
+//			this.game.addEntity(
+//				new Effect(this.game, this.pos.x, this.pos.y,
+//					hitAnimation, 0.4, 2));
+//		} else {
+//			this.game.addEntity(
+//				new Effect(this.game, this.pos.x + this.dim.x * 0.75, this.pos.y,
+//					hitAnimation, 0.4, 2));
+//        }
+//	}
+//}
 
 /**
  * Basic attacks for ranged enemies. Flies at a fixed angle specified during construction.
@@ -471,67 +734,6 @@ class EnemyRangedAttack extends Agent {
 			if (collisions.up || collisions.down || collisions.left || collisions.right) {
 				this.removeFromWorld = true;
 			}
-		}
-	}
-}
-
-class Explosion extends Agent{
-	/**
-	* Creates a new ranged attack to be extended.
-	* @param {GameEngine} game Instance of the game.
-	* @param {number} x Horizontal coordinate to place attack.
-	* @param {number} y Vertical coordinate to place attack.
-	* @param {number} radius Size of the agent bounding box.
-    * @param {number} attack attack value of this explosion.
-	*/
-	constructor(game, x, y, radius, scale, attack, existTime) {
-		super(game, x, y, "./Sprites/EnergyBallExplosion.png");
-		this.setDimensions(scale, radius * 2, radius * 2);
-		this.radius = radius;
-		this.scale = scale;
-		this.vel.x = 0;
-		this.vel.y = 0;
-		this.attack = attack;
-		this.existTime = existTime;
-		this.damagedEnemies = [];
-	}
-
-	/** @override */
-	loadAnimations() {
-		// default animation
-		this.animations[0] = new Animator(
-			this.spritesheet, 0, 0, 256, 256, 8, 0.1, 0, false, false, false);
-		this.animations[1] = new Animator(
-			this.spritesheet, 0, 0, 256, 256, 8, 0.1, 0, false, false, false);
-	}
-
-	/**
-	 * Change default animation.
-	 * @param {any} leftAnimation animation going left.
-	 * @param {any} rightAnimation animation going right.
-	 */
-	changeAnimations(leftAnimation, rightAnimation) {
-		this.animations[0] = leftAnimation;
-		this.animations[1] = rightAnimation;
-	}
-
-	/** @override */
-	update() {
-		this.move(this.game.clockTick);
-		this.existTime -= this.game.clockTick;
-		if (this.existTime <= 0) this.removeFromWorld = true;
-	}
-
-	/** @override */
-	defineWorldCollisions(entity, collisions) {
-		// do nothing
-	}
-
-	/** @override */
-	defineAgentCollisions(entity) {
-		if (entity instanceof Enemy && !this.damagedEnemies.includes(entity)) {
-			entity.takeDamage(this);
-			this.damagedEnemies.push(entity);
 		}
 	}
 }

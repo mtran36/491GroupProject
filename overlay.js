@@ -350,6 +350,124 @@ class MenuScreen {
     }
 }
 
+class LevelUpScreen {
+    constructor(game) {
+        this.game = game;
+        this.camera = new Object();
+        this.camera.pos = { x: 0, y: 0 };
+        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.screen = false;
+        this.levelUpScreen = false;
+        this.selectLeft = false;
+        this.selectRight = false;
+
+
+        this.game.canvas.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case "ArrowLeft":
+                case "KeyA":
+                    if (!this.left && this.levelUpScreen
+                        && this.game.druid.attacks.length > 0) {
+                        if (this.game.druid.attackSelection == 0) {
+                            this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
+                        } else {
+                            this.game.druid.attackSelection =
+                                (this.game.druid.attackSelection - 1) % this.game.druid.attacks.length;
+                        }
+                        this.left = true;
+                    }
+                    break;
+                case "ArrowRight":
+                case "KeyD":
+                    if (!this.right && this.levelUpScreen
+                        && this.game.druid.attacks.length > 0) {
+                        this.game.druid.attackSelection =
+                            (this.game.druid.attackSelection + 1) % this.game.druid.attacks.length;
+                        this.right = true;
+                    }
+                    break;
+                case "KeyX":
+                case "KeyJ":
+                    if (this.levelUpScreen
+                        && this.game.druid.attacks.length > 0) {
+                        if (this.game.druid.attacks[this.game.druid.attackSelection].canLevelUp) {
+                            this.game.druid.attacks[this.game.druid.attackSelection].levelUp();
+                            this.item.removeFromWorld = true;
+                            this.item = null;
+                            this.levelUpScreen = false;
+                            this.game.A = false;
+                            this.game.screen = false;
+                        }
+                    }
+                    break;
+                case "KeyQ":
+                    if (this.levelUpScreen) {
+                        this.levelUpScreen = false;
+                        this.game.screen = false;
+                    }
+                break;
+            }
+        });
+        this.game.canvas.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case "ArrowLeft":
+                case "KeyA":
+                    this.left = false;
+                    break;
+                case "ArrowRight":
+                case "KeyD":
+                    this.right = false;
+                    break;
+            }
+        });
+    }
+
+    showScreen(item) {
+        this.levelUpScreen = true;
+        this.game.screen = this;
+        this.item = item;
+    }
+
+    /**
+     * Display the level up screen.
+     * @param {CanvasRenderingContext2D} context
+     */
+    display(context) {
+        // draw the interface
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/LevelUpScreen.png"),
+            0, 0, 192, 128, 140, 160, 768, 512);
+        context.save();
+        context.font = "bold 30px Arial";
+        context.fillStyle = "black";
+        context.fillText("Spell Upgrade", 425, 220);
+        context.font = "bold 20px Arial";
+        context.fillText("Select one spell to level up using key [X/J], [Q] to cancel.", 200, 300);
+        context.restore();
+
+        // draw each of the powerups in the interface
+        let powerups = this.game.druid.attacks;
+        for (let i = 0; i < powerups.length; i++) {
+            let imageX = 250 + 220 * i;
+            context.drawImage(powerups[i].spritesheet,
+                    0, 0, 64, 64, imageX, 500, 64, 64);
+            // draw power selection
+            if (i === this.game.druid.attackSelection) {
+                context.save();
+                context.font = "bold 20px Arial";
+                context.fillStyle = "black";
+                let level = powerups[i].level;
+                context.fillText("Level " + level + " -> Level " + (level + 1) + ":",
+                    200, 350);
+                context.fillText(powerups[i].levelDescription[powerups[i].level - 1],
+                    200, 400);
+                context.restore();
+                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    0, 0, 32, 32, imageX - 8, 500 - 8, 80, 80);
+            }
+        }
+    }
+}
+
 class HUD {
     /**
      * Draws a standard resource bar which can be depleted.
@@ -405,9 +523,9 @@ class HUD {
      * @param {Array} powerups List of powerups.
      * @param {number} attackSelection Druid's attack selection.
      */
-    static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection) {
-        const imageY = yOffset + 12;
-        const HEIGHT = 48;
+    static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection, DRUID) {
+        const imageY = yOffset + 9;
+        const HEIGHT = 52;
         const WIDTH = 192;
         let i, imageX;
 
@@ -418,24 +536,31 @@ class HUD {
         context.save();
         context.font = "bold 15px Castellar";
         context.fillStyle = COLORS.FRAME_BROWN;
-        context.fillText("SPELLS", xOffset + 20, yOffset + 31);
+        context.fillText("SPELLS:", xOffset + 15, yOffset + 26);
         context.fillStyle = "black";
-        context.fillText("SPELLS", xOffset + 19, yOffset + 30);
+        context.fillText("SPELLS:", xOffset +14, yOffset + 25);
         context.restore();
         // draw each of the powerups in the interface
         for (i = 0; i < powerups.length; i++) {
-            imageX = xOffset + 85 + 32 * i;
-            if (powerups[i].cooldown > 0) { // if the powerup is on cooldown
+            imageX = xOffset + 85 + 34 * i;
+            if (powerups[i].cost > DRUID.mana && i == attackSelection) { // if the powerup is on cooldown
                 context.drawImage(powerups[i].cooldownSpritesheet,
-                    0, 0, 64, 64, imageX, imageY, 24, 24);
-            } else {                        // not on cooldown
+                    0, 0, 64, 64, imageX, imageY, 26, 26);
+            }else {                        // not on cooldown
                 context.drawImage(powerups[i].spritesheet,
-                    0, 0, 64, 64, imageX, imageY, 24, 24);
+                    0, 0, 64, 64, imageX, imageY, 26, 26);
             }
+
+            // display powerups level
+            context.save();
+            context.font = "bold 10px Arial";
+            context.fillStyle = "black";
+            context.fillText("Lv." + powerups[i].level, imageX, imageY + 36);
+            context.restore();
             // draw power selection
             if (i === attackSelection) {
                 context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select.png"),
-                    0, 0, 32, 32, imageX - 1, imageY - 1, 26, 26);
+                    0, 0, 32, 32, imageX - 1, imageY - 1, 28, 28);
             }
         }
     }

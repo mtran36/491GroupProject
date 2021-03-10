@@ -10,6 +10,7 @@ class PowerUp extends Agent {
 		this.cost = 0;
 		this.level = 1;
 		this.canLevelUp = true;
+		this.levelDescription = [];
 	} 
 
 	/** Update the coodown of this powerup. */
@@ -74,6 +75,11 @@ class RangedPowerUp extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/greengem.png");
 		this.cost = 20;
+		this.levelDescription = [
+			"Energy Ball size increase.",
+			"Energy Ball spell will causes explodsion when hit.",
+			"This spell has already reached max level."
+		]
 	}
 
 	static construct(game, params) {
@@ -89,37 +95,18 @@ class RangedPowerUp extends PowerUp {
 	attack(DRUID) {
 		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
 			DRUID.mana -= this.cost;
-			if (this.level == 1) {
-				if (DRUID.facing === 0) { // shoot left
-					this.game.addEntity(new EnergyBallAttack(
-						DRUID.game,
-						DRUID.pos.x - PARAMS.TILE_WIDTH,
-						DRUID.pos.y + DRUID.scaleDim.y / 3,
-						180, PARAMS.TILE_WIDTH / 2, 600));
-				} else { // shoot right
-					this.game.addEntity(new EnergyBallAttack(
-						DRUID.game,
-						DRUID.pos.x + DRUID.scaleDim.x,
-						DRUID.pos.y + DRUID.scaleDim.y / 3,
-						0, PARAMS.TILE_WIDTH / 2, 600));
-				}
-			} else if (this.level >= 2) {
-				if (DRUID.facing === 0) {
-					var attack = new EnergyBallAttack(
-						DRUID.game,
-						DRUID.pos.x - PARAMS.TILE_WIDTH,
-						DRUID.pos.y,
-						180, PARAMS.TILE_WIDTH / 2 * 1.5, 600);
-				} else {
-					var attack = new EnergyBallAttack(
-						DRUID.game,
-						DRUID.pos.x + DRUID.scaleDim.x,
-						DRUID.pos.y,
-						0, PARAMS.TILE_WIDTH / 2 * 1.5, 600);
-				}
-				attack.scale = 1.5;
-				if (this.level == 3) attack.hasExplosion = true;
-				this.game.addEntity(attack);
+			if (DRUID.facing === 0) { // shoot left
+				this.game.addEntity(new EnergyBallAttack(
+					DRUID.game,
+					DRUID.pos.x - PARAMS.TILE_WIDTH,
+					DRUID.pos.y + DRUID.scaleDim.y / 3,
+					180, PARAMS.TILE_WIDTH / 2, 600, this.level));
+			} else { // shoot right
+				this.game.addEntity(new EnergyBallAttack(
+					DRUID.game,
+					DRUID.pos.x + DRUID.scaleDim.x,
+					DRUID.pos.y + DRUID.scaleDim.y / 3,
+					0, PARAMS.TILE_WIDTH / 2, 600, this.level));
 			}
 			this.game.A = false;
 			this.cooldown = 0.3;
@@ -134,6 +121,11 @@ class WindElement extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/bluegem.png");
 		this.cost = 35;
+		this.levelDescription = [
+			"Tornado spell attack increase.",
+			"Tornado spell increases size as it moves.",
+			"This spell has already reached max level."
+		]
 	}
 
 	static construct(game, params) {
@@ -149,33 +141,19 @@ class WindElement extends PowerUp {
 	attack(DRUID) {
 		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
 			DRUID.mana -= this.cost;
-			if (this.level <= 2) {
-				if (DRUID.facing === 0) { // shoot left
-					this.game.addEntity(new TornadoAttack(
-						DRUID.game,
-						DRUID.pos.x - PARAMS.TILE_WIDTH / 2,
-						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0, 0.8 * this.level));
-				} else { // shoot right
-					this.game.addEntity(new TornadoAttack(
-						DRUID.game,
-						DRUID.pos.x + PARAMS.TILE_WIDTH * 2,
-						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1, 0.8 * this.level));
-				}
-			} else if (this.level == 3) {
-				if (DRUID.facing === 0) { // shoot left
-					this.game.addEntity(new TornadoAttack(
-						DRUID.game,
-						DRUID.pos.x - PARAMS.TILE_WIDTH / 2,
-						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0, 1.6, true));
-				} else { // shoot right
-					this.game.addEntity(new TornadoAttack(
-						DRUID.game,
-						DRUID.pos.x + PARAMS.TILE_WIDTH * 2,
-						DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1, 1.6, true));
-				}
-            }
+			if (DRUID.facing === 0) { // shoot left
+				this.game.addEntity(new TornadoAttack(
+								DRUID.game,
+								DRUID.pos.x - PARAMS.TILE_WIDTH / 2,
+								DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 0, this.level));
+			} else { // shoot right
+				this.game.addEntity(new TornadoAttack(
+							DRUID.game,
+							DRUID.pos.x + PARAMS.TILE_WIDTH * 2,
+							DRUID.pos.y - PARAMS.TILE_WIDTH - 2, 1, this.level));
+			}
 			this.game.A = false;
-			this.cooldown = 1;
+			this.cooldown = 0.5;
 		}
 	}
 }
@@ -187,6 +165,12 @@ class LightElement extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/yellowgem.png");
 		this.cost = 50;
+		this.empowered = false;
+		this.levelDescription = [
+			"Thunder spell also shock enemy with lightining bolt.",
+			"Thunder spell will empower the next thunder spell.",
+			"Spell has already reached max level."
+		]
 	}
 
 	static construct(game, params) {
@@ -202,17 +186,33 @@ class LightElement extends PowerUp {
 	attack(DRUID) {
 		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
 			DRUID.mana -= this.cost;
+			let druidCenter = this.game.druid.worldBB.centerPoint();
 			if (DRUID.facing === 0) { // shoot left
-				this.game.addEntity(new ThunderAttack(
-					DRUID.game,
-					DRUID.pos.x - PARAMS.TILE_WIDTH * 2,
-					DRUID.pos.y + PARAMS.TILE_WIDTH, 0));
+				if (this.level == 3 && this.empowered) {
+					this.game.addEntity(new ThunderAttack(
+						DRUID.game,
+						druidCenter.x - PARAMS.TILE_WIDTH * 7,
+						DRUID.pos.y + PARAMS.TILE_WIDTH / 2,
+						0, this.level, this.empowered));
+				} else {
+					this.game.addEntity(new ThunderAttack(
+						DRUID.game,
+						druidCenter.x - PARAMS.TILE_WIDTH * 4.5,
+						DRUID.pos.y + PARAMS.TILE_WIDTH / 2,
+						0, this.level, this.empowered));
+                }
 			} else { // shoot right
 				this.game.addEntity(new ThunderAttack(
 					DRUID.game,
-					DRUID.pos.x + DRUID.scaleDim.x,
-					DRUID.pos.y + PARAMS.TILE_WIDTH, 1));
+					DRUID.pos.x + DRUID.scaleDim.x - PARAMS.TILE_WIDTH / 2,
+					DRUID.pos.y + PARAMS.TILE_WIDTH / 2, 1, this.level, this.empowered));
 			}
+			if (this.level == 3 && this.empowered == false) {
+				this.empowered = true;
+			} else {
+				this.empowered = false;
+            }
+			DRUID.casting = true;
 			this.game.A = false;
 			this.cooldown = 0.5;
 		}
@@ -222,6 +222,7 @@ class LightElement extends PowerUp {
 class HealthPowerup extends PowerUp {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/HealthPowerup.png");
+		this.colliding = false;
 	}
 
 	static construct(game, params) {
@@ -229,4 +230,43 @@ class HealthPowerup extends PowerUp {
 			params.x * PARAMS.TILE_WIDTH,
 			params.y * PARAMS.TILE_WIDTH));
     }
+}
+
+class LevelUpStone extends Agent{
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/Stone.png");
+	}
+
+	static construct(game, params) {
+		game.addEntity(new LevelUpStone(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
+	}
+
+	/** @override */
+	defineWorldCollisions(entity, collisions) {
+		if (entity instanceof Druid && !this.colliding) {
+			this.game.camera.levelUpScreen.showScreen(this);
+			this.colliding = true;
+		}
+	}
+
+	/** @override */
+	update() {
+		let druid = this.game.druid;
+		if (this.pos.x + PARAMS.TILE_WIDTH < druid.pos.x
+			|| this.pos.x > druid.pos.x + druid.scaleDim.x
+			|| this.pos.y + PARAMS.TILE_WIDTH < druid.pos.y
+			|| this.pos.y > druid.pos.y + druid.scaleDim.y) {
+			this.colliding = false;
+		}
+		this.move(this.game.clockTick);
+	}
+
+	/** @override */
+	draw(context) {
+		context.drawImage(this.spritesheet, 0, 0, 32, 32,
+			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
+			this.scaleDim.x, this.scaleDim.y);
+	}
 }

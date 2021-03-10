@@ -13,6 +13,7 @@ class Scene {
 		this.StartScreen = new StartScreen(this.game);
 		this.menuScreen = new MenuScreen(this.game);
 		this.loseScreen = new LoseScreen(this.game);
+		this.levelUpScreen = new LevelUpScreen(this.game);
 	}
 
 	loadLevel(level, x, y) {

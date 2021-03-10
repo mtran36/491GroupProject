@@ -16,6 +16,7 @@ class PauseScreen {
                         this.pausePressed = true;
                         if (this.game.screen === this) {
                             this.game.screen = this.screen;
+                            this.screen = false;
                         } else {
                             this.screen = this.game.screen;
                             this.game.screen = this;
@@ -77,14 +78,14 @@ class StartScreen {
         this.game.canvas.addEventListener('click', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(levelOne, 15, 115);
-                this.game.screen = null;
+                this.game.screen = false;
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
             if (this.game.screen === this) {
                 this.game.camera.loadLevel(
                     levelOne, 15, 115);
-                this.game.screen = null;
+                this.game.screen = false;
             }
         });
         this.display(this.game.context);
@@ -165,14 +166,14 @@ class LoseScreen {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => { this.game.screen = this.game.camera.startScreen }, 100);
+                setTimeout(() => { this.game.screen = this.game.camera.StartScreen }, 100);
             }
         });
         this.game.canvas.addEventListener('keydown', (e) => {
-            if (this.game.screen === this && e.code == 'KeyR') {
+            if (this.game.screen === this && e.code === 'KeyR') {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
-                setTimeout(() => this.game.screen = this.game.camera.startScreen, 100);
+                setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
             }
         });
     }
@@ -220,14 +221,19 @@ class MenuScreen {
                         this.menuPressed = true;
                         if (this.game.screen === this) {
                             this.game.screen = false;
-                        } else {
+                        } else if (this.game.screen === false) {
                             this.game.screen = this;
                         }
                     }
+                    if (this.game.druid.itemSelection >= this.game.druid.items.length ||
+                        this.game.druid.itemSelection === -1) {
+                        this.game.druid.itemSelection = this.game.druid.items.length - 1;
+                    }
+                    console.log(this.game.druid.itemSelection);
                     break;
                 case "ArrowLeft":
                     this.selectLeft = true;
-                    if (this.selectLeft == true && this.game.druid.itemSelection != null) {
+                    if (this.selectLeft == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
                         //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
                         this.selectLeft = false;
@@ -235,28 +241,28 @@ class MenuScreen {
                     break;
                 case "ArrowRight":
                     this.selectRight = true;
-                    if (this.selectRight == true && this.game.druid.itemSelection != null) {
+                    if (this.selectRight == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
                         this.selectRight = false;
                     }
                     break;
                 case "ArrowUp":
                     this.selectUp = true;
-                    if (this.selectUp == true && this.game.druid.itemSelection != null) {
+                    if (this.selectUp == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
                         this.selectUp = false;
                     }
                     break;
                 case "ArrowDown":
                     this.selectDown = true;
-                    if (this.selectDown == true && this.game.druid.itemSelection != null) {
+                    if (this.selectDown == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
                         this.selectDown = false;
                     }
                     break;
                 case "KeyR":
                     this.selectEnter = true;
-                    this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
+                    this.game.druid.items[this.game.druid.itemSelection].useItemOnDruid(this.game.druid);
                     this.selectEnter = false;
                     break;
             }

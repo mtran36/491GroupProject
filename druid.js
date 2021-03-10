@@ -50,7 +50,7 @@ class Druid extends Agent {
 		this.attackSelection = null;
 		this.attacks = [];
 		this.items = [];
-		this.itemSelection = null;
+		this.itemSelection = -1;
 		this.knockbackTime = 0;
 	}
 
@@ -79,8 +79,10 @@ class Druid extends Agent {
 				AUDIO_PLAYER.playSound("./Audio/DruidDamage.mp3");
 			}
 		}
-		this.invincTime = 1;
-		this.flashing = true;
+		if (this.invincTime <= 0) {
+			this.invincTime = 1;
+			this.flashing = true;
+		}
 	}
 
 /**
@@ -162,10 +164,15 @@ class Druid extends Agent {
 
 	/** @override */
 	defineAgentCollisions(entity) {
-		if (entity instanceof Door) {
-			if (this.keyCounter > 0) {
-				entity.removeFromWorld = true;
-				this.keyCounter -= 1;
+		let i;
+		if (entity instanceof Door && this.keyCounter > 0) {
+			for (i = 0; i < this.items.length; i++) {
+				if (this.items[i] instanceof Key) {
+					this.keyCounter--;
+					entity.removeFromWorld = true;
+					this.items.splice(i, 1);
+					break;
+				}
 			}
 		}
 	}

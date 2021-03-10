@@ -254,7 +254,7 @@ var levelOne = {
 	],
 	mantis: [
 		(game, params) => Mantis.construct(game, params),
-		{ x: 30, y: 115, prizeRate: 0.5, prize: "PotionHigh" },
+		{ x: 74, y: 97, prizeRate: 0.5, prize: "PotionHigh" },
 		{ x: 42, y: 54, prizeRate: 1, prize: "PotionHigh" }
 	],
 	earthElement: [
@@ -263,15 +263,16 @@ var levelOne = {
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
-		{ x: 80, y: 99 }
+		{ x: 83, y: 99 }
 	],
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
-		{ x: 28, y: 79 }
+		{ x: 28, y: 79 },
+		{ x: 45, y: 30 },
 	],
 	healthPowerup: [
 		(game, params) => HealthPowerup.construct(game, params),
-		{ x: 20, y: 119 }
+		{ x: 1, y: 89 }
 	],
 	boss: [
 		(game, params) => LionBoss.construct(game, params),

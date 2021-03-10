@@ -392,15 +392,15 @@ class ThunderAttack extends Agent {
 	/** @override */
 	defineAgentCollisions(entity) {
 		if (entity instanceof Enemy) {
-				if (!this.damagedEnemies.includes(entity)) {
+			if (!this.damagedEnemies.includes(entity)) {
 				entity.takeDamage(this);
 				this.damagedEnemies.push(entity);
 				this.playHitAnimation(entity.pos.x + entity.scaleDim.x / 4,
 				  	entity.pos.y + entity.scaleDim.y / 4);
 				if (this.level >= 2) {
-					this.game.addEntity(new LightingBolt(this.game,
-						entity.pos.x, entity.pos.y - PARAMS.TILE_WIDTH * 1.5, entity));
-				  }
+						this.game.addEntity(new LightingBolt(this.game,
+							entity.pos.x, entity.pos.y - PARAMS.TILE_WIDTH * 1.5, entity));
+				}
 		  	}
 		}
 	}
@@ -561,10 +561,18 @@ class LightingBolt extends Agent {
 /** @override */
 	draw(context) {
 		if (this.delayTime <= 0) {
-			this.pos = {
-				x: this.target.pos.x,
-				y: this.target.pos.y + this.target.scaleDim.y - this.scaleDim. y
-			};
+			if (this.target instanceof LionBoss) {
+				this.pos = {
+					x: this.target.pos.x + this.target.scaleDim.x / 3,
+					y: this.target.pos.y + this.target.scaleDim.y - this.scaleDim.y - PARAMS.TILE_WIDTH
+				};
+			} else {
+				this.pos = {
+					x: this.target.pos.x,
+					y: this.target.pos.y + this.target.scaleDim.y - this.scaleDim.y
+				};
+            }
+
 			this.worldBB.shift(this.pos.x, this.pos.y);
 			let RADIUS = this.scaleDim.x / 2;
 			this.agentBB = [

@@ -60,6 +60,7 @@ const IMAGE_PATHS = [
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
 	{ path: "./Audio/Potion.mp3", players: 1 },
+	{ path: "./Audio/PowerupPickUp.mp3", players: 1 },
 	{ path: "./Audio/DruidJump.mp3", players: 1 },
 	{ path: "./Audio/DruidDeath.mp3", players: 1 },
 	{ path: "./Audio/SwordAttack.mp3", players: 1 },

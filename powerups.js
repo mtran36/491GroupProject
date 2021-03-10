@@ -34,6 +34,7 @@ class PowerUp extends Agent {
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Druid) {
+			AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
 			this.removeFromWorld = true;
 			if (this instanceof HealthPowerup) {
 				entity.maxHealth += 20;
@@ -246,6 +247,7 @@ class LevelUpStone extends Agent{
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (entity instanceof Druid && !this.colliding) {
+			AUDIO_PLAYER.playSound("./Audio/PowerupPickUp.mp3");
 			this.game.camera.levelUpScreen.showScreen(this);
 			this.colliding = true;
 		}

@@ -233,6 +233,7 @@ class MenuScreen {
                     console.log(this.game.druid.itemSelection);
                     break;
                 case "ArrowLeft":
+                case "KeyA":
                     this.selectLeft = true;
                     if (this.selectLeft == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
@@ -241,6 +242,7 @@ class MenuScreen {
                     }
                     break;
                 case "ArrowRight":
+                case "KeyD":
                     this.selectRight = true;
                     if (this.selectRight == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
@@ -248,6 +250,7 @@ class MenuScreen {
                     }
                     break;
                 case "ArrowUp":
+                case "KeyW":
                     this.selectUp = true;
                     if (this.selectUp == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
@@ -255,6 +258,7 @@ class MenuScreen {
                     }
                     break;
                 case "ArrowDown":
+                case "KeyS":
                     this.selectDown = true;
                     if (this.selectDown == true && this.game.druid.itemSelection !== -1) {
                         this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
@@ -274,15 +278,19 @@ class MenuScreen {
                     this.menuPressed = false;
                     break;
                 case "ArrowLeft":
+                case "KeyA":
                     this.selectLeft = false;
                     break;
                 case "ArrowRight":
+                case "KeyD":
                     this.selectRight = false;
                     break;
-                case "ArrowLeft":
+                case "ArrowUp":
+                case "KeyW":
                     this.selectUp = false;
                     break;
-                case "ArrowRight":
+                case "ArrowDown":
+                case "KeyS":
                     this.selectDown = false;
                     break;
                 case "KeyR":
@@ -456,8 +464,14 @@ class LevelUpScreen {
                 context.font = "bold 20px Arial";
                 context.fillStyle = "black";
                 let level = powerups[i].level;
-                context.fillText("Level " + level + " -> Level " + (level + 1) + ":",
+                if (level == 3) {
+                    context.fillText("Max Level.",
+                        200, 350);
+                } else {
+                    context.fillText("Level " + level + " -> Level " + (level + 1) + ":",
                     200, 350);
+                }
+
                 context.fillText(powerups[i].levelDescription[powerups[i].level - 1],
                     200, 400);
                 context.restore();

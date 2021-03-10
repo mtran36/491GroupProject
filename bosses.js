@@ -92,7 +92,6 @@ class LionBoss extends Enemy{
         this.stateChange -= this.game.clockTick;
         let druidCenter = this.game.druid.worldBB.centerPoint();
         let thisCenter = this.worldBB.centerPoint();
-        console.warn(this.stateChange);
         if (this.stateChange < 0) {
             if (this.state !== 3 && this.state !== 1 && Math.random() < 0.2) {
                 this.state = 3;

@@ -12,6 +12,7 @@ class Scene {
 		this.winScreen = new WinScreen(this.game);
 		this.startScreen = new StartScreen(this.game);
 		this.loseScreen = new LoseScreen(this.game);
+		this.menuScreen = new MenuScreen(this.game);
 	}
 
 	loadLevel(level) {

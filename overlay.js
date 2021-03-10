@@ -200,6 +200,149 @@ class LoseScreen {
     
 }
 
+class MenuScreen {
+    constructor(game) {
+        this.game = game;
+        this.camera = new Object();
+        this.camera.pos = { x: 0, y: 0 };
+        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.menuPressed = false;
+        this.selectLeft = false;
+        this.selectRight = false;
+        this.selectUp = false;
+        this.selectDown = false;
+        this.selectEnter = false;
+
+        this.game.canvas.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case "KeyI":
+                    if (!this.menuPressed) {
+                        this.menuPressed = true;
+                        if (this.game.screen === this) {
+                            this.game.screen = false;
+                        } else {
+                            this.game.screen = this;
+                        }
+                    }
+                    break;
+                case "ArrowLeft":
+                    this.selectLeft = true;
+                    if (this.selectLeft == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
+                        //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
+                        this.selectLeft = false;
+                    }
+                    break;
+                case "ArrowRight":
+                    this.selectRight = true;
+                    if (this.selectRight == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
+                        this.selectRight = false;
+                    }
+                    break;
+                case "ArrowUp":
+                    this.selectUp = true;
+                    if (this.selectUp == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
+                        this.selectUp = false;
+                    }
+                    break;
+                case "ArrowDown":
+                    this.selectDown = true;
+                    if (this.selectDown == true && this.game.druid.itemSelection != null) {
+                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
+                        this.selectDown = false;
+                    }
+                    break;
+                case "KeyR":
+                    this.selectEnter = true;
+                    this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
+                    this.selectEnter = false;
+                    break;
+            }
+        })
+        this.game.canvas.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case "KeyI":
+                    this.menuPressed = false;
+                    break;
+                case "ArrowLeft":
+                    this.selectLeft = false;
+                    break;
+                case "ArrowRight":
+                    this.selectRight = false;
+                    break;
+                case "ArrowLeft":
+                    this.selectUp = false;
+                    break;
+                case "ArrowRight":
+                    this.selectDown = false;
+                    break;
+                case "KeyR":
+                    this.selectEnter = false;
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Display the pause screen.
+     * @param {CanvasRenderingContext2D} context
+     */
+    display(context) {
+        let i;
+        const OFFSET = 10;
+
+        context.drawImage(
+            ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
+            PARAMS.CANVAS_WIDTH / 5,
+            OFFSET * 4,
+            122 * 5,
+            137 * 5);
+
+        context.save();
+
+        if (this.style.fill) {
+            context.fillStyle = this.style.fill;
+        }
+        if (this.style.stroke) {
+            context.strokeStyle = this.style.stroke;
+        }
+
+        context.font = "bold 64px sans-serif";
+        context.fillText(
+            "Inventory",
+            PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
+            PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
+
+        context.strokeText(
+            "Inventory",
+            PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
+            PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
+
+        for (i = 0; i < this.game.druid.items.length; i++) {
+            this.game.druid.items[i].animations[0].drawFrame(
+                0,
+                context,
+                ((i % 7) * (OFFSET * 8)) + 255,
+                (Math.floor(i / 7) * (OFFSET * 8)) + 164,
+                0.9,
+                this.camera);
+
+            if (i === this.game.druid.itemSelection) {
+                context.drawImage(
+                    ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    ((i % 7) * (OFFSET * 8)) + 235,
+                    (Math.floor(i / 7) * (OFFSET * 8)) + 155,
+                    32 * 2.4,
+                    32 * 2.4);
+            }
+        }
+
+        context.restore();
+    }
+}
+
 class HUD {
     /**
      * Draws a standard resource bar which can be depleted.

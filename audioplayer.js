@@ -78,7 +78,7 @@ class AudioPlayer {
      */
     unpauseAudio() {
         this.playing.forEach((audio) => {
-            audio.play();
+            if (!audio.ended) audio.play();
         });
         this.music.forEach((audio) => {
             audio.play();

@@ -3,7 +3,7 @@
  * allows for easier detection of enemies colliding with enemies.
  */
 class Enemy extends Agent {
-	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate) {
+	constructor(game, x, y, spritesheet, prize = "Potion", prizeRate = 0.1) {
 		super(game, x, y, spritesheet);
 		Object.assign(this, { prize, prizeRate });
 		// Default values that may be overriden in specific enemy classes.
@@ -14,7 +14,12 @@ class Enemy extends Agent {
 		this.velMax = { x: 400, y: 700 };
 		this.sightRange = 400;
 		this.sight = new BoundingCircle(this.pos.x, this.pos.y, this.sightRange);
-		this.defineAgentCollisions = function () { /* Do nothing */ };
+	}
+
+	defineAgentCollisions(entity) {
+		if (entity instanceof Druid) {
+			entity.takeDamage(this.attack);
+		}
 	}
 
 	/**

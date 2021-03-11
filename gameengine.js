@@ -26,8 +26,6 @@ class GameEngine {
         this.mutePressed = false;
         this.screen = false;
         this.menuPressed = false;
-        // for testing
-        this.Q = false;
     };
 
     /**
@@ -119,9 +117,6 @@ class GameEngine {
                         that.mutePressed = true;
                     }
                     break;
-                case "KeyQ":
-                    that.Q = true;
-                    break;
             }
         });
         this.context.canvas.addEventListener("keyup", function (e) {
@@ -160,9 +155,6 @@ class GameEngine {
                     break;
                 case "KeyM":
                     that.mutePressed = false;
-                    break;
-                case "KeyQ":
-                    that.Q = false;
                     break;
             };
         });
@@ -213,11 +205,6 @@ class GameEngine {
             }
         }
         AUDIO_PLAYER.update();
-        // Author: tommy
-        // temporary winning condition checking:
-        if (!this.entities.includes(this.camera.temporaryBoss)) {
-            this.screen = this.camera.winScreen;
-        }
     };
 
     /** 

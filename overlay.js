@@ -552,7 +552,7 @@ class HUD {
         context.fillStyle = COLORS.FRAME_BROWN;
         context.fillText("SPELLS:", xOffset + 15, yOffset + 26);
         context.fillStyle = "black";
-        context.fillText("SPELLS:", xOffset +14, yOffset + 25);
+        context.fillText("SPELLS:", xOffset + 14, yOffset + 25);
         // Draw each of the powerups 
         for (powerup = 0; powerup < powerups.length; powerup++) {
             imageX = xOffset + 85 + 34 * powerup;

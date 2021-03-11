@@ -52,19 +52,19 @@ class Enemy extends Agent {
 			switch (this.prize) {
 				case 'Potion':
 					this.game.addEntity(new Potion(
-						this.game, thisCenter.x, thisCenter.y, 0));
+						this.game, thisCenter.x, thisCenter.y - 100, 0));
 					break;
 				case 'PotionMid':
 					this.game.addEntity(new Potion(
-						this.game, thisCenter.x, thisCenter.y, 1));
+						this.game, thisCenter.x, thisCenter.y - 100, 1));
 					break;
 				case 'PotionHigh':
 					this.game.addEntity(new Potion(
-						this.game, thisCenter.x, thisCenter.y, 2));
+						this.game, thisCenter.x, thisCenter.y - 100, 2));
 					break;
 				case 'Key':
 					this.game.addEntity(new Key(
-						this.game, thisCenter.x, thisCenter.y));
+						this.game, thisCenter.x, thisCenter.y - 100));
 					break;
 			}
 		}

@@ -144,11 +144,15 @@ var levelOne = {
 		{ x: 70, y: 100, width: 15, height: 8 },
 
 		// Pre A1:
+		{ x: -65, y: 113, width: 13, height: 10 },
+		{ x: -67, y: 117, width: 6, height: 4 },
 		{ x: -100, y: 120, width: 102, height: 13 }
+		
 	],
 	mask: [
 		(game, params) => Mask.construct(game, params),
-		{ x: -100, y: 114, width: 10, height: 5 }
+		{ x: -100, y: 104, width: 10, height: 15 },
+		{ x: -63, y: 114, width: 4, height: 6 }
 	],
 	wood: [
 		(game, params) => Wood.construct(game, params),
@@ -165,8 +169,48 @@ var levelOne = {
 		{ x: -100, y: 114, length: 5, type: 0, isVertical: 1 },
 		{ x: -91, y: 114, length: 3, type: 0, isVertical: 1 },
 		{ x: -100, y: 119, length: 10, type: 0, isVertical: 0 },
-		{ x: -100, y: 114, length: 10, type: 0, isVertical: 0 }
-
+		{ x: -100, y: 114, length: 5, type: 0, isVertical: 0 },
+		{ x: -92, y: 114, length: 2, type: 0, isVertical: 0 },
+		{ x: -96, y: 115, length: 2, type: 0, isVertical: 0 },
+		{ x: -100, y: 110, length: 4, type: 0, isVertical: 1 },
+		{ x: -100, y: 109, length: 11, type: 0, isVertical: 0 },
+		{ x: -91, y: 110, length: 4, type: 0, isVertical: 1 },
+		{ x: -100, y: 105, length: 4, type: 0, isVertical: 1 },
+		{ x: -100, y: 104, length: 10, type: 0, isVertical: 0 },
+		{ x: -91, y: 105, length: 2, type: 0, isVertical: 1 }
+	],
+	tree: [
+		(game, params) => Tree.construct(game, params),
+		// Tree 1
+		{ x: -85, y: 112 },
+		// Tree 2
+		{ x: -75, y: 112 }
+	],
+	trunk: [
+		(game, params) => TreeTrunk.construct(game, params),
+		// Tree 1
+		{ x: -85, y: 106 }
+	],
+	branch: [
+		(game, params) => Branch.construct(game, params),
+		// Tree 1
+		{ x: -86, y: 116.5, type: 5, isDark: true },
+		{ x: -83, y: 113, type: 5, isDark: false },
+		{ x: -85, y: 109.5, type: 4, isDark: true },
+		{ x: -75, y: 115, type: 1, isDark: true },
+		{ x: -73, y: 113, type: 2, isDark: false }
+	],
+	leaves: [
+		(game, params) => Leaves.construct(game, params),
+		// Tree 1
+		{ x: -87, y: 116, type: 1 },
+		{ x: -86.75, y: 109.25, type: 1 },
+		{ x: -83.75, y: 112.5, type: 0 }
+	],
+	treeTop: [
+		(game, params) => Leaves.constructTop(game, params),
+		{ x: -75.3, y: 109.5 },
+		{ x: -85.3, y: 103.5}
 	],
 	standingBreakBlock: [
 		(game, params) => StandingBreakBlock.construct(game, params),
@@ -206,10 +250,11 @@ var levelOne = {
 		{ x: 47, y: 22 },
 		//{ x: 5, y: 117 },
 		//{ x: -91, y: 117 }
+		{ x: -91, y: 107 }
 	],
 	key: [
 		(game, params) => Key.construct(game, params),
-		{ x: -80, y: 117 }
+		{ x: -98, y: 113 }
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
@@ -310,7 +355,7 @@ var levelOne = {
 	],
 	druid: [
 		(game, params) => Druid.construct(game, params),
-		{ x: 0, y: 117 }
+		{ x: -95, y: 116 }
 	]
 };
 

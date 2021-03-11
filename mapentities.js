@@ -173,8 +173,13 @@ class Tree extends Block {
 	constructor(game, x, y, width = 3, height = 8, xOffset = 0, yOffset = 0) {
 		super(game, x, y, width, height, "./Sprites/tree.png");
 		Object.assign(this, { xOffset, yOffset });
+		this.mapPipColor = "brown";
 		this.setSize(width, height, 59);
-		this.hidden = true;
+		this.hidden = false;
+		this.worldBB = new BoundingBox(
+			this.pos.x + PARAMS.TILE_WIDTH, this.pos.y,
+			width * PARAMS.TILE_WIDTH - 2 * PARAMS.TILE_WIDTH,
+			height * PARAMS.TILE_WIDTH);
 	}
 
 	static construct(game, params) {
@@ -186,7 +191,19 @@ class Tree extends Block {
 
 	/** @override */
 	draw(context) {
-		drawOffset(context);
+		let col, row;
+		for (col = this.xOffset; col < this.size.width + this.xOffset; col++) {
+			for (row = this.yOffset; row < this.size.height + this.yOffset; row++) {
+				context.drawImage(this.spritesheet,
+					col * this.dim.x, row * this.dim.y, this.dim.x, this.dim.y,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x
+					- this.xOffset * PARAMS.TILE_WIDTH,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y
+					- this.yOffset * PARAMS.TILE_WIDTH,
+					this.scaleDim.x, this.scaleDim.y);
+			}
+		}
+		this.worldBB.display(this.game);
 	}
 }
 
@@ -209,6 +226,10 @@ class Branch extends Tree {
 		Object.assign(this, { type, isDark });
 
 		this.pickLook();
+		this.worldBB = new BoundingBox(
+			this.pos.x, this.pos.y,
+			this.size.width * PARAMS.TILE_WIDTH,
+			this.size.height * PARAMS.TILE_WIDTH);
 	}
 
 	static construct(game, params) {
@@ -279,6 +300,16 @@ class Leaves extends Tree {
 			params.type));
 	}
 
+	static constructTop(game, params) {
+		let i;
+		for (i = 0; i < 2; i += 0.5) {
+			console.log(params.x, params.y);
+			game.addEntity(new Leaves(game,
+				params.x * PARAMS.TILE_WIDTH,
+				(params.y + i) * PARAMS.TILE_WIDTH, 0));
+		}
+	}
+
 	pickLook() {
 		switch (this.type) {
 			case 0:
@@ -286,18 +317,33 @@ class Leaves extends Tree {
 				this.size.height = 2;
 				this.xOffset = 3;
 				this.yOffset = 6;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.8,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.5,
+					(this.size.width - 1.2) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
 			case 1:
 				this.size.width = 4;
 				this.size.height = 2;
 				this.xOffset = 3;
 				this.yOffset = 8;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.8,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.5,
+					(this.size.width - 1.2) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
 			case 2:
 				this.size.width = 2;
 				this.size.height = 2;
 				this.xOffset = 7;
 				this.yOffset = 6;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.7,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.7,
+					(this.size.height - 1) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
 			case 3:
 				this.size.width = 2;

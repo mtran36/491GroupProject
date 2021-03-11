@@ -46,7 +46,6 @@ const IMAGE_PATHS = [
 	"./Sprites/LevelUpScreen.png",
 	"./Sprites/puffBoom.png",
 	"./Sprites/select.png",
-	"./Sprites/select2.png",
 	"./Sprites/transparency.png",
 	"./Sprites/tree.png",
 	"./Sprites/inventoryTemp.png",

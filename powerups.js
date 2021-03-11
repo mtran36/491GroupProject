@@ -233,7 +233,7 @@ class HealthPowerup extends PowerUp {
     }
 }
 
-class LevelUpStone extends Agent{
+class LevelUpStone extends Agent {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/Stone.png");
 	}
@@ -271,4 +271,9 @@ class LevelUpStone extends Agent{
 			this.pos.x - this.game.camera.pos.x, this.pos.y - this.game.camera.pos.y,
 			this.scaleDim.x, this.scaleDim.y);
 	}
+
+	/** @override */
+	loadAnimations() {
+		// Do nothing
+    }
 }

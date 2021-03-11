@@ -543,7 +543,7 @@ class HUD {
         const IMAGE_Y = yOffset + 9;
         const HEIGHT = 52;
         const WIDTH = 192;
-        let i, imageX;
+        let powerup, imageX;
 
         context.save();
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
@@ -554,20 +554,20 @@ class HUD {
         context.fillStyle = "black";
         context.fillText("SPELLS:", xOffset +14, yOffset + 25);
         // Draw each of the powerups 
-        for (i = 0; i < powerups.length; i++) {
-            imageX = xOffset + 85 + 34 * i;
-            (powerups[i].cost > DRUID.mana && i == attackSelection) ?
-                context.drawImage(powerups[i].cooldownSpritesheet,
+        for (powerup = 0; powerup < powerups.length; powerup++) {
+            imageX = xOffset + 85 + 34 * powerup;
+            (powerups[powerup].cost > DRUID.mana && powerup == attackSelection) ?
+                context.drawImage(powerups[powerup].cooldownSpritesheet,
                     0, 0, 64, 64, imageX, IMAGE_Y, 26, 26):
-                context.drawImage(powerups[i].spritesheet,
+                context.drawImage(powerups[powerup].spritesheet,
                     0, 0, 64, 64, imageX, IMAGE_Y, 26, 26);
             // display powerups level
             context.font = "bold 10px Arial";
             context.fillStyle = "black";
-            context.fillText("Lv." + powerups[i].level, imageX, IMAGE_Y + 36);
+            context.fillText("Lv." + powerups[powerup].level, imageX, IMAGE_Y + 36);
             // draw power selection
-            if (i === attackSelection) {
-                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select.png"),
+            if (powerup === attackSelection) {
+                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
                     0, 0, 32, 32, imageX - 1, IMAGE_Y - 1, 28, 28);
             }
         }

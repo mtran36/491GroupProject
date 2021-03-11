@@ -311,13 +311,6 @@ class Druid extends Agent {
 			this.health += 20;
 			this.potionCounter -= 1;
 		}
-		// Damage flashing 
-		if (this.invincDuration > 0) {
-			this.invincDuration -= this.game.clockTick;
-			this.flashing = !this.flashing;
-		} else {
-			this.flashing = false;
-		}
 		// Jump handling
 		if (!this.isJumping && this.game.B) {
 			this.vel.y = -JUMP_VEL;
@@ -386,19 +379,16 @@ class Druid extends Agent {
 		// Bars background gradient
 		context.fillStyle = this.backgroundGradient;
 		context.fillRect( 
-			this.origin.x + this.origin.offset, this.origin.y + this.origin.offset,
+			this.origin.x + this.origin.offset,
+			this.origin.y + this.origin.offset,
 			this.maxHealth * 5 + this.origin.offset * 3,
 			this.origin.width * 2 + this.origin.offset * 5);
 		// Health bar
 		HUD.drawBar(context, 
 			this.origin.x + this.origin.offset * 2,
 			this.origin.y + this.origin.offset * 2,
-			this.origin.width, this.origin.offset, { 
-				current: this.health,
-				max: this.maxHealth,
-				name: "",
-				tickWidth: 5
-			}, "DRUID",
+			this.origin.width, this.origin.offset,
+			{ current: this.health, max: this.maxHealth, name: "", tickWidth: 5 }, "DRUID",
 			this.health / this.maxHealth <= 0.2 ?
 				this.lowHealthGradient : this.healthGradient,
 			this.health / this.maxHealth <= 0.2 ?
@@ -408,21 +398,16 @@ class Druid extends Agent {
 			HUD.drawBar(context,
 				this.origin.x + this.origin.offset * 2,
 				this.origin.y + this.origin.offset * 4 + this.origin.width,
-				this.origin.width, this.origin.offset, {
-					current: this.mana,
-					max: this.maxMana,
-					name: "",
-					tickWidth: 5
-				}, "MANA",
+				this.origin.width, this.origin.offset,
+				{ current: this.mana, max: this.maxMana, name: "", tickWidth: 5 }, "MANA",
 				this.mana < this.attacks[this.attackSelection].cost - 1 ?
 					this.lowManaGradient : this.manaGradient,
 				this.mana < this.attacks[this.attackSelection].cost - 1 ?
 					"indigo" : COLORS.LAPIS);
 			// Powerup UI
-			HUD.drawPowerupUI(context, 118, 62, this.attacks, this.attackSelection, this);
+			HUD.drawPowerupUI(context, 117, 63, this.attacks, this.attackSelection, this);
 		}
 		// Druid frame selection
-		console.warn(this.flashing);
 		if (this.flashing) return;
 		this.animations[this.facing][this.isJumping ? 1 : 0].drawFrame(
 			this.game.clockTick, context,

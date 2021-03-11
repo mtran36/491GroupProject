@@ -29,6 +29,15 @@ class Items extends Agent {
         }
         this.worldBB.shift(x, y);
     }
+
+    /** @override */
+    update() {
+        const FALL_ACC = 1500;
+        const TICK = this.game.clockTick;
+
+        this.vel.y += FALL_ACC * TICK;
+        this.move(TICK);
+    }
 }
 
 class Potion extends Items {
@@ -62,15 +71,6 @@ class Potion extends Items {
         }
     }
 
-    /** @override */
-    update() {
-        const FALL_ACC = 1500;
-        const TICK = this.game.clockTick;
-
-        this.vel.y += FALL_ACC * TICK;
-        this.move(TICK);
-    }
-
     addItemsToDruid(DRUID) {
         AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
     }
@@ -88,10 +88,8 @@ class Potion extends Items {
                     DRUID.health += DRUID.maxHealth;
                     break;
             }
-
             if (DRUID.health >= DRUID.maxHealth) {
                 DRUID.health = DRUID.maxHealth;
-                //this.game.druid.items.pop(this);
             }
         } else {
             DRUID.health = DRUID.maxHealth;
@@ -116,19 +114,13 @@ class Key extends Items {
         game.addEntity(new Potion(game, params.x, params.y));
     }
 
-    update() {
-        const FALL_ACC = 1500;
-        const TICK = this.game.clockTick;
-        this.vel.y += FALL_ACC * TICK;
-        this.move(TICK);
-    }
-
     addItemsToDruid(DRUID) {
         DRUID.keyCounter += 1;
         AUDIO_PLAYER.playSound("./Audio/Key.mp3");
     }
 
     loadAnimations() {
-        this.animations[0] = new Animator(this.spritesheet, 0, 0, 65, 60, 1, 1, 0, false, true, false);
+        this.animations[0] = new Animator(
+            this.spritesheet, 0, 0, 65, 60, 1, 1, 0, false, true, false);
     }
 }

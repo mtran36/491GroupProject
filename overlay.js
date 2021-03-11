@@ -206,7 +206,7 @@ class MenuScreen {
         this.game = game;
         this.camera = new Object();
         this.camera.pos = { x: 0, y: 0 };
-        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.style = { fill: 'black', stroke: 'brown' };
         this.menuPressed = false;
         this.selectLeft = false;
         this.selectRight = false;
@@ -309,7 +309,7 @@ class MenuScreen {
         const OFFSET = 10;
 
         context.drawImage(
-            ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
+            ASSET_LOADER.getImageAsset("./Sprites/inventory.png"),
             PARAMS.CANVAS_WIDTH / 5,
             OFFSET * 4,
             122 * 5,

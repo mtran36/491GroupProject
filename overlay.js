@@ -51,9 +51,13 @@ class PauseScreen {
 
         AUDIO_PLAYER.pauseMusic();
         AUDIO_PLAYER.pauseSounds();
+        context.save();
+        context.fillStyle = "COLORS.FRAME_BROWN";
+        context.globalAlpha = 0.4;
+        context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+        context.globalAlpha = 1;
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
             ORIGIN_X - 53, ORIGIN_Y - 70, WIDTH, HEIGHT);
-        context.save();
         context.font = "bold 38px sans-serif";
         context.fillStyle = this.style.shadow;
         context.fillText("- PAUSE -", ORIGIN_X + TEXT_NUDGE_X + 2, ORIGIN_Y + TEXT_NUDGE_Y + 2);
@@ -543,16 +547,18 @@ class HUD {
         const IMAGE_Y = yOffset + 9;
         const HEIGHT = 52;
         const WIDTH = 192;
+        const TEXT_NUDGE_Y = 32;
+        const TEXT_NUDGE_X = 14;
         let powerup, imageX;
 
         context.save();
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
             0, 0, WIDTH, HEIGHT, xOffset, yOffset, WIDTH, HEIGHT);
-        context.font = "bold 15px Castellar";
+        context.font = "bold 17px Castellar";
         context.fillStyle = COLORS.FRAME_BROWN;
-        context.fillText("SPELLS:", xOffset + 15, yOffset + 26);
+        context.fillText("SPELLS", xOffset + TEXT_NUDGE_X + 1, yOffset + TEXT_NUDGE_Y + 1);
         context.fillStyle = "black";
-        context.fillText("SPELLS:", xOffset + 14, yOffset + 25);
+        context.fillText("SPELLS", xOffset + TEXT_NUDGE_X, yOffset + TEXT_NUDGE_Y);
         // Draw each of the powerups 
         for (powerup = 0; powerup < powerups.length; powerup++) {
             imageX = xOffset + 85 + 34 * powerup;

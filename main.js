@@ -62,7 +62,7 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
 	{ path: "./Audio/Potion.mp3", players: 1 },
 	{ path: "./Audio/PowerupPickUp.mp3", players: 1 },
-	{ path: "./Audio/DruidJump.mp3", players: 1 },
+	{ path: "./Audio/DruidJump.wav", players: 1 },
 	{ path: "./Audio/DruidDeath.mp3", players: 1 },
 	{ path: "./Audio/SwordAttack.mp3", players: 1 },
 	{ path: "./Audio/DruidDamage.mp3", players: 1 },
@@ -75,7 +75,9 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/FlyBuzz.mp3", players: 2 },
 	{ path: "./Audio/PuffBoom.mp3", players: 2 },
 	{ path: "./Audio/MantisCackle.mp3", players: 2 },
-	{ path: "./Audio/Key.mp3", players: 1 }
+	{ path: "./Audio/Key.mp3", players: 1 },
+	{ path: "./Audio/DruidManaExhausted.wav", players: 1 },
+	{ path: "./Audio/DruidManaFull.wav", players: 1 }
 ]
 
 // ENTRY POINT

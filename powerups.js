@@ -5,6 +5,7 @@
 class PowerUp extends Agent {
 	constructor(game, x, y, spritesheet) {
 		super(game, x, y, spritesheet);
+		this.mapPipColor = "yellow";
 		this.cooldownSpritesheet = ASSET_LOADER.getImageAsset("./Sprites/greygem.png");
 		this.cooldown = 0;
 		this.cost = 0;
@@ -36,7 +37,9 @@ class PowerUp extends Agent {
 		if (entity instanceof Druid) {
 			AUDIO_PLAYER.playSound("./Audio/Potion.mp3");
 			this.removeFromWorld = true;
-			if (this instanceof HealthPowerup) {
+			if (this instanceof SwordPowerup) {
+				entity.hasSword = true;
+			} else if (this instanceof HealthPowerup) {
 				entity.maxHealth += 20;
 				entity.health += 20;
 				entity.updateBackgroundGradient();
@@ -78,7 +81,7 @@ class RangedPowerUp extends PowerUp {
 		this.cost = 20;
 		this.levelDescription = [
 			"Energy Ball size increase.",
-			"Energy Ball spell will causes explodsion when hit.",
+			"Energy Ball spell causes explosion on hit.",
 			"This spell has already reached max level."
 		]
 	}
@@ -111,7 +114,9 @@ class RangedPowerUp extends PowerUp {
 			}
 			this.game.A = false;
 			this.cooldown = 0.3;
-		}
+		} else if (this.game.A) {
+			AUDIO_PLAYER.playSound("./Audio/DruidManaExhausted.wav");
+        }
 	}
 }
 
@@ -168,8 +173,8 @@ class LightElement extends PowerUp {
 		this.cost = 50;
 		this.empowered = false;
 		this.levelDescription = [
-			"Thunder spell also shock enemy with lightining bolt.",
-			"Thunder spell will empower the next thunder spell.",
+			"Thunder spell also shocks enemy with lightning bolt.",
+			"Casting thunder spell will empower the next thunder spell.",
 			"Spell has already reached max level."
 		]
 	}
@@ -216,7 +221,7 @@ class LightElement extends PowerUp {
 			DRUID.casting = true;
 			this.game.A = false;
 			this.cooldown = 0.5;
-		}
+		} 
 	}
 }
 
@@ -231,6 +236,38 @@ class HealthPowerup extends PowerUp {
 			params.x * PARAMS.TILE_WIDTH,
 			params.y * PARAMS.TILE_WIDTH));
     }
+}
+
+class SwordPowerup extends PowerUp {
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/sword.png");
+		this.setDimensions(2.5, 34, 15);
+		this.colliding = false;
+	}
+
+	static construct(game, params) {
+		game.addEntity(new SwordPowerup(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
+	}
+
+	/** @override */
+	loadAnimations() {
+		this.animations[0] = new Animator(
+			this.spritesheet, 0, 0, 34, 15, 4, 0.5, 1, false, true, false);
+	}
+
+	/** @override */
+	draw(context) {
+		this.animations[0].drawFrame(
+			this.game.clockTick, context,
+			this.pos.x, this.pos.y,
+			this.scale, this.game.camera);
+		this.worldBB.display(this.game);
+		this.agentBB.forEach((BB) => {
+			BB.display(this.game);
+		});
+	}
 }
 
 class LevelUpStone extends Agent {

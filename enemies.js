@@ -173,7 +173,8 @@ class Fly extends Enemy {
 		if (entity instanceof Ground
 			|| entity instanceof Enemy
 			|| entity instanceof Door
-			|| entity instanceof Wood) {
+			|| entity instanceof Wood
+			|| entity instanceof Leaves) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
 				if (this.vel.y > 100) {
@@ -317,7 +318,7 @@ class Beetle extends Enemy{
 	avoidLedge() {
 		if (this.vel.y !== 0 || (this.rightGround && this.leftGround)) return;
 		this.game.entities.forEach((entity) => {
-			if (entity instanceof Ground) {
+			if (entity instanceof Ground || entity instanceof Leaves) {
 				if (this.groundCheckLeft.collide(entity.worldBB)) {
 					this.leftGround = true;
 				}
@@ -420,7 +421,8 @@ class Beetle extends Enemy{
 		if (entity instanceof Ground
 			|| entity instanceof Enemy
 			|| entity instanceof Door
-			|| entity instanceof Wood) {
+			|| entity instanceof Wood
+			|| entity instanceof Leaves) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;

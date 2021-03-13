@@ -57,7 +57,7 @@ var PARAMS = {
     TILE_WIDTH: 64,
     CANVAS_WIDTH: 1024,
     CANVAS_HEIGHT: 768,
-    BB_LINE_WIDTH: 5,
+    BB_LINE_WIDTH: 3,
     DEBUG: false,
     MUTE: false
 };

@@ -21,7 +21,7 @@ class Items extends Agent {
     defineWorldCollisions(entity, collisions) {
         let x = this.worldBB.x;
         let y = this.worldBB.y;
-        if (entity instanceof Ground || entity instanceof Wood) {
+        if (entity instanceof Ground || entity instanceof Wood || entity instanceof Leaves) {
             if (collisions.down) {
                 y = entity.worldBB.top - this.worldBB.height;
                 this.vel.y = 0;
@@ -44,13 +44,15 @@ class Potion extends Items {
     constructor(game, x, y, type = 0) {
         super(game, x, y, "./Sprites/potions.png");
         this.setDimensions(1, 40, 55);
-        //this.worldBB.display(this.game);
         this.type = type;
         this.loadAnimations();
     }
 
     static construct(game, params) {
-        game.addEntity(new Potion(game, params.x, params.y));
+        game.addEntity(new Potion(game,
+            params.x * PARAMS.TILE_WIDTH,
+            params.y * PARAMS.TILE_WIDTH,
+            params.type));
     }
 
     /** @override */

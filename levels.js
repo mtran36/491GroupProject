@@ -146,13 +146,28 @@ var levelOne = {
 		// Pre A1:
 		{ x: -65, y: 113, width: 13, height: 10 },
 		{ x: -67, y: 117, width: 6, height: 4 },
-		{ x: -100, y: 120, width: 102, height: 13 }
+		{ x: -41, y: 100, width: 4, height: 30 },
+		{ x: -41, y: 100, width: 6, height: 30 },
+		{ x: -100, y: 120, width: 102, height: 13 },
 		
+		{ x: -56, y: 116, width: 7, height: 1 },
+		{ x: -44, y: 114, width: 6, height: 3 },
+		{ x: -49, y: 106, width: 4, height: 3 }
 	],
 	mask: [
 		(game, params) => Mask.construct(game, params),
 		{ x: -100, y: 104, width: 10, height: 15 },
-		{ x: -63, y: 114, width: 4, height: 6 }
+		{ x: -63, y: 114, width: 4, height: 6 },
+		{ x: -65, y: 119, width: 11, height: 2 },
+		{ x: -39, y: 120, width: 2, height: 1 },
+		{ x: -56, y: 116, width: 3, height: 1 },
+		{ x: -40, y: 114, width: 3, height: 3 },
+		{ x: -49, y: 100, width: 9, height: 6 },
+		{ x: -49, y: 70, width: 11, height: 30 }
+	],
+	mesh: [
+		(game, params) => Mesh.construct(game, params),
+		{ x: -61.75, y: 97.15, width: 7, height: 1 }
 	],
 	wood: [
 		(game, params) => Wood.construct(game, params),
@@ -166,6 +181,7 @@ var levelOne = {
 		{ x: 3, y: 115, length: 1, type: 0, isVertical: 0 },
 		{ x: 7, y: 115, length: 1, type: 0, isVertical: 0 },
 		// Pre A1
+		// Starting house
 		{ x: -100, y: 114, length: 5, type: 0, isVertical: 1 },
 		{ x: -91, y: 114, length: 3, type: 0, isVertical: 1 },
 		{ x: -100, y: 119, length: 10, type: 0, isVertical: 0 },
@@ -177,19 +193,63 @@ var levelOne = {
 		{ x: -91, y: 110, length: 4, type: 0, isVertical: 1 },
 		{ x: -100, y: 105, length: 4, type: 0, isVertical: 1 },
 		{ x: -100, y: 104, length: 10, type: 0, isVertical: 0 },
-		{ x: -91, y: 105, length: 2, type: 0, isVertical: 1 }
+		{ x: -91, y: 105, length: 2, type: 0, isVertical: 1 },
+		{ x: -98, y: 108, length: 3, type: 0, isVertical: 0 },
+		// Bridge building
+		{ x: -49, y: 70, length: 35, type: 0, isVertical: 1 },
+		{ x: -48, y: 101, length: 1, type: 0, isVertical: 0 },
+		{ x: -44, y: 100, length: 6, type: 1, isVertical: 0 },
+		{ x: -45, y: 101, length: 1, type: 0, isVertical: 0 },
+		{ x: -49, y: 105, length: 5, type: 0, isVertical: 0 },
+		{ x: -40.5, y: 102, length: 4, type: 1, isVertical: 1 },
+		{ x: -41.5, y: 105, length: 1, type: 0, isVertical: 0 },
+		{ x: -39, y: 70, length: 26, type: 0, isVertical: 1 },
+		{ x: -43, y: 96, length: 3, type: 0, isVertical: 0 },
+		{ x: -40, y: 96, length: 2, type: 1, isVertical: 1 },
+		{ x: -49, y: 92, length: 2, type: 1, isVertical: 1 },
+		{ x: -47, y: 92, length: 6, type: 0, isVertical: 0 },
+		{ x: -43, y: 88, length: 3, type: 0, isVertical: 0 },
+		{ x: -40, y: 88, length: 2, type: 1, isVertical: 1 },
+		{ x: -49, y: 84, length: 2, type: 1, isVertical: 1 },
+		{ x: -44, y: 80, length: 4, type: 0, isVertical: 0 },
+		{ x: -40, y: 80, length: 2, type: 1, isVertical: 1 },
+		{ x: -44, y: 76, length: 2, type: 0, isVertical: 0 },
+		{ x: -49, y: 67, length: 11, type: 2, isVertical: 0 },
+		{ x: -48, y: 72, length: 4, type: 0, isVertical: 0 }
+	],
+	pedestal: [
+		(game, params) => Wood.constructPedestal(game, params),
+		{ x: -79.5, y: 119 }
 	],
 	tree: [
 		(game, params) => Tree.construct(game, params),
 		// Tree 1
 		{ x: -85, y: 112 },
 		// Tree 2
-		{ x: -75, y: 112 }
+		{ x: -75, y: 112 },
+		// Tree 3
+		{ x: -70, y: 112 },
+		// Tree 4
+		{ x: -63, y: 105 },
+		// Tree 5
+		{ x: -60, y: 105 },
+		// Tree 6
+		{ x: -57, y: 105 },
+		// Tree 7
+		{ x: -44, y: 106 }
 	],
 	trunk: [
 		(game, params) => TreeTrunk.construct(game, params),
 		// Tree 1
-		{ x: -85, y: 106 }
+		{ x: -85, y: 106 },
+		// Tree 3
+		{ x: -70, y: 106 },
+		// Tree 4
+		{ x: -63, y: 99 },
+		// Tree 5
+		{ x: -60, y: 99 },
+		// Tree 6
+		{ x: -57, y: 99 }
 	],
 	branch: [
 		(game, params) => Branch.construct(game, params),
@@ -197,20 +257,64 @@ var levelOne = {
 		{ x: -86, y: 116.5, type: 5, isDark: true },
 		{ x: -83, y: 113, type: 5, isDark: false },
 		{ x: -85, y: 109.5, type: 4, isDark: true },
+		// Tree 2
 		{ x: -75, y: 115, type: 1, isDark: true },
-		{ x: -73, y: 113, type: 2, isDark: false }
+		{ x: -73, y: 113, type: 2, isDark: false },
+		// Tree 3
+		{ x: -70, y: 115, type: 0, isDark: true },
+		{ x: -68, y: 110, type: 3, isDark: false },
+		{ x: -71, y: 110, type: 3, isDark: true },
+		// Tree 4
+		{ x: -63, y: 107, type: 2, isDark: true },
+		{ x: -64, y: 104, type: 5, isDark: true },
+		{ x: -64, y: 100, type: 5, isDark: true },
+		{ x: -61, y: 104, type: 5, isDark: false },
+		// Tree 5
+		{ x: -60, y: 109, type: 4, isDark: true },
+		// Tree 6
+		{ x: -55, y: 105.5, type: 5, isDark: false },
+		{ x: -55, y: 108, type: 2, isDark: false },
+		{ x: -57, y: 102, type: 2, isDark: true },
+		// Tree 7
+		{ x: -42, y: 111, type: 2, isDark: false },
+		{ x: -45, y: 107, type: 5, isDark: true }
 	],
 	leaves: [
 		(game, params) => Leaves.construct(game, params),
 		// Tree 1
 		{ x: -87, y: 116, type: 1 },
 		{ x: -86.75, y: 109.25, type: 1 },
-		{ x: -83.75, y: 112.5, type: 0 }
+		{ x: -83.75, y: 112.5, type: 0 },
+		// Tree 3
+		{ x: -67.95, y: 109.25, type: 4 },
+		{ x: -71.05, y: 109.25, type: 2 },
+		// Tree 4
+		{ x: -61.75, y: 103.5, type: 0 },
+		{ x: -65, y: 103.5, type: 1 },
+		{ x: -65, y: 99.5, type: 1 },
+		// Tree 5
+		{ x: -61.5, y: 109, type: 1 },
+		// Tree 6
+		{ x: -55.9, y: 105, type: 0 },
+		{ x: -57.9, y: 101.5, type: 2 },
+		// Tree 7
+		{ x: -42.25, y: 110.5, type: 4 },
+		{ x: -46.25, y: 106.5, type: 1 }
 	],
 	treeTop: [
 		(game, params) => Leaves.constructTop(game, params),
+		// Tree 1
 		{ x: -75.3, y: 109.5 },
-		{ x: -85.3, y: 103.5}
+		// Tree 2
+		{ x: -85.3, y: 103.5 },
+		// Tree 3
+		{ x: -70.4, y: 103.5 },
+		// Tree 4
+		{ x: -57.3, y: 96.5 },
+		// Tree 5
+		{ x: -60.3, y: 96.5 },
+		// Tree 6
+		{ x: -63.3, y: 96.5 }
 	],
 	standingBreakBlock: [
 		(game, params) => StandingBreakBlock.construct(game, params),
@@ -248,13 +352,20 @@ var levelOne = {
 	door: [
 		(game, params) => Door.construct(game, params),
 		{ x: 47, y: 22 },
-		//{ x: 5, y: 117 },
-		//{ x: -91, y: 117 }
-		{ x: -91, y: 107 }
+		{ x: 5, y: 117 },
+		{ x: -91, y: 117 },
+		{ x: -91, y: 107 },
+		{ x: -39, y: 98 }
 	],
 	key: [
 		(game, params) => Key.construct(game, params),
-		{ x: -98, y: 113 }
+		{ x: -98, y: 113 },
+		{ x: -47, y: 70 }
+	],
+	potion: [
+		(game, params) => Potion.construct(game, params),
+		{ x: -74, y: 100, type: 0 },
+		{ x: -52, y: 119, type: 1 }
 	],
 	flies: [
 		(game, params) => Fly.construct(game, params),
@@ -277,6 +388,9 @@ var levelOne = {
 	],
 	beetles: [
 		(game, params) => Beetle.construct(game, params),
+		// Pre A1
+		{ x: -61, y: 111, prizeRate: 0 },
+		{ x: -61, y: 95, prizeRate: 1, prize: "Key"},
 		// A1:
 		{ x: 40, y: 118, prizeRate: 1 },
 		{ x: 41, y: 118, prizeRate: 1 },
@@ -296,21 +410,29 @@ var levelOne = {
 	],
 	flyBeetles: [
 		(game, params) => FlyBeetle.construct(game, params),
+		// Pre A1
+		{ x: -59, y: 100, prizeRate: 0.1, prize: "Potion" },
+		{ x: -49, y: 118, prizeRate: 0.1, prize: "Potion" },
+		{ x: -47, y: 95.5, prizeRate: 0.1, prize: "Potion" },
+		{ x: -48, y: 87.5, prizeRate: 0.1, prize: "Potion" },
+		{ x: -46, y: 79.5, prizeRate: 0.1, prize: "Potion" },
+		{ x: -47, y: 83.5, prizeRate: 0.1, prize: "Potion" },
+		{ x: -42, y: 75.5, prizeRate: 0.1, prize: "Potion" },
 		// A1:
-		{ x: 60, y: 115, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 117, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 75, y: 115, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 60, y: 115, prizeRate: 0.1, prize: "Potion" },
+		{ x: 70, y: 117, prizeRate: 0.1, prize: "Potion" },
+		{ x: 75, y: 115, prizeRate: 0.1, prize: "Potion" },
 		// A3:
 		{ x: 6, y: 80 },
 		// A4:
-		{ x: 90, y: 72, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 90, y: 64, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 90, y: 61, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 90, y: 72, prizeRate: 0.1, prize: "Potion" },
+		{ x: 90, y: 64, prizeRate: 0.1, prize: "Potion" },
+		{ x: 90, y: 61, prizeRate: 0.1, prize: "Potion" },
 		// A5:
-		{ x: 60, y: 44, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 60, y: 45, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 70, y: 46, prizeRate: 0.1, prize: 'PotionMid' },
-		{ x: 80, y: 47, prizeRate: 0.1, prize: 'PotionMid' },
+		{ x: 60, y: 44, prizeRate: 0.1, prize: "Potion" },
+		{ x: 60, y: 45, prizeRate: 0.1, prize: "Potion" },
+		{ x: 70, y: 46, prizeRate: 0.1, prize: "Potion" },
+		{ x: 80, y: 47, prizeRate: 0.1, prize: "Potion" }
 	],
 	hopper: [
 		(game, params) => Hopper.construct(game, params),
@@ -326,9 +448,13 @@ var levelOne = {
 		{ x: 74, y: 97, prizeRate: 0.5, prize: "PotionHigh" },
 		{ x: 42, y: 54, prizeRate: 1, prize: "PotionHigh" }
 	],
+	sword: [
+		(game, params) => SwordPowerup.construct(game, params),
+		{ x: -79.2, y: 118 }
+	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),
-		{ x: 15, y: 119 }
+		//{ x: -79, y: 118 }
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
@@ -340,7 +466,8 @@ var levelOne = {
 	],
 	healthPowerup: [
 		(game, params) => HealthPowerup.construct(game, params),
-		{ x: 1, y: 89 }
+		{ x: 1, y: 89 },
+		{ x: -97, y: 107 }
 	],
 	boss: [
 		(game, params) => LionBoss.construct(game, params),
@@ -355,7 +482,10 @@ var levelOne = {
 	],
 	druid: [
 		(game, params) => Druid.construct(game, params),
-		{ x: -95, y: 116 }
+		// Druid start
+		//{ x: -97, y: 117 },
+		// Test start
+		{ x: -49, y: 82 }
 	]
 };
 

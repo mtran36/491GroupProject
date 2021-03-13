@@ -122,9 +122,10 @@ var levelOne = {
 
 		// A1:
 		// left pillar:
-		{ x: 39, y: 117, width: 2, height: 1 },
-		{ x: 42, y: 118, width: 2, height: 1 },
-		{ x: 40, y: 114, width: 3, height: 10 },
+		{ x: 38, y: 114, width: 5, height: 10 },
+		{ x: 37, y: 117, width: 4, height: 1 },
+		{ x: 40, y: 118, width: 4, height: 1 },
+		
 		// right pillar:
 		{ x: 59, y: 116, width: 2, height: 1 },
 		{ x: 62, y: 117, width: 2, height: 1 },
@@ -147,7 +148,7 @@ var levelOne = {
 		{ x: -65, y: 113, width: 13, height: 10 },
 		{ x: -67, y: 117, width: 6, height: 4 },
 		{ x: -41, y: 100, width: 4, height: 30 },
-		{ x: -41, y: 100, width: 6, height: 30 },
+		{ x: -41, y: 100, width: 17, height: 30 },
 		{ x: -100, y: 120, width: 102, height: 13 },
 		
 		{ x: -56, y: 116, width: 7, height: 1 },
@@ -156,6 +157,7 @@ var levelOne = {
 	],
 	mask: [
 		(game, params) => Mask.construct(game, params),
+		// Pre A1
 		{ x: -100, y: 104, width: 10, height: 15 },
 		{ x: -63, y: 114, width: 4, height: 6 },
 		{ x: -65, y: 119, width: 11, height: 2 },
@@ -163,7 +165,9 @@ var levelOne = {
 		{ x: -56, y: 116, width: 3, height: 1 },
 		{ x: -40, y: 114, width: 3, height: 3 },
 		{ x: -49, y: 100, width: 9, height: 6 },
-		{ x: -49, y: 70, width: 11, height: 30 }
+		{ x: -49, y: 70, width: 11, height: 30 },
+		// A1
+		{ x: 40, y: 115, width: 1, height: 5 }
 	],
 	mesh: [
 		(game, params) => Mesh.construct(game, params),
@@ -219,7 +223,8 @@ var levelOne = {
 	],
 	pedestal: [
 		(game, params) => Wood.constructPedestal(game, params),
-		{ x: -79.5, y: 119 }
+		{ x: -79.5, y: 119 },
+		{ x: -33, y: 99 }
 	],
 	tree: [
 		(game, params) => Tree.construct(game, params),
@@ -393,10 +398,6 @@ var levelOne = {
 		{ x: -61, y: 95, prizeRate: 1, prize: "Key"},
 		// A1:
 		{ x: 40, y: 118, prizeRate: 1 },
-		{ x: 41, y: 118, prizeRate: 1 },
-		{ x: 42, y: 118, prizeRate: 1 },
-		{ x: 43, y: 118, prizeRate: 1 },
-		{ x: 50, y: 118, prizeRate: 1 },
 		{ x: 70, y: 118 },
 		// A3:
 		{ x: 15, y: 93 },
@@ -418,6 +419,7 @@ var levelOne = {
 		{ x: -46, y: 79.5, prizeRate: 0.1, prize: "Potion" },
 		{ x: -47, y: 83.5, prizeRate: 0.1, prize: "Potion" },
 		{ x: -42, y: 75.5, prizeRate: 0.1, prize: "Potion" },
+		{ x: -44, y: 71.5 },
 		// A1:
 		{ x: 60, y: 115, prizeRate: 0.1, prize: "Potion" },
 		{ x: 70, y: 117, prizeRate: 0.1, prize: "Potion" },
@@ -454,7 +456,7 @@ var levelOne = {
 	],
 	earthElement: [
 		(game, params) => RangedPowerUp.construct(game, params),
-		//{ x: -79, y: 118 }
+		{ x: -32.5, y: 98 }
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
@@ -485,7 +487,7 @@ var levelOne = {
 		// Druid start
 		//{ x: -97, y: 117 },
 		// Test start
-		{ x: -49, y: 82 }
+		{ x: 41, y: 116 }
 	]
 };
 

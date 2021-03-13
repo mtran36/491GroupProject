@@ -172,7 +172,9 @@ class EnergyBallAttack extends Agent {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
-		if (entity instanceof Ground) {
+		if (entity instanceof Ground
+			|| entity instanceof Wood
+			|| entity instanceof Leaves) {
 			this.removeFromWorld = true;
 			this.playHitAnimation();
 		} else if (entity instanceof HitBreakBlock) {

@@ -63,7 +63,10 @@ class LionBoss extends Enemy{
         if (this.state === 4) {
             return;
         }
-        this.battleStarted = true;
+        if (!this.battleStarted) {
+            this.startBattle();
+
+        }
         this.health -= entity.attack;
         AUDIO_PLAYER.playSound("./Audio/EnemyDamage.mp3");
         if (this.health <= 0) {
@@ -79,11 +82,17 @@ class LionBoss extends Enemy{
         }
     }
 
+    startBattle() {
+        this.battleStarted = true;
+        AUDIO_PLAYER.stopMusic();
+        AUDIO_PLAYER.playMusic("./Audio/Abstraction - Three Red Hearts - Out of Time.mp3");
+    }
+
     update() {
         this.vel.y += this.game.clockTick * this.ACC.y;
         if (!this.battleStarted) {
             if (this.canSee(this.game.druid)) {
-                this.battleStarted = true;
+                this.startBattle();
             } else {
                 this.move(this.game.clockTick);
                 return;
@@ -126,7 +135,7 @@ class LionBoss extends Enemy{
                 this.vel.x = this.facing === 0 ? -this.velMax.x : this.velMax.x;
                 break;
             case 2:
-                if (this.stateChange < 1.1 & !this.hasAttacked) {
+                if (this.stateChange < 1.2 & !this.hasAttacked) {
                     let x = thisCenter.x + (this.facing === 0 ? -30 : 30);
                     this.game.addEntity(
                         new LionBossAttack(
@@ -208,6 +217,7 @@ class LionBossAttack extends Agent {
         this.time = 0.7;
         this.attack = 10;
         this.force = 1000;
+        AUDIO_PLAYER.playSound("./Audio/LionAttack.mp3");
     }
 
     update() {

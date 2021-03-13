@@ -10,7 +10,7 @@ class Druid extends Agent {
 		// Resource fields
 		this.maxHealth = 60;
 		this.maxMana = 60;
-		this.health = 1;
+		this.health = this.maxHealth;
 		this.mana = this.maxMana;
 		this.lastHealth = this.health;
 		this.lastMana = this.mana;
@@ -282,7 +282,7 @@ class Druid extends Agent {
 			if (this.vel.x != 0 || this.vel.y != 0) {
 				this.mana += 0.08;
 			} else {
-				this.mana += 0.23;
+				this.mana += 0.26;
 			}
 		}
 		if (this.mana > this.maxMana) {

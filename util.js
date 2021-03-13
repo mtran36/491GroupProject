@@ -19,6 +19,15 @@ function hsl(h, s, l) {
     return "hsl(" + h + "," + s + "%," + l + "%)";
 }
 
+function drawUIBackground(context) {
+    context.save();
+    context.fillStyle = "COLORS.FRAME_BROWN";
+    context.globalAlpha = 0.4;
+    context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+    context.globalAlpha = 1;
+    context.restore();
+}
+
 /** 
  * Creates an alias for requestAnimationFrame for backwards compatibility. 
  */

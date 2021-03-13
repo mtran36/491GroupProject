@@ -52,10 +52,7 @@ class PauseScreen {
         AUDIO_PLAYER.pauseMusic();
         AUDIO_PLAYER.pauseSounds();
         context.save();
-        context.fillStyle = "COLORS.FRAME_BROWN";
-        context.globalAlpha = 0.4;
-        context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
-        context.globalAlpha = 1;
+        drawUIBackground(context);
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
             ORIGIN_X - 53, ORIGIN_Y - 70, WIDTH, HEIGHT);
         context.font = "bold 38px sans-serif";
@@ -159,6 +156,7 @@ class WinScreen {
 
     display(context) {
         context.save();
+        drawUIBackground(context);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
         context.font = "bold 32px sans-serif";
@@ -178,7 +176,7 @@ class WinScreen {
 class LoseScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: "red", stroke: "black" };
+        this.style = { fill: "black", stroke: COLORS.FRAME_BROWN };
         this.game.canvas.addEventListener("click", (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
@@ -196,23 +194,45 @@ class LoseScreen {
     }
 
     display(context) {
+        const ORIGIN_X = PARAMS.CANVAS_WIDTH / 2 - 330;
+        const ORIGIN_Y = PARAMS.CANVAS_HEIGHT / 2 - 10;
+        const TEXT_NUDGE_X = 15;
+        const TEXT_NUDGE_Y = 0;
+        const HEIGHT = 192;
+        const WIDTH = 768;
+
         context.save();
+        drawUIBackground(context);
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
+            ORIGIN_X - 53, ORIGIN_Y - 70, WIDTH, HEIGHT);
+
+        context.font = "bold 32px castellar";
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText(
+            "You were overwhelmed",
+            ORIGIN_X + TEXT_NUDGE_X + 2, ORIGIN_Y + TEXT_NUDGE_Y + 2);
+        context.fillStyle = "black";
+        context.fillText(
+            "You were overwhelmed",
+            ORIGIN_X + TEXT_NUDGE_X, ORIGIN_Y + TEXT_NUDGE_Y);
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText(
+            "by the infestation...",
+            ORIGIN_X + TEXT_NUDGE_X + 210 + 2, ORIGIN_Y + TEXT_NUDGE_Y + 40 + 2);
+        context.fillStyle = "black";
+        context.fillText(
+            "by the infestation...",
+            ORIGIN_X + TEXT_NUDGE_X + 210, ORIGIN_Y + TEXT_NUDGE_Y + 40);
+
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
-        context.font = "bold 32px sans-serif";
-        context.fillText(
-            "You are dead. Please try again.",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText(
-            "You are dead. Please try again.",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.font = "bold 20px sans-serif";
         context.fillText(
-            "Click or press R to restart.",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+            "Try again? (Click or press R)",
+            ORIGIN_X + 195, ORIGIN_Y + 80);
         context.strokeText(
-            "Click or press R to restart",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+            "Try again? (Click or press R)",
+            ORIGIN_X + 195, ORIGIN_Y + 80);
         context.restore();
     }
     
@@ -280,7 +300,9 @@ class MenuScreen {
                     }
                     break;
                 case "KeyR":
-                      DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
+                    if (DRUID.items[DRUID.itemSelection]) {
+                        DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
+                    }
                     break;
             }
         });
@@ -319,7 +341,7 @@ class MenuScreen {
     display(context) {
         let i;
         const OFFSET = 10;
-
+        drawUIBackground(context);
         context.drawImage(
             ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
             PARAMS.CANVAS_WIDTH / 5,

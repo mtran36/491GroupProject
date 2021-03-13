@@ -10,7 +10,7 @@ class Druid extends Agent {
 		// Resource fields
 		this.maxHealth = 60;
 		this.maxMana = 60;
-		this.health = this.maxHealth;
+		this.health = 1;
 		this.mana = this.maxMana;
 		this.lastHealth = this.health;
 		this.lastMana = this.mana;

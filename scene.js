@@ -21,6 +21,7 @@ class Scene {
 		this.game.entities = [];
 		let entry, construct, entityArr;
 
+		this.game.druid = new Druid(this.game);
 		AUDIO_PLAYER.stopAll();
 		document.getElementById("gameWorld").setAttribute("style", "background: black");
 		// Add all entities from level data

@@ -588,13 +588,6 @@ var levelOne = {
 	secretMask: [
 		(game, params) => SecretMask.construct(game, params),
 		{ x: -11, y: 114, width: 4, height: 6 }
-	],
-	druid: [
-		(game, params) => Druid.construct(game, params),
-		// Druid start
-		{ x: -97, y: 117 }
-		// Test start
-		//{ x: 39, y: 95 }
 	]
 };
 

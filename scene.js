@@ -2,9 +2,7 @@ class Scene {
 	constructor(game) {
 		this.game = game;
 		this.game.camera = this;
-		this.game.druid = new Druid(game);
 		this.pos = { x: 0, y: 0 };
-
 		this.createScreens();
 	};
 
@@ -20,8 +18,6 @@ class Scene {
 	loadLevel(level, x, y) {
 		this.game.entities = [];
 		let entry, construct, entityArr;
-
-		this.game.druid = new Druid(this.game);
 		AUDIO_PLAYER.stopAll();
 		document.getElementById("gameWorld").setAttribute("style", "background: black");
 		// Add all entities from level data
@@ -33,12 +29,8 @@ class Scene {
 			});
 			entityArr.splice(0, 0, construct);
 		}
-		// TODO: Temporary, remove when final boss is added.
-		this.temporaryBoss = new Hopper(this.game, 60 * PARAMS.TILE_WIDTH, 28 * PARAMS.TILE_WIDTH);
-		this.temporaryBoss.setDimensions(2, this.temporaryBoss.dim.x, this.temporaryBoss.dim.y);
-		this.temporaryBoss.health = 10;
-		this.temporaryBoss.attack = 10;
-		this.game.addEntity(this.temporaryBoss);
+		this.game.druid = new Druid(this.game, x * PARAMS.TILE_WIDTH, y * PARAMS.TILE_WIDTH);
+		this.game.addEntity(this.game.druid);
 	};
 
 	/** @override */

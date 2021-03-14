@@ -2,7 +2,7 @@
  * Player character 
  */
 class Druid extends Agent {
-	constructor(game, x = 0, y = 0) {
+	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/druidmerge.png");
 		this.setDimensions(1, 176, 128);
 		// Jump fields
@@ -293,7 +293,7 @@ class Druid extends Agent {
 		if (this.mana != this.maxMana) {
 			this.updateManaGradient();
 		}
-		if (this.lastMana != this.mana) {
+		if (this.lastMana != this.mana && this.mana == this.maxMana) {
 			AUDIO_PLAYER.playSound("./Audio/DruidManaFull.wav");
         }
 		// Knockback

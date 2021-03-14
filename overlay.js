@@ -77,7 +77,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener("click", clickStart);
             this.game.canvas.removeEventListener("keydown", clickStart);
-            this.game.camera.loadLevel(levelOne);
+            this.game.camera.loadLevel(levelOne, -97, 117);
             this.game.start();
         };
         this.game.canvas.addEventListener("click", clickStart);
@@ -85,13 +85,13 @@ class StartScreen {
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener("click", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne, 16, 115);
+                this.game.camera.loadLevel(levelOne, -97, 117);
                 this.game.screen = false;
             }
         });
         this.game.canvas.addEventListener("keydown", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne);
+                this.game.camera.loadLevel(levelOne, -97, 117);
                 this.game.screen = false;
             }
         });
@@ -368,7 +368,6 @@ class MenuScreen {
 
 class LevelUpScreen {
     constructor(game) {
-        const DRUID = game.druid;
 
         this.game = game;
         this.camera = new Object();
@@ -385,12 +384,12 @@ class LevelUpScreen {
                 case "ArrowLeft":
                 case "KeyA":
                     if (!this.left && this.levelUpScreen
-                        && DRUID.attacks.length > 0) {
-                        if (DRUID.attackSelection == 0) {
-                            DRUID.attackSelection = DRUID.attacks.length - 1;
+                        && this.game.druid.attacks.length > 0) {
+                        if (this.game.druid.attackSelection == 0) {
+                            this.game.druid.attackSelection = this.game.druid.attacks.length - 1;
                         } else {
-                            DRUID.attackSelection =
-                                (DRUID.attackSelection - 1) % DRUID.attacks.length;
+                            this.game.druid.attackSelection =
+                                (this.game.druid.attackSelection - 1) % this.game.druid.attacks.length;
                         }
                         this.left = true;
                     }
@@ -398,18 +397,18 @@ class LevelUpScreen {
                 case "ArrowRight":
                 case "KeyD":
                     if (!this.right && this.levelUpScreen
-                        && DRUID.attacks.length > 0) {
-                        DRUID.attackSelection =
-                            (DRUID.attackSelection + 1) % DRUID.attacks.length;
+                        && this.game.druid.attacks.length > 0) {
+                        this.game.druid.attackSelection =
+                            (this.game.druid.attackSelection + 1) % this.game.druid.attacks.length;
                         this.right = true;
                     }
                     break;
                 case "KeyX":
                 case "KeyJ":
                     if (this.levelUpScreen
-                        && DRUID.attacks.length > 0) {
-                        if (DRUID.attacks[DRUID.attackSelection].canLevelUp) {
-                            DRUID.attacks[DRUID.attackSelection].levelUp();
+                        && this.game.druid.attacks.length > 0) {
+                        if (this.game.druid.attacks[this.game.druid.attackSelection].canLevelUp) {
+                            this.game.druid.attacks[this.game.druid.attackSelection].levelUp();
                             this.item.removeFromWorld = true;
                             this.item = null;
                             this.levelUpScreen = false;
@@ -453,7 +452,7 @@ class LevelUpScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
-        let powerups, imageX, level;
+        let powerups, imageX, level, i;
 
         // draw the interface
         context.save();
@@ -624,9 +623,9 @@ class Minimap extends Entity {
             context.fillStyle = entity.mapPipColor;
             let pip = {
                 x: this.pos.x + CENTER_OFFSET
-                    + (entity.pos.x - this.game.camera.pos.x) / SCALE,
+                    + (entity.worldBB.x - this.game.camera.pos.x) / SCALE,
                 y: this.pos.y + CENTER_OFFSET
-                    + (entity.pos.y - this.game.camera.pos.y) / SCALE,
+                    + (entity.worldBB.y - this.game.camera.pos.y) / SCALE,
                 width: entity.worldBB.width / SCALE,
                 height: entity.worldBB.height / SCALE
             };

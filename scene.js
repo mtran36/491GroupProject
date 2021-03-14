@@ -2,6 +2,7 @@ class Scene {
 	constructor(game) {
 		this.game = game;
 		this.game.camera = this;
+		this.game.druid = new Druid(this.game, 0, 0);
 		this.pos = { x: 0, y: 0 };
 		this.createScreens();
 	};
@@ -29,8 +30,12 @@ class Scene {
 			});
 			entityArr.splice(0, 0, construct);
 		}
-		this.game.druid = new Druid(this.game, x * PARAMS.TILE_WIDTH, y * PARAMS.TILE_WIDTH);
+		this.game.druid.pos.x = x * PARAMS.TILE_WIDTH;
+		this.game.druid.pos.y = y * PARAMS.TILE_WIDTH;
+		this.game.druid.updateBoundingShapes();
 		this.game.addEntity(this.game.druid);
+		this.update();
+		console.warn(this.game.druid.pos.x, this.pos.x);
 	};
 
 	/** @override */

@@ -75,6 +75,10 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/PuffBoom.mp3", players: 2 },
 	{ path: "./Audio/MantisCackle.mp3", players: 2 },
 	{ path: "./Audio/Key.mp3", players: 1 },
+	{ path: "./Audio/DoorOpen.mp3", players: 1 },
+	{ path: "./Audio/Error.mp3", players: 1 },
+	{ path: "./Audio/LevelUp.mp3", players: 1 },
+	{ path: "./Audio/UsePotion.mp3", players: 1 },
 	{ path: "./Audio/Abstraction - Three Red Hearts - Out of Time.mp3", players: 1 },
 	{ path: "./Audio/LionAttack.mp3", players: 1 }
 ]

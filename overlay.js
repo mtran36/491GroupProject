@@ -69,7 +69,7 @@ class StartScreen {
         let clickStart = (e) => {
             this.game.canvas.removeEventListener('click', clickStart);
             this.game.canvas.removeEventListener('keydown', clickStart);
-            this.game.camera.loadLevel(levelOne, 15, 115);
+            this.game.camera.loadLevel(levelOne, 30, 75);
             this.game.start();
         };
         this.game.canvas.addEventListener('click', clickStart);
@@ -268,6 +268,7 @@ class MenuScreen {
                 case "KeyR":
                     this.selectEnter = true;
                     this.game.druid.items[this.game.druid.itemSelection].useItemOnDruid(this.game.druid);
+                    ASSET_LOADER.getAudioAsset("./Audio/UsePotion.mp3")[0].play();
                     this.selectEnter = false;
                     break;
             }
@@ -405,6 +406,8 @@ class LevelUpScreen {
                             this.levelUpScreen = false;
                             this.game.A = false;
                             this.game.screen = false;
+                        } else {
+                            ASSET_LOADER.getAudioAsset("./Audio/Error.mp3")[0].play();
                         }
                     }
                     break;

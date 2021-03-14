@@ -324,8 +324,7 @@ class TornadoAttack extends Agent {
 }
 
 /** 
- * A special attack consists of mutiple ranged attack bounding boxes that would deal a
- * one-time damage. 
+ * A special melee attack would deal one-time damage to each enemy it collides.
  */
 class ThunderAttack extends Agent {
 	/**

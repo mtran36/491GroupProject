@@ -25,6 +25,7 @@ class Druid extends Agent {
 		this.loadAnimations();
 		this.isJumping = false;
 		this.casting = false;
+		this.castFacing = 1;
 
 		this.maxHealth = 60;
 		this.maxMana = 60;
@@ -189,7 +190,8 @@ class Druid extends Agent {
 				this.vel.x = 0;
 			}
 			if (entity instanceof Door && this.keyCounter > 0) {
-				entity.removeFromWorld = true;
+				entity.open = true;
+				AUDIO_PLAYER.playSound("./Audio/DoorOpen.mp3");
 				this.keyCounter--;
 				this.items.splice(this.items.findIndex((a) => {
 					return a instanceof Key;
@@ -334,6 +336,8 @@ class Druid extends Agent {
 			this.attacks[this.attackSelection].attack(this);
 		}
 		this.move(TICK);
+		// when casting thunder attack
+		if (this.casting) this.facing = this.castFacing;
 	}
 
 	/** @override */

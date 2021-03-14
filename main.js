@@ -10,12 +10,10 @@ const IMAGE_PATHS = [
 	"./Sprites/HopperJump.png",
 	"./Sprites/Hopper.png",
 	"./Sprites/Mantis.png",
-	"./Sprites/druid.png",
 	"./Sprites/DruidJumpEffect.png",
 	"./Sprites/ground.png",
 	"./Sprites/ball.png",
 	"./Sprites/sword.png",
-	"./Sprites/testpotion.png",
 	"./Sprites/door.png",
 	"./Sprites/key.png",
 	"./Sprites/TestEnemyAttack.png",
@@ -45,8 +43,6 @@ const IMAGE_PATHS = [
 	"./Sprites/powerupsUI.png",
 	"./Sprites/LevelUpScreen.png",
 	"./Sprites/puffBoom.png",
-	"./Sprites/select.png",
-	"./Sprites/select2.png",
 	"./Sprites/transparency.png",
 	"./Sprites/tree.png",
 	"./Sprites/inventoryTemp.png",
@@ -55,13 +51,16 @@ const IMAGE_PATHS = [
 	"./Sprites/LionIdle.png",
 	"./Sprites/LionRun.png",
 	"./Sprites/LionAttack.png",
-	"./Sprites/LionDeath.png"
+	"./Sprites/LionDeath.png",
+	"./Sprites/titleTree.png",
+	"./Sprites/woods.png",
+	"./Sprites/manaPowerup.png"
 ]
 const AUDIO_PATHS = [
 	{ path: "./Audio/Abstraction - Three Red Hearts - Rumble at the Gates.mp3", players: 1 },
 	{ path: "./Audio/Potion.mp3", players: 1 },
 	{ path: "./Audio/PowerupPickUp.mp3", players: 1 },
-	{ path: "./Audio/DruidJump.mp3", players: 1 },
+	{ path: "./Audio/DruidJump.wav", players: 1 },
 	{ path: "./Audio/DruidDeath.mp3", players: 1 },
 	{ path: "./Audio/SwordAttack.mp3", players: 1 },
 	{ path: "./Audio/DruidDamage.mp3", players: 1 },
@@ -80,13 +79,15 @@ const AUDIO_PATHS = [
 	{ path: "./Audio/LevelUp.mp3", players: 1 },
 	{ path: "./Audio/UsePotion.mp3", players: 1 },
 	{ path: "./Audio/Abstraction - Three Red Hearts - Out of Time.mp3", players: 1 },
-	{ path: "./Audio/LionAttack.mp3", players: 1 }
+	{ path: "./Audio/LionAttack.mp3", players: 1 },
+	{ path: "./Audio/Key.mp3", players: 1 },
+	{ path: "./Audio/DruidManaExhausted.wav", players: 1 },
+	{ path: "./Audio/DruidManaFull.wav", players: 1 }
 ]
 
 // ENTRY POINT
 window.onkeydown = function (e) {
-	// Stop spacebar from scrolling screen
-	return !(e.keyCode == 32);
+	return !(e.keyCode === 32);
 };
 IMAGE_PATHS.forEach(function (path) {
 	ASSET_LOADER.queueImageDownload(path);
@@ -100,3 +101,4 @@ ASSET_LOADER.downloadAll(function () {
 	GAME_ENGINE.init(canvas);
 	new Scene(GAME_ENGINE);
 });
+

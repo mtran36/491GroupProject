@@ -5,10 +5,12 @@
 class PauseScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'white', stroke: 'red' };
+        this.style = {
+            fill: "black", shadow: COLORS.FRAME_BROWN
+        };
         this.pausePressed = false;
         this.screen = false;
-        this.game.canvas.addEventListener('keydown', (e) => {
+        this.game.canvas.addEventListener("keydown", (e) => {
             switch (e.code) {
                 case "KeyP":
                 case "Escape":
@@ -25,7 +27,7 @@ class PauseScreen {
                     break;
             }
         })
-        this.game.canvas.addEventListener('keyup', (e) => {
+        this.game.canvas.addEventListener("keyup", (e) => {
             switch (e.code) {
                 case "KeyP":
                 case "Escape":
@@ -40,19 +42,24 @@ class PauseScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        const ORIGIN_X = PARAMS.CANVAS_WIDTH / 2 - 140;
+        const ORIGIN_Y = PARAMS.CANVAS_HEIGHT / 2 + 20;
+        const TEXT_NUDGE_X = 48;
+        const TEXT_NUDGE_Y = -7;
+        const HEIGHT = 96;
+        const WIDTH = 384;
+
         AUDIO_PLAYER.pauseMusic();
         AUDIO_PLAYER.pauseSounds();
         context.save();
-        context.fillStyle = 'black';
-        if (this.style.fill) {
-            context.fillStyle = this.style.fill;
-        }
-        if (this.style.stroke) {
-            context.strokeStyle = this.style.stroke;
-        }
-        context.font = "bold 64px sans-serif";
-        context.fillText("Paused", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText("Paused", PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        drawUIBackground(context);
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
+            ORIGIN_X - 53, ORIGIN_Y - 70, WIDTH, HEIGHT);
+        context.font = "bold 38px sans-serif";
+        context.fillStyle = this.style.shadow;
+        context.fillText("- PAUSE -", ORIGIN_X + TEXT_NUDGE_X + 2, ORIGIN_Y + TEXT_NUDGE_Y + 2);
+        context.fillStyle = this.style.fill;
+        context.fillText("- PAUSE -", ORIGIN_X + TEXT_NUDGE_X, ORIGIN_Y + TEXT_NUDGE_Y);
         context.restore();
     }
 }
@@ -64,27 +71,27 @@ class PauseScreen {
 class StartScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'white', stroke: 'red' };
+        this.style = { fill: COLORS.FRAME_TAN, stroke: COLORS.FRAME_BROWN };
+        this.titleTree = ASSET_LOADER.getImageAsset("./Sprites/titleTree.png");
         // Start upon first load.
         let clickStart = (e) => {
-            this.game.canvas.removeEventListener('click', clickStart);
-            this.game.canvas.removeEventListener('keydown', clickStart);
-            this.game.camera.loadLevel(levelOne, 16, 115);
+            this.game.canvas.removeEventListener("click", clickStart);
+            this.game.canvas.removeEventListener("keydown", clickStart);
+            this.game.camera.loadLevel(levelOne, -97, 117);
             this.game.start();
         };
-        this.game.canvas.addEventListener('click', clickStart);
-        this.game.canvas.addEventListener('keydown', clickStart);
+        this.game.canvas.addEventListener("click", clickStart);
+        this.game.canvas.addEventListener("keydown", clickStart);
         // Start after reset, win, or lose.
-        this.game.canvas.addEventListener('click', (e) => {
+        this.game.canvas.addEventListener("click", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne, 16, 115);
+                this.game.camera.loadLevel(levelOne, -97, 117);
                 this.game.screen = false;
             }
         });
-        this.game.canvas.addEventListener('keydown', (e) => {
+        this.game.canvas.addEventListener("keydown", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(
-                    levelOne, 15, 115);
+                this.game.camera.loadLevel(levelOne, -97, 117);
                 this.game.screen = false;
             }
         });
@@ -96,18 +103,30 @@ class StartScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        const SCALE = 1.5;
+
         context.save();
-        this.fillStyle = 'black';
+        context.fillStyle = "black";
         context.fillRect(0, 0, PARAMS.CANVAS_WIDTH, PARAMS.CANVAS_HEIGHT);
+        context.drawImage(this.titleTree, 25, 25, 500 * SCALE, 477 * SCALE);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
         context.font = "bold 32px sans-serif";
-        context.fillText(
-            "Click or press any key to Start",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText(
-            "Click or press any key to Start",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
+        context.fillText("- Click to Begin -",
+            PARAMS.CANVAS_WIDTH / 2 + 185, PARAMS.CANVAS_HEIGHT / 2 + 175);
+        context.strokeText("- Click to Begin -",
+            PARAMS.CANVAS_WIDTH / 2 + 185, PARAMS.CANVAS_HEIGHT / 2 + 175);
+        context.font = "bold 47px castellar";
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100 + 4, PARAMS.CANVAS_HEIGHT / 2 + 30 + 4);
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100 + 4, PARAMS.CANVAS_HEIGHT / 2 + 30 + 4);
+        context.fillStyle = COLORS.FRAME_TAN;
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100, PARAMS.CANVAS_HEIGHT / 2 + 30);
+        context.fillText("Hollow Tree",
+            PARAMS.CANVAS_WIDTH / 2 + 100, PARAMS.CANVAS_HEIGHT / 2 + 30);
         context.restore();
     }
 }
@@ -118,16 +137,16 @@ class StartScreen {
 class WinScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'white', stroke: 'blue' };
-        this.game.canvas.addEventListener('click', (e) => {
+        this.style = { fill: "white", stroke: "blue" };
+        this.game.canvas.addEventListener("click", (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => { this.game.screen = this.game.camera.StartScreen; }, 100);
             }
         });
-        this.game.canvas.addEventListener('keydown', (e) => {
-            if (this.game.screen === this && e.code == 'KeyR') {
+        this.game.canvas.addEventListener("keydown", (e) => {
+            if (this.game.screen === this && e.code == "KeyR") {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
@@ -137,40 +156,36 @@ class WinScreen {
 
     display(context) {
         context.save();
+        drawUIBackground(context);
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
         context.font = "bold 32px sans-serif";
-        context.fillText(
-            "You Win!",
+        context.fillText("You Win!",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText(
-            "You Win!",
+        context.strokeText("You Win!",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.font = "bold 20px sans-serif";
-        context.fillText(
-            "Click or press R to restart.",
+        context.fillText("Click or press R to restart.",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
-        context.strokeText(
-            "Click or press R to restart",
+        context.strokeText("Click or press R to restart",
             PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
         context.restore();
     }
 }
 
-
 class LoseScreen {
     constructor(game) {
         this.game = game;
-        this.style = { fill: 'red', stroke: 'black' };
-        this.game.canvas.addEventListener('click', (e) => {
+        this.style = { fill: "black", stroke: COLORS.FRAME_BROWN };
+        this.game.canvas.addEventListener("click", (e) => {
             if (this.game.screen === this) {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => { this.game.screen = this.game.camera.StartScreen }, 100);
             }
         });
-        this.game.canvas.addEventListener('keydown', (e) => {
-            if (this.game.screen === this && e.code === 'KeyR') {
+        this.game.canvas.addEventListener("keydown", (e) => {
+            if (this.game.screen === this && e.code === "KeyR") {
                 this.game.camera.pos = { x: 0, y: 0 };
                 AUDIO_PLAYER.stopAll();
                 setTimeout(() => this.game.screen = this.game.camera.StartScreen, 100);
@@ -179,23 +194,45 @@ class LoseScreen {
     }
 
     display(context) {
+        const ORIGIN_X = PARAMS.CANVAS_WIDTH / 2 - 330;
+        const ORIGIN_Y = PARAMS.CANVAS_HEIGHT / 2 - 10;
+        const TEXT_NUDGE_X = 15;
+        const TEXT_NUDGE_Y = 0;
+        const HEIGHT = 192;
+        const WIDTH = 768;
+
         context.save();
+        drawUIBackground(context);
+        context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
+            ORIGIN_X - 53, ORIGIN_Y - 70, WIDTH, HEIGHT);
+
+        context.font = "bold 32px castellar";
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText(
+            "You were overwhelmed",
+            ORIGIN_X + TEXT_NUDGE_X + 2, ORIGIN_Y + TEXT_NUDGE_Y + 2);
+        context.fillStyle = "black";
+        context.fillText(
+            "You were overwhelmed",
+            ORIGIN_X + TEXT_NUDGE_X, ORIGIN_Y + TEXT_NUDGE_Y);
+        context.fillStyle = COLORS.FRAME_BROWN;
+        context.fillText(
+            "by the infestation...",
+            ORIGIN_X + TEXT_NUDGE_X + 210 + 2, ORIGIN_Y + TEXT_NUDGE_Y + 40 + 2);
+        context.fillStyle = "black";
+        context.fillText(
+            "by the infestation...",
+            ORIGIN_X + TEXT_NUDGE_X + 210, ORIGIN_Y + TEXT_NUDGE_Y + 40);
+
         context.fillStyle = this.style.fill;
         context.strokeStyle = this.style.stroke;
-        context.font = "bold 32px sans-serif";
-        context.fillText(
-            "You are dead. Please try again.",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
-        context.strokeText(
-            "You are dead. Please try again.",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2);
         context.font = "bold 20px sans-serif";
         context.fillText(
-            "Click or press R to restart.",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+            "Try again? (Click or press R)",
+            ORIGIN_X + 195, ORIGIN_Y + 80);
         context.strokeText(
-            "Click or press R to restart",
-            PARAMS.CANVAS_WIDTH / 2 - 200, PARAMS.CANVAS_HEIGHT / 2 + 200);
+            "Try again? (Click or press R)",
+            ORIGIN_X + 195, ORIGIN_Y + 80);
         context.restore();
     }
     
@@ -203,19 +240,27 @@ class LoseScreen {
 
 class MenuScreen {
     constructor(game) {
+        const ROW = 7;
+        let moveCursor = (amount) => {
+            const DRUID = game.druid;
+
+            if (DRUID.itemSelection + amount >= DRUID.items.length) {
+                DRUID.itemSelection = DRUID.items.length - 1;
+            } else if (DRUID.itemSelection + amount < 0) {
+                DRUID.itemSelection = 0;
+            } else {
+                DRUID.itemSelection = DRUID.itemSelection + amount;
+            }
+        }
+
         this.game = game;
         this.camera = new Object();
         this.camera.pos = { x: 0, y: 0 };
-        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.style = { fill: "beige", stroke: "darkgreen" };
         this.menuPressed = false;
-        this.selectLeft = false;
-        this.selectRight = false;
-        this.selectUp = false;
-        this.selectDown = false;
-        this.selectEnter = false;
+        this.game.canvas.addEventListener("keydown", (e) => {
+            const DRUID = game.druid;
 
-        this.game.canvas.addEventListener('keydown', (e) => {
-            if (!this.game.druid) return;
             switch (e.code) {
                 case "KeyI":
                     if (!this.menuPressed) {
@@ -226,54 +271,30 @@ class MenuScreen {
                             this.game.screen = this;
                         }
                     }
-                    if (this.game.druid.itemSelection >= this.game.druid.items.length ||
-                        this.game.druid.itemSelection === -1) {
-                        this.game.druid.itemSelection = this.game.druid.items.length - 1;
-                    }
-                    console.log(this.game.druid.itemSelection);
                     break;
                 case "ArrowLeft":
                 case "KeyA":
-                    this.selectLeft = true;
-                    if (this.selectLeft == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 1) % this.game.druid.items.length;
-                        //this.game.druid.items[this.game.druid.itemSelection].addItemsToDruid(this.game.druid);
-                        this.selectLeft = false;
-                    }
+                    moveCursor(-1);
                     break;
                 case "ArrowRight":
                 case "KeyD":
-                    this.selectRight = true;
-                    if (this.selectRight == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 1) % this.game.druid.items.length;
-                        this.selectRight = false;
-                    }
+                    moveCursor(1);
                     break;
                 case "ArrowUp":
                 case "KeyW":
-                    this.selectUp = true;
-                    if (this.selectUp == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection - 7) % this.game.druid.items.length;
-                        this.selectUp = false;
-                    }
+                    moveCursor(-ROW);
                     break;
                 case "ArrowDown":
                 case "KeyS":
-                    this.selectDown = true;
-                    if (this.selectDown == true && this.game.druid.itemSelection !== -1) {
-                        this.game.druid.itemSelection = (this.game.druid.itemSelection + 7) % this.game.druid.items.length;
-                        this.selectDown = false;
-                    }
+                    moveCursor(ROW);
                     break;
                 case "KeyR":
-                    this.selectEnter = true;
-                    this.game.druid.items[this.game.druid.itemSelection].useItemOnDruid(this.game.druid);
+                    DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
                     ASSET_LOADER.getAudioAsset("./Audio/UsePotion.mp3")[0].play();
-                    this.selectEnter = false;
                     break;
             }
-        })
-        this.game.canvas.addEventListener('keyup', (e) => {
+        });
+        this.game.canvas.addEventListener("keyup", (e) => {
             switch (e.code) {
                 case "KeyI":
                     this.menuPressed = false;
@@ -306,72 +327,59 @@ class MenuScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
-        let i;
+        let item;
         const OFFSET = 10;
 
+        context.save();
+        drawUIBackground(context);
         context.drawImage(
             ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
-            PARAMS.CANVAS_WIDTH / 5,
-            OFFSET * 4,
-            122 * 5,
-            137 * 5);
-
-        context.save();
-
+            PARAMS.CANVAS_WIDTH / 5, OFFSET * 4, 122 * 5, 137 * 5);
         if (this.style.fill) {
             context.fillStyle = this.style.fill;
         }
         if (this.style.stroke) {
             context.strokeStyle = this.style.stroke;
         }
-
         context.font = "bold 64px sans-serif";
         context.fillText(
             "Inventory",
             PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
             PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
-
         context.strokeText(
             "Inventory",
             PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
             PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
-
-        for (i = 0; i < this.game.druid.items.length; i++) {
-            this.game.druid.items[i].animations[0].drawFrame(
-                0,
-                context,
-                ((i % 7) * (OFFSET * 8)) + 255,
-                (Math.floor(i / 7) * (OFFSET * 8)) + 164,
-                0.9,
-                this.camera);
-
-            if (i === this.game.druid.itemSelection) {
+        for (item = 0; item < this.game.druid.items.length; item++) {
+            this.game.druid.items[item].animations[0].drawFrame(
+                0, context, ((item % 7) * (OFFSET * 8)) + 255,
+                (Math.floor(item / 7) * (OFFSET * 8)) + 164, 0.9, this.camera);
+            if (item === this.game.druid.itemSelection) {
                 context.drawImage(
                     ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
-                    ((i % 7) * (OFFSET * 8)) + 235,
-                    (Math.floor(i / 7) * (OFFSET * 8)) + 155,
-                    32 * 2.4,
-                    32 * 2.4);
+                    ((item % 7) * (OFFSET * 8)) + 235,
+                    (Math.floor(item / 7) * (OFFSET * 8)) + 155,
+                    32 * 2.4, 32 * 2.4);
             }
         }
-
         context.restore();
     }
 }
 
 class LevelUpScreen {
     constructor(game) {
+
         this.game = game;
         this.camera = new Object();
         this.camera.pos = { x: 0, y: 0 };
-        this.style = { fill: 'beige', stroke: 'darkgreen' };
+        this.style = { fill: "beige", stroke: "darkgreen" };
         this.screen = false;
         this.levelUpScreen = false;
         this.selectLeft = false;
         this.selectRight = false;
 
 
-        this.game.canvas.addEventListener('keydown', (e) => {
+        this.game.canvas.addEventListener("keydown", (e) => {
             switch (e.code) {
                 case "ArrowLeft":
                 case "KeyA":
@@ -419,7 +427,7 @@ class LevelUpScreen {
                 break;
             }
         });
-        this.game.canvas.addEventListener('keyup', (e) => {
+        this.game.canvas.addEventListener("keyup", (e) => {
             switch (e.code) {
                 case "ArrowLeft":
                 case "KeyA":
@@ -444,44 +452,36 @@ class LevelUpScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
+        let powerups, imageX, level, i;
+
         // draw the interface
+        context.save();
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/LevelUpScreen.png"),
             0, 0, 192, 128, 140, 160, 768, 512);
-        context.save();
         context.font = "bold 30px Arial";
         context.fillStyle = "black";
         context.fillText("Spell Upgrade", 425, 220);
         context.font = "bold 20px Arial";
         context.fillText("Select one spell to level up using key [X/J], [Q] to cancel.", 200, 300);
-        context.restore();
-
         // draw each of the powerups in the interface
-        let powerups = this.game.druid.attacks;
-        for (let i = 0; i < powerups.length; i++) {
-            let imageX = 250 + 220 * i;
-            context.drawImage(powerups[i].spritesheet,
-                    0, 0, 64, 64, imageX, 500, 64, 64);
+        powerups = this.game.druid.attacks;
+        for (i = 0; i < powerups.length; i++) {
+            imageX = 250 + 220 * i;
+            context.drawImage(powerups[i].spritesheet, 0, 0, 64, 64, imageX, 500, 64, 64);
             // draw power selection
             if (i === this.game.druid.attackSelection) {
-                context.save();
                 context.font = "bold 20px Arial";
                 context.fillStyle = "black";
-                let level = powerups[i].level;
-                if (level == 3) {
-                    context.fillText("Max Level.",
-                        200, 350);
-                } else {
-                    context.fillText("Level " + level + " -> Level " + (level + 1) + ":",
-                    200, 350);
-                }
-
-                context.fillText(powerups[i].levelDescription[powerups[i].level - 1],
-                    200, 400);
-                context.restore();
+                level = powerups[i].level;
+                level === 3 ?
+                    context.fillText("Max Level.", 200, 350):
+                    context.fillText("Level " + level + " -> Level " + (level + 1) + ":", 200, 350);
+                context.fillText(powerups[i].levelDescription[powerups[i].level - 1], 200, 400);
                 context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
                     0, 0, 32, 32, imageX - 8, 500 - 8, 80, 80);
             }
         }
+        context.restore();
     }
 }
 
@@ -538,48 +538,43 @@ class HUD {
      * @param {number} xOffset Horizontal distance from origin.
      * @param {number} yOffset Vertical distance from origin.
      * @param {Array} powerups List of powerups.
-     * @param {number} attackSelection Druid's attack selection.
+     * @param {number} attackSelection Druid"s attack selection.
      */
     static drawPowerupUI(context, xOffset, yOffset, powerups, attackSelection, DRUID) {
-        const imageY = yOffset + 9;
+        const IMAGE_Y = yOffset + 9;
         const HEIGHT = 52;
         const WIDTH = 192;
-        let i, imageX;
+        const TEXT_NUDGE_Y = 32;
+        const TEXT_NUDGE_X = 14;
+        let powerup, imageX;
 
-        // draw the interface
+        context.save();
         context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/powerupsUI.png"),
             0, 0, WIDTH, HEIGHT, xOffset, yOffset, WIDTH, HEIGHT);
-        // draw text
-        context.save();
-        context.font = "bold 15px Castellar";
+        context.font = "bold 17px Castellar";
         context.fillStyle = COLORS.FRAME_BROWN;
-        context.fillText("SPELLS:", xOffset + 15, yOffset + 26);
+        context.fillText("SPELLS", xOffset + TEXT_NUDGE_X + 1, yOffset + TEXT_NUDGE_Y + 1);
         context.fillStyle = "black";
-        context.fillText("SPELLS:", xOffset +14, yOffset + 25);
-        context.restore();
-        // draw each of the powerups in the interface
-        for (i = 0; i < powerups.length; i++) {
-            imageX = xOffset + 85 + 34 * i;
-            if (powerups[i].cost > DRUID.mana && i == attackSelection) { // if the powerup is on cooldown
-                context.drawImage(powerups[i].cooldownSpritesheet,
-                    0, 0, 64, 64, imageX, imageY, 26, 26);
-            }else {                        // not on cooldown
-                context.drawImage(powerups[i].spritesheet,
-                    0, 0, 64, 64, imageX, imageY, 26, 26);
-            }
-
+        context.fillText("SPELLS", xOffset + TEXT_NUDGE_X, yOffset + TEXT_NUDGE_Y);
+        // Draw each of the powerups 
+        for (powerup = 0; powerup < powerups.length; powerup++) {
+            imageX = xOffset + 85 + 34 * powerup;
+            (powerups[powerup].cost > DRUID.mana && powerup == attackSelection) ?
+                context.drawImage(powerups[powerup].cooldownSpritesheet,
+                    0, 0, 64, 64, imageX, IMAGE_Y, 26, 26):
+                context.drawImage(powerups[powerup].spritesheet,
+                    0, 0, 64, 64, imageX, IMAGE_Y, 26, 26);
             // display powerups level
-            context.save();
             context.font = "bold 10px Arial";
             context.fillStyle = "black";
-            context.fillText("Lv." + powerups[i].level, imageX, imageY + 36);
-            context.restore();
+            context.fillText("Lv." + powerups[powerup].level, imageX, IMAGE_Y + 36);
             // draw power selection
-            if (i === attackSelection) {
-                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select.png"),
-                    0, 0, 32, 32, imageX - 1, imageY - 1, 28, 28);
+            if (powerup === attackSelection) {
+                context.drawImage(ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
+                    0, 0, 32, 32, imageX - 1, IMAGE_Y - 1, 28, 28);
             }
         }
+        context.restore();
     }
 }
 
@@ -599,6 +594,7 @@ class Minimap extends Entity {
     draw(context) {
         const SCALE = 16;
         const OFFSET = 2;
+        const CENTER_OFFSET = 25;
         const PIP_OFFSET = OFFSET * 3;
         const ORIGIN_X = this.pos.x;
         const ORIGIN_Y = this.pos.y;
@@ -626,8 +622,10 @@ class Minimap extends Entity {
             if (entity.hidden || entity instanceof Effect) return;
             context.fillStyle = entity.mapPipColor;
             let pip = {
-                x: this.pos.x + 25 + (entity.worldBB.x - this.game.camera.pos.x) / SCALE,
-                y: this.pos.y + 25 + (entity.worldBB.y - this.game.camera.pos.y) / SCALE,
+                x: this.pos.x + CENTER_OFFSET
+                    + (entity.worldBB.x - this.game.camera.pos.x) / SCALE,
+                y: this.pos.y + CENTER_OFFSET
+                    + (entity.worldBB.y - this.game.camera.pos.y) / SCALE,
                 width: entity.worldBB.width / SCALE,
                 height: entity.worldBB.height / SCALE
             };

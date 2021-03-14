@@ -25,6 +25,33 @@ class Block extends Entity {
 		this.lastWorldBB = this.worldBB;
 	}
 
+	/**
+	 * Uses a lot of parameters to allow accessing multiple different sprites from the 
+	 * same spritesheet correctly. To use this method a class extending block must create a
+	 * pickLook method which sets the size and source image offset in a switch case
+	 * according to which type is specified in the parameters.
+	 * ex. { x: 10, y: 20, type: 2 } -> switch case picks source offset, width, and height
+	 * sprite type 2 from the sheet.
+	 * @param {CanvasImageSource} context Canvas to draw on.
+	 * @param {number} rowOffset How many tiles to shift the destination drawing down.
+	 * @param {number} colOffset How many tiles to shift the destination drawing right.
+	 */
+	drawOffset(context, rowOffset = 0, colOffset = 0) {
+		let col, row;
+		for (col = this.offset.x; col < this.size.width + this.offset.x; col++) {
+			for (row = this.offset.y; row < this.size.height + this.offset.y; row++) {
+				context.drawImage(this.spritesheet,
+					col * this.dim.x, row * this.dim.y, this.dim.x, this.dim.y,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x
+					- this.offset.x * PARAMS.TILE_WIDTH + rowOffset * PARAMS.TILE_WIDTH,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y
+					- this.offset.y * PARAMS.TILE_WIDTH + colOffset * PARAMS.TILE_WIDTH,
+					this.scaleDim.x, this.scaleDim.y);
+			}
+		}
+		this.worldBB.display(this.game);
+	}
+
 	/** @override */
 	draw(context) {
 		let col, row;
@@ -46,12 +73,127 @@ class Block extends Entity {
 	}
 }
 
+class Wood extends Block {
+	constructor(game, x, y, length = 1, type = 0, isVertical = 1) {
+		super(game, x, y, 0, 0, "./Sprites/woods.png");
+		Object.assign(this, { length, type, isVertical });
+		this.data = this.pickLook();
+		this.offset = this.data.offset;
+		this.size = this.data.size;
+		this.setSize(this.size.width, this.size.height, 16);
+
+		this.createBoundingBox();
+	}
+
+	static construct(game, params) {
+		game.addEntity(new Wood(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH,
+			params.length, params.type, params.isVertical));
+	}
+
+	static constructPedestal(game, params) {
+		const WIDTH = PARAMS.TILE_WIDTH;
+		const PLACE_X = params.x * WIDTH;
+		const PLACE_Y = params.y * WIDTH;
+
+		game.addEntity(new Wood(game, PLACE_X, PLACE_Y, 1, 1, 1));
+		game.addEntity(new Wood(game, PLACE_X - WIDTH, PLACE_Y + WIDTH, 2, 2, 1));
+		game.addEntity(new Wood(game, PLACE_X, PLACE_Y, 1, 1, 1));
+		game.addEntity(new Wood(game, PLACE_X - WIDTH * 2, PLACE_Y + WIDTH * 1.5, 1, 0, 0));
+		game.addEntity(new Wood(game, PLACE_X + WIDTH * 3, PLACE_Y + WIDTH * 1.5, 1, 0, 0));
+		game.addEntity(new Wood(game, PLACE_X, PLACE_Y + WIDTH * 3, 1, 1, 1));
+		game.addEntity(new Wood(game, PLACE_X + WIDTH * 0.5, PLACE_Y + WIDTH * 4, 1, 0, 1));
+    }
+
+	createBoundingBox() {
+		this.worldBB = this.isVertical ?
+			// Extend hitbox vertically
+			this.worldBB = new BoundingBox(
+				this.pos.x, this.pos.y,
+				this.size.width * PARAMS.TILE_WIDTH,
+				this.length * PARAMS.TILE_WIDTH):
+			// Extend hitbox horizontally
+			this.worldBB = new BoundingBox(
+				this.pos.x, this.pos.y,
+				this.length * PARAMS.TILE_WIDTH,
+				this.size.height * PARAMS.TILE_WIDTH);
+    }
+
+	pickLook() {
+		let size, offset;
+		
+		if (this.isVertical === 1) { // Vertical block
+			switch (this.type) {
+				case 0:
+					size = { height: 1, width: 1 };
+					offset = { x: 12, y: 2 };
+					break;
+				case 1:
+					size = { height: 1, width: 2 };
+					offset = { x: 13, y: 2 };
+					break;
+				case 2:
+					size = { height: 1, width: 3 };
+					offset = { x: 12, y: 4 };
+				case 3:
+					size = { height: 1, width: 4 };
+					offset = { x: 17, y: 0 };
+					break;
+				case 4:
+					size = { height: 1, width: 12 };
+					offset = { x: 0, y: 2 };
+					break;
+				default:
+					console.error("Wood does not have vertical type", this.type);
+			}
+		} else { // Horizontal block
+			switch (this.type) {
+				case 0:
+					size = { height: 1, width: 1 };
+					offset = { x: 12, y: 3 };
+					break;
+				case 1:
+					size = { height: 2, width: 1 };
+					offset = { x: 15, y: 2 };
+					break;
+				case 2:
+					size = { height: 3, width: 1 };
+					offset = { x: 20, y: 4 };
+					break;
+				case 3:
+					size = { height: 4, width: 1 };
+					offset = { x: 18, y: 4 };
+					break;
+				default:
+					console.error("Wood does not have horizontal type", this.type);
+			}
+		}
+		return { size: size, offset: offset };
+	}
+
+	/** @override */
+	draw(context) {
+		let offset;
+		for (offset = 0; offset < this.length; offset++) {
+			this.isVertical ?
+				this.drawOffset(context, 0, offset):
+				this.drawOffset(context, offset, 0);
+        }
+	}
+}
+
 class Tree extends Block {
 	constructor(game, x, y, width = 3, height = 8, xOffset = 0, yOffset = 0) {
 		super(game, x, y, width, height, "./Sprites/tree.png");
 		Object.assign(this, { xOffset, yOffset });
+		this.mapPipColor = "brown";
 		this.setSize(width, height, 59);
-		this.hidden = true;
+		this.hidden = false;
+		this.worldBB = new BoundingBox(
+			this.pos.x + PARAMS.TILE_WIDTH, this.pos.y,
+			width * PARAMS.TILE_WIDTH - 2 * PARAMS.TILE_WIDTH,
+			height * PARAMS.TILE_WIDTH);
 	}
 
 	static construct(game, params) {
@@ -68,10 +210,10 @@ class Tree extends Block {
 			for (row = this.yOffset; row < this.size.height + this.yOffset; row++) {
 				context.drawImage(this.spritesheet,
 					col * this.dim.x, row * this.dim.y, this.dim.x, this.dim.y,
-					this.pos.x + col * this.scaleDim.x -
-					this.game.camera.pos.x - this.xOffset * PARAMS.TILE_WIDTH,
-					this.pos.y + row * this.scaleDim.y -
-					this.game.camera.pos.y - this.yOffset * PARAMS.TILE_WIDTH,
+					this.pos.x + col * this.scaleDim.x - this.game.camera.pos.x
+					- this.xOffset * PARAMS.TILE_WIDTH,
+					this.pos.y + row * this.scaleDim.y - this.game.camera.pos.y
+					- this.yOffset * PARAMS.TILE_WIDTH,
 					this.scaleDim.x, this.scaleDim.y);
 			}
 		}
@@ -82,6 +224,7 @@ class Tree extends Block {
 class TreeTrunk extends Tree {
 	constructor(game, x, y, height = 6) {
 		super(game, x, y, 3, height, 3, 0);
+		this.hidden = false;
 	}
 
 	static construct(game, params) {
@@ -97,7 +240,12 @@ class Branch extends Tree {
 		super(game, x, y);
 		Object.assign(this, { type, isDark });
 
+		this.hidden = true;
 		this.pickLook();
+		this.worldBB = new BoundingBox(
+			this.pos.x, this.pos.y,
+			this.size.width * PARAMS.TILE_WIDTH,
+			this.size.height * PARAMS.TILE_WIDTH);
 	}
 
 	static construct(game, params) {
@@ -157,6 +305,8 @@ class Leaves extends Tree {
 		super(game, x, y);
 
 		this.type = type;
+		this.hidden = true;
+
 		this.pickLook();
 	}
 
@@ -167,6 +317,15 @@ class Leaves extends Tree {
 			params.type));
 	}
 
+	static constructTop(game, params) {
+		let i;
+		for (i = 0; i < 2; i += 0.5) {
+			game.addEntity(new Leaves(game,
+				params.x * PARAMS.TILE_WIDTH,
+				(params.y + i) * PARAMS.TILE_WIDTH, 0));
+		}
+	}
+
 	pickLook() {
 		switch (this.type) {
 			case 0:
@@ -174,30 +333,55 @@ class Leaves extends Tree {
 				this.size.height = 2;
 				this.xOffset = 3;
 				this.yOffset = 6;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.8,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.5,
+					(this.size.width - 1.2) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
 			case 1:
 				this.size.width = 4;
 				this.size.height = 2;
 				this.xOffset = 3;
 				this.yOffset = 8;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.8,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.5,
+					(this.size.width - 1.2) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
-			case 2:
+			case 2: 
 				this.size.width = 2;
 				this.size.height = 2;
 				this.xOffset = 7;
 				this.yOffset = 6;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 2,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.7,
+					(this.size.height - 1) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
-			case 3:
+			case 3: // Flat small
 				this.size.width = 2;
 				this.size.height = 2;
 				this.xOffset = 7;
 				this.yOffset = 8;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.7,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.7,
+					(this.size.height - 1) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
 			case 4:
 				this.size.width = 2;
 				this.size.height = 2;
 				this.xOffset = 9;
 				this.yOffset = 6;
+				this.worldBB = new BoundingBox(
+					this.pos.x + PARAMS.TILE_WIDTH / 1.7,
+					this.pos.y + PARAMS.TILE_WIDTH / 1.7,
+					(this.size.height - 1) * PARAMS.TILE_WIDTH,
+					(this.size.height - 1.3) * PARAMS.TILE_WIDTH);
 				break;
 		}
 	}
@@ -309,6 +493,9 @@ class Ground extends Block {
 	}
 }
 
+/**
+ * Masks out of bounds areas to hide ugly level geometry
+ */
 class Mask extends Block {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height, "./Sprites/ground.png");
@@ -339,10 +526,36 @@ class Mask extends Block {
 	}
 }
 
+class SecretMask extends Mask {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height);
+		this.hidden = false;
+		this.isColliding = false;
+	}
+
+	static construct(game, params) {
+		game.addEntity(new SecretMask(game,
+			PARAMS.TILE_WIDTH * params.x,
+			PARAMS.TILE_WIDTH * params.y,
+			params.width, params.height));
+	}
+
+	/** @override */
+	draw(context) {
+		if (!this.game.druid.worldBB.collide(this.worldBB)) {
+			super.draw(context);
+        }
+    }
+}
+
+/**
+ * Invisible collidable block
+ */
 class Mesh extends Ground {
 	constructor(game, x, y, width, height) {
 		super(game, x, y, width, height);
 		this.spritesheet = ASSET_LOADER.getImageAsset("./Sprites/transparency.png");
+		this.hidden = true;
 	}
 
 	static construct(game, params) {
@@ -371,8 +584,20 @@ class BreakBlock extends Entity {
 		super(game, x, y, "./Sprites/crack.png");
 		this.block;
 		switch (blockType) {
-			case 'Ground':
+			case "Ground":
 				this.block = new Ground(game, x, y, width, height);
+				break;
+			case "Wood0":
+				this.block = new Wood(game, x, y, 2, 1, 1);
+				break;
+			case "Wood1":
+				this.block = new Wood(game, x, y, 1, 0, 1);
+				break;
+			case "Wood2":
+				this.block = new Wood(game, x, y, 2, 0, 0);
+				break;
+			case "Wood3":
+				this.block = new Wood(game, x, y, 3, 0, 0);
 				break;
 		}
 		this.worldBB = this.block.worldBB;
@@ -498,7 +723,7 @@ class HitBreakBlock extends BreakBlock {
 	constructor(game, x, y, width, height, blockType) {
 		super(game, x, y, width, height, blockType);
 		this.hitStep = 0.25;
-		this.minCrack = 0.1;
+		this.minCrack = 0;
 		this.lingerTime = 0.05;
 	}
 
@@ -535,21 +760,35 @@ class HitBreakBlock extends BreakBlock {
 	}
 }
 
+/**
+ * Door which must be unlocked with a key.
+ */
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");
-		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 3);
+		this.setDimensions(0.9, 64, 192);
+
 		this.open = false;
 		this.openAnimationCounter = 0.5;
-		this.openAnimation = new Animator(
-			this.spritesheet, 0, 0, 64, 192, 4, 0.1, 0, false, false, false, false, true);
+		this.mapPipColor = "yellow";
+		this.worldBB = new BoundingBox(
+			this.pos.x + 5, this.pos.y + 40,
+			this.scaleDim.x - 5, this.scaleDim.y - 45);
+
+		this.loadAnimations();
 	};
 
 	static construct(game, params) {
 		game.addEntity(new Door(game,
-			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH));
+			(params.x * PARAMS.TILE_WIDTH) + 2,
+			(params.y * PARAMS.TILE_WIDTH) - 40));
 	}
+
+	/** @override */
+	loadAnimations() {
+		this.openAnimation = new Animator(
+			this.spritesheet, 5, 0, this.dim.x, this.dim.y, 4, 0.1, 0, false, false, true, false, true);
+    }
 
 	/** @override */
 	draw(context) {
@@ -557,10 +796,10 @@ class Door extends Entity {
 			this.openAnimation.drawFrame(this.game.clockTick, context,
 				this.pos.x, this.pos.y, this.scale, this.game.camera);
 		} else {
-			context.drawImage(this.spritesheet, 0, 0, 64, 192,
+			context.drawImage(this.spritesheet, 0, 0, this.dim.x, this.dim.y,
 				this.pos.x - this.game.camera.pos.x,
 				this.pos.y - this.game.camera.pos.y,
-				this.dim.x, this.dim.y);
+				this.scaleDim.x, this.scaleDim.y);
 		}
 		this.worldBB.display(this.game);
 	}
@@ -645,27 +884,32 @@ class Background extends Entity {
 
 	/** @override */
 	draw(context) {
+		const SCALE = 1;
+
 		// leftImage:
 		context.drawImage(this.spritesheet, 0, 0,
-			this.spriteWidth, this.spriteLength,
+			this.spriteWidth * SCALE , this.spriteLength * SCALE,
 			this.leftImagePos.x - this.game.camera.pos.x + this.speed,
 			this.leftImagePos.y,
 			this.dim.x, this.dim.y + 300);
 		// midImage:
 		context.drawImage(this.spritesheet, 0, 0,
-			this.spriteWidth, this.spriteLength,
+			this.spriteWidth * SCALE, this.spriteLength * SCALE,
 			this.midImagePos.x - this.game.camera.pos.x + this.speed,
 			this.midImagePos.y,
 			this.dim.x, this.dim.y + 300);
 		// rightImage:
 		context.drawImage(this.spritesheet, 0, 0,
-			this.spriteWidth, this.spriteLength,
+			this.spriteWidth * SCALE, this.spriteLength * SCALE,
 			this.rightImagePos.x - this.game.camera.pos.x + this.speed,
 			this.rightImagePos.y,
 			this.dim.x, this.dim.y + 300);
 	}
 }
 
+/**
+ * Superclass for effects.
+ */
 class Effect {
 	constructor(game, x, y, animation, existTime = 1, scale) {
 		this.game = game;

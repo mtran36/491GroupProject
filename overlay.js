@@ -256,7 +256,7 @@ class MenuScreen {
         this.game = game;
         this.camera = new Object();
         this.camera.pos = { x: 0, y: 0 };
-        this.style = { fill: "beige", stroke: "darkgreen" };
+        this.style = { fill: 'black', stroke: 'brown' };
         this.menuPressed = false;
         this.game.canvas.addEventListener("keydown", (e) => {
             const DRUID = game.druid;
@@ -333,8 +333,14 @@ class MenuScreen {
         context.save();
         drawUIBackground(context);
         context.drawImage(
-            ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
-            PARAMS.CANVAS_WIDTH / 5, OFFSET * 4, 122 * 5, 137 * 5);
+            ASSET_LOADER.getImageAsset("./Sprites/inventory.png"),
+            PARAMS.CANVAS_WIDTH / 5,
+            OFFSET * 4,
+            122 * 5,
+            137 * 5);
+
+        context.save();
+
         if (this.style.fill) {
             context.fillStyle = this.style.fill;
         }

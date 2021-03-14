@@ -43,7 +43,7 @@ class Items extends Agent {
 class Potion extends Items {
     constructor(game, x, y, type = 0) {
         super(game, x, y, "./Sprites/potions.png");
-        this.setDimensions(1, 40, 55);
+        this.setDimensions(1, 40, 60);
         this.type = type;
         this.loadAnimations();
     }

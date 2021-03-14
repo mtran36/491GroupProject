@@ -19,12 +19,12 @@ class Druid extends Agent {
 		this.flashing = false;
 		this.invincDuration = 0;
 		// Item counting fields
-		this.hasSword = false;
+		this.hasSword = true;
 		this.keyCounter = 0;
 		this.potionCounter = 0;
 		this.maxPotions = 10;
 		this.items = [];
-		this.itemSelection = -1;
+		this.itemSelection = 0;
 		// UI data fields
 		this.mapPipColor = COLORS.HEALTH_GREEN;
 		this.origin = {
@@ -95,9 +95,10 @@ class Druid extends Agent {
 	}
 
 	updateBackgroundGradient() {
+		let max = Math.max(this.maxHealth, this.maxMana);
 		this.backgroundGradient = this.game.context.createLinearGradient(
 			this.origin.x, this.origin.y,
-			this.origin.x + this.maxHealth * 5 + this.origin.offset * 3,
+			this.origin.x + max * 5 + this.origin.offset * 3,
 			this.origin.y + this.origin.width * 2 + this.origin.offset * 5);
 		this.backgroundGradient.addColorStop(0, COLORS.FRAME_BROWN);
 		this.backgroundGradient.addColorStop(0.5, COLORS.FRAME_TAN);
@@ -369,6 +370,7 @@ class Druid extends Agent {
 
 	/** @override */
 	draw(context) {
+		let max = Math.max(this.maxHealth, this.maxMana);
 		context.save();
 		// Draw minimap
 		this.minimap.draw(context);
@@ -376,14 +378,14 @@ class Druid extends Agent {
 		context.fillStyle = "black";
 		context.fillRect( 
 			this.origin.x, this.origin.y,
-			this.maxHealth * 5 + this.origin.offset * 5,
+			max * 5 + this.origin.offset * 5,
 			this.origin.width * 2 + this.origin.offset * 7);
 		// Bars background gradient
 		context.fillStyle = this.backgroundGradient;
 		context.fillRect( 
 			this.origin.x + this.origin.offset,
 			this.origin.y + this.origin.offset,
-			this.maxHealth * 5 + this.origin.offset * 3,
+			max * 5 + this.origin.offset * 3,
 			this.origin.width * 2 + this.origin.offset * 5);
 		// Health bar
 		HUD.drawBar(context, 

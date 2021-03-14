@@ -240,15 +240,16 @@ class LoseScreen {
 
 class MenuScreen {
     constructor(game) {
-        const DRUID = game.druid;
         const ROW = 7;
         let moveCursor = (amount) => {
+            const DRUID = game.druid;
+
             if (DRUID.itemSelection + amount >= DRUID.items.length) {
                 DRUID.itemSelection = DRUID.items.length - 1;
             } else if (DRUID.itemSelection + amount < 0) {
                 DRUID.itemSelection = 0;
             } else {
-                DRUID.itemSelection = (DRUID.itemSelection + amount);
+                DRUID.itemSelection = DRUID.itemSelection + amount;
             }
         }
 
@@ -257,9 +258,9 @@ class MenuScreen {
         this.camera.pos = { x: 0, y: 0 };
         this.style = { fill: "beige", stroke: "darkgreen" };
         this.menuPressed = false;
-
         this.game.canvas.addEventListener("keydown", (e) => {
-            if (!DRUID) return;
+            const DRUID = game.druid;
+
             switch (e.code) {
                 case "KeyI":
                     if (!this.menuPressed) {
@@ -270,40 +271,26 @@ class MenuScreen {
                             this.game.screen = this;
                         }
                     }
-                    if (DRUID.itemSelection >= DRUID.items.length
-                        || DRUID.itemSelection === -1) {
-                        DRUID.itemSelection = DRUID.items.length - 1;
-                    }
                     break;
                 case "ArrowLeft":
                 case "KeyA":
-                    if (DRUID.itemSelection !== -1) {
-                        moveCursor(-1);
-                    }
+                    moveCursor(-1);
                     break;
                 case "ArrowRight":
                 case "KeyD":
-                    if (DRUID.itemSelection !== -1) {
-                        moveCursor(1);
-                    }
+                    moveCursor(1);
                     break;
                 case "ArrowUp":
                 case "KeyW":
-                    if (DRUID.itemSelection !== -1) {
-                        moveCursor(-ROW);
-                    }
+                    moveCursor(-ROW);
                     break;
                 case "ArrowDown":
                 case "KeyS":
-                    if (DRUID.itemSelection !== -1) {
-                        moveCursor(ROW);
-                    }
+                    moveCursor(ROW);
                     break;
                 case "KeyR":
-                    if (DRUID.items[DRUID.itemSelection]) {
-                        DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
-                        ASSET_LOADER.getAudioAsset("./Audio/UsePotion.mp3")[0].play();
-                    }
+                    DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
+                    ASSET_LOADER.getAudioAsset("./Audio/UsePotion.mp3")[0].play();
                     break;
             }
         });
@@ -340,55 +327,41 @@ class MenuScreen {
      * @param {CanvasRenderingContext2D} context
      */
     display(context) {
-        let i;
+        let item;
         const OFFSET = 10;
+
+        context.save();
         drawUIBackground(context);
         context.drawImage(
             ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
-            PARAMS.CANVAS_WIDTH / 5,
-            OFFSET * 4,
-            122 * 5,
-            137 * 5);
-
-        context.save();
-
+            PARAMS.CANVAS_WIDTH / 5, OFFSET * 4, 122 * 5, 137 * 5);
         if (this.style.fill) {
             context.fillStyle = this.style.fill;
         }
         if (this.style.stroke) {
             context.strokeStyle = this.style.stroke;
         }
-
         context.font = "bold 64px sans-serif";
         context.fillText(
             "Inventory",
             PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
             PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
-
         context.strokeText(
             "Inventory",
             PARAMS.CANVAS_WIDTH / 2 - (OFFSET * 15),
             PARAMS.CANVAS_HEIGHT / 3 - (OFFSET * 13.5));
-
-        for (i = 0; i < this.game.druid.items.length; i++) {
-            this.game.druid.items[i].animations[0].drawFrame(
-                0,
-                context,
-                ((i % 7) * (OFFSET * 8)) + 255,
-                (Math.floor(i / 7) * (OFFSET * 8)) + 164,
-                0.9,
-                this.camera);
-
-            if (i === this.game.druid.itemSelection) {
+        for (item = 0; item < this.game.druid.items.length; item++) {
+            this.game.druid.items[item].animations[0].drawFrame(
+                0, context, ((item % 7) * (OFFSET * 8)) + 255,
+                (Math.floor(item / 7) * (OFFSET * 8)) + 164, 0.9, this.camera);
+            if (item === this.game.druid.itemSelection) {
                 context.drawImage(
                     ASSET_LOADER.getImageAsset("./Sprites/select2.png"),
-                    ((i % 7) * (OFFSET * 8)) + 235,
-                    (Math.floor(i / 7) * (OFFSET * 8)) + 155,
-                    32 * 2.4,
-                    32 * 2.4);
+                    ((item % 7) * (OFFSET * 8)) + 235,
+                    (Math.floor(item / 7) * (OFFSET * 8)) + 155,
+                    32 * 2.4, 32 * 2.4);
             }
         }
-
         context.restore();
     }
 }

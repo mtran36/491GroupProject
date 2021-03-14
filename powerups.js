@@ -44,6 +44,10 @@ class PowerUp extends Agent {
 				entity.maxHealth += 20;
 				entity.health += 20;
 				entity.updateBackgroundGradient();
+			} else if (this instanceof ManaPowerup) {
+				entity.maxMana += 20;
+				entity.mana += 20;
+				entity.updateBackgroundGradient();
 			} else {
 				this.game.druid.attacks.push(this);
 				if (this.game.druid.attackSelection == null) {
@@ -238,6 +242,21 @@ class HealthPowerup extends PowerUp {
 			params.x * PARAMS.TILE_WIDTH,
 			params.y * PARAMS.TILE_WIDTH));
     }
+}
+
+class ManaPowerup extends PowerUp {
+	constructor(game, x, y) {
+		super(game, x, y, "./Sprites/manaPowerup.png");
+		this.colliding = false;
+
+		this.loadAnimations();
+	}
+
+	static construct(game, params) {
+		game.addEntity(new ManaPowerup(game,
+			params.x * PARAMS.TILE_WIDTH,
+			params.y * PARAMS.TILE_WIDTH));
+	}
 }
 
 class SwordPowerup extends PowerUp {

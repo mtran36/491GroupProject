@@ -604,7 +604,10 @@ class Hopper extends Enemy {
 	defineWorldCollisions(entity, collisions) {
 		let x = this.worldBB.x;
 		let y = this.worldBB.y;
-		if (entity instanceof Ground || entity instanceof Enemy || entity instanceof Door) {
+		if (entity instanceof Ground
+			|| entity instanceof Enemy
+			|| entity instanceof Door
+			|| entity instanceof Wood) {
 			if (collisions.down) {
 				y = entity.worldBB.top - this.worldBB.height;
 				this.vel.y = 0;

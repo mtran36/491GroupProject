@@ -224,7 +224,7 @@ class Tree extends Block {
 class TreeTrunk extends Tree {
 	constructor(game, x, y, height = 6) {
 		super(game, x, y, 3, height, 3, 0);
-		this.hidden = true;
+		this.hidden = false;
 	}
 
 	static construct(game, params) {
@@ -526,6 +526,28 @@ class Mask extends Block {
 	}
 }
 
+class SecretMask extends Mask {
+	constructor(game, x, y, width, height) {
+		super(game, x, y, width, height);
+		this.hidden = false;
+		this.isColliding = false;
+	}
+
+	static construct(game, params) {
+		game.addEntity(new SecretMask(game,
+			PARAMS.TILE_WIDTH * params.x,
+			PARAMS.TILE_WIDTH * params.y,
+			params.width, params.height));
+	}
+
+	/** @override */
+	draw(context) {
+		if (!this.game.druid.worldBB.collide(this.worldBB)) {
+			super.draw(context);
+        }
+    }
+}
+
 /**
  * Invisible collidable block
  */
@@ -564,6 +586,18 @@ class BreakBlock extends Entity {
 		switch (blockType) {
 			case "Ground":
 				this.block = new Ground(game, x, y, width, height);
+				break;
+			case "Wood0":
+				this.block = new Wood(game, x, y, 2, 1, 1);
+				break;
+			case "Wood1":
+				this.block = new Wood(game, x, y, 1, 0, 1);
+				break;
+			case "Wood2":
+				this.block = new Wood(game, x, y, 2, 0, 0);
+				break;
+			case "Wood3":
+				this.block = new Wood(game, x, y, 3, 0, 0);
 				break;
 		}
 		this.worldBB = this.block.worldBB;
@@ -689,7 +723,7 @@ class HitBreakBlock extends BreakBlock {
 	constructor(game, x, y, width, height, blockType) {
 		super(game, x, y, width, height, blockType);
 		this.hitStep = 0.25;
-		this.minCrack = 0.1;
+		this.minCrack = 0;
 		this.lingerTime = 0.05;
 	}
 

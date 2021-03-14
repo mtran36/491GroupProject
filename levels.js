@@ -122,9 +122,8 @@ var levelOne = {
 
 		// A1:
 		// left pillar:
-		{ x: 38, y: 114, width: 5, height: 10 },
-		{ x: 37, y: 117, width: 4, height: 1 },
-		{ x: 40, y: 118, width: 4, height: 1 },
+		{ x: 37, y: 114, width: 6, height: 10 },
+		{ x: 36, y: 117, width: 8, height: 1 },
 		
 		// right pillar:
 		{ x: 59, y: 116, width: 2, height: 1 },
@@ -155,7 +154,7 @@ var levelOne = {
 		{ x: -44, y: 114, width: 6, height: 3 },
 		{ x: -49, y: 106, width: 4, height: 3 }
 	],
-	mask: [
+	groundMask: [
 		(game, params) => Mask.construct(game, params),
 		// Pre A1
 		{ x: -100, y: 104, width: 10, height: 15 },

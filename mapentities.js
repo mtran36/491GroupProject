@@ -732,19 +732,29 @@ class HitBreakBlock extends BreakBlock {
 class Door extends Entity {
 	constructor(game, x, y) {
 		super(game, x, y, "./Sprites/door.png");
-		this.setDimensions(1, PARAMS.TILE_WIDTH, PARAMS.TILE_WIDTH * 3);
+		this.setDimensions(0.9, 64, 192);
+
 		this.open = false;
 		this.openAnimationCounter = 0.5;
-		this.openAnimation = new Animator(
-			this.spritesheet, 0, 0, 64, 192, 4, 0.1, 0, false, false, false, false, true);
 		this.mapPipColor = "yellow";
+		this.worldBB = new BoundingBox(
+			this.pos.x + 5, this.pos.y + 40,
+			this.scaleDim.x - 5, this.scaleDim.y - 45);
+
+		this.loadAnimations();
 	};
 
 	static construct(game, params) {
 		game.addEntity(new Door(game,
-			params.x * PARAMS.TILE_WIDTH,
-			params.y * PARAMS.TILE_WIDTH));
+			(params.x * PARAMS.TILE_WIDTH) + 2,
+			(params.y * PARAMS.TILE_WIDTH) - 40));
 	}
+
+	/** @override */
+	loadAnimations() {
+		this.openAnimation = new Animator(
+			this.spritesheet, 5, 0, this.dim.x, this.dim.y, 4, 0.1, 0, false, false, true, false, true);
+    }
 
 	/** @override */
 	draw(context) {
@@ -752,10 +762,10 @@ class Door extends Entity {
 			this.openAnimation.drawFrame(this.game.clockTick, context,
 				this.pos.x, this.pos.y, this.scale, this.game.camera);
 		} else {
-			context.drawImage(this.spritesheet, 0, 0, 64, 192,
+			context.drawImage(this.spritesheet, 0, 0, this.dim.x, this.dim.y,
 				this.pos.x - this.game.camera.pos.x,
 				this.pos.y - this.game.camera.pos.y,
-				this.dim.x, this.dim.y);
+				this.scaleDim.x, this.scaleDim.y);
 		}
 		this.worldBB.display(this.game);
 	}

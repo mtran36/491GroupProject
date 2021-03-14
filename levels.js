@@ -484,9 +484,9 @@ var levelOne = {
 	druid: [
 		(game, params) => Druid.construct(game, params),
 		// Druid start
-		//{ x: -97, y: 117 },
+		{ x: -97, y: 117 },
 		// Test start
-		{ x: 41, y: 116 }
+		//{ x: 41, y: 116 }
 	]
 };
 

@@ -81,17 +81,15 @@ var levelOne = {
 		{ x: 96, y: 20, width: 4, height: 60 },
 		// ceiling:
 		{ x: 35, y: 60, width: 52, height: 5 },
-
 	// A3:
-		// lower tunnel:
-		{ x: 10, y: 95, width: 29, height: 1 },
-		{ x: 15, y: 90, width: 22, height: 1 },
+		// Lower tunnel:
+		//{ x: 10, y: 95, width: 29, height: 1 },
+		//{ x: 15, y: 90, width: 22, height: 1 },
 		{ x: 8, y: 92, width: 3, height: 4 },
 		{ x: 14, y: 87, width: 3, height: 4 },
 		{ x: 0, y: 92, width: 11, height: 1 },
 		{ x: 5, y: 87, width: 12, height: 1 },
 		// lower tunnel ladder:
-		{ x: -2, y: 78, width: 3, height: 16 },
 		{ x: 4, y: 83, width: 3, height: 5 },
 		{ x: 0, y: 90, width: 2, height: 1 },
 		{ x: 3, y: 86, width: 2, height: 1 },
@@ -105,17 +103,12 @@ var levelOne = {
 		{ x: 17, y: 70, width: 20, height: 1 },
 		{ x: 23, y: 80, width: 15, height: 2 },
 		{ x: 35, y: 60, width: 4, height: 12 },
-
 	// A2:
-		// left platforms:
-		{ x: 37, y: 97, width: 6, height: 4 },
-		{ x: 37, y: 99, width: 8, height: 2 },
-		{ x: 35, y: 95, width: 4, height: 6 },
+		// Top left wall:
 		{ x: 35, y: 80, width: 4, height: 12 },
-		// celling:
+		// Ceiling:
 		{ x: 35, y: 80, width: 24, height: 5 },
 		{ x: 70, y: 80, width: 30, height: 5 },
-		
 	// A1:
 		// Right and left ladder wall:
 		{ x: 88, y: 80, width: 20, height: 55 },
@@ -186,6 +179,11 @@ var levelOne = {
 		// Filler blocks
 		{ x: 71, y: 100, length: 1, type: 0, isVertical: 0 },
 		{ x: 51, y: 100, length: 2, type: 0, isVertical: 0 },
+		// Tunnel planks
+		{ x: 11, y: 95, length: 28, type: 1, isVertical: 0 },
+		{ x: 11, y: 97, length: 32, type: 1, isVertical: 0 },
+		{ x: 11, y: 99, length: 34, type: 0, isVertical: 0 },
+		{ x: -2, y: 78, length: 16, type: 1, isVertical: 1 },
 	// A1
 		// Entrance:
 		{ x: 0, y: 92, length: 22, type: 4, isVertical: 1 },
@@ -594,9 +592,9 @@ var levelOne = {
 	druid: [
 		(game, params) => Druid.construct(game, params),
 		// Druid start
-		//{ x: -97, y: 117 }
+		{ x: -97, y: 117 }
 		// Test start
-		{ x: 11, y: 92 }
+		//{ x: 39, y: 95 }
 	]
 };
 

@@ -199,7 +199,8 @@ class Druid extends Agent {
 				this.vel.x = 0;
 			}
 			if (entity instanceof Door && this.keyCounter > 0) {
-				entity.removeFromWorld = true;
+				entity.open = true;
+				AUDIO_PLAYER.playSound("./Audio/DoorOpen.mp3");
 				this.keyCounter--;
 				this.items.splice(this.items.findIndex((a) => {
 					return a instanceof Key;
@@ -362,6 +363,8 @@ class Druid extends Agent {
 			this.game.SHIFT = false;
 		}
 		this.move(TICK);
+		// when casting thunder attack
+		if (this.casting) this.facing = this.castFacing;
 	}
 
 	/** @override */

@@ -23,6 +23,7 @@ class PowerUp extends Agent {
 	levelUp() {
 		if (this.canLevelUp) {
 			this.level++;
+			AUDIO_PLAYER.playSound("./Audio/LevelUp.mp3");
         }
 		if (this.level >= 3) this.canLevelUp = false;
     }
@@ -219,6 +220,7 @@ class LightElement extends PowerUp {
 				this.empowered = false;
             }
 			DRUID.casting = true;
+			DRUID.castFacing = DRUID.facing;
 			this.game.A = false;
 			this.cooldown = 0.5;
 		} 

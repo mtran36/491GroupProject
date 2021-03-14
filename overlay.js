@@ -85,7 +85,7 @@ class StartScreen {
         // Start after reset, win, or lose.
         this.game.canvas.addEventListener("click", () => {
             if (this.game.screen === this) {
-                this.game.camera.loadLevel(levelOne, 15, 115);
+                this.game.camera.loadLevel(levelOne, 16, 115);
                 this.game.screen = false;
             }
         });
@@ -302,6 +302,7 @@ class MenuScreen {
                 case "KeyR":
                     if (DRUID.items[DRUID.itemSelection]) {
                         DRUID.items[DRUID.itemSelection].useItemOnDruid(DRUID);
+                        ASSET_LOADER.getAudioAsset("./Audio/UsePotion.mp3")[0].play();
                     }
                     break;
             }
@@ -441,6 +442,8 @@ class LevelUpScreen {
                             this.levelUpScreen = false;
                             this.game.A = false;
                             this.game.screen = false;
+                        } else {
+                            ASSET_LOADER.getAudioAsset("./Audio/Error.mp3")[0].play();
                         }
                     }
                     break;

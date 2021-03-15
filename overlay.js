@@ -333,7 +333,7 @@ class MenuScreen {
         context.save();
         drawUIBackground(context);
         context.drawImage(
-            ASSET_LOADER.getImageAsset("./Sprites/inventoryTemp.png"),
+            ASSET_LOADER.getImageAsset("./Sprites/inventory.png"),
             PARAMS.CANVAS_WIDTH / 5, OFFSET * 4, 122 * 5, 137 * 5);
         if (this.style.fill) {
             context.fillStyle = this.style.fill;

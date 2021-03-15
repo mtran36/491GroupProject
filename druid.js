@@ -19,7 +19,7 @@ class Druid extends Agent {
 		this.flashing = false;
 		this.invincDuration = 0;
 		// Item counting fields
-		this.hasSword = true;
+		this.hasSword = false;
 		this.keyCounter = 0;
 		this.potionCounter = 0;
 		this.maxPotions = 10;

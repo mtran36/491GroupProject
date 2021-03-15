@@ -565,7 +565,7 @@ var levelOne = {
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
-		//{ x: 83, y: 99 }
+		{ x: 71, y: 93 }
 	],
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),
@@ -705,7 +705,7 @@ var levelTwo = {
 	],
 	wingElement: [
 		(game, params) => WindElement.construct(game, params),
-		{ x: -78.5, y: -10 }
+		{ x: -78, y: -10 }
 	],
 	lightElement: [
 		(game, params) => LightElement.construct(game, params),

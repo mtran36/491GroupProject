@@ -195,7 +195,8 @@ class LightElement extends PowerUp {
 	* @param {any} DRUID the main character.
 	*/
 	attack(DRUID) {
-		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost) {
+		if (this.cooldown <= 0 && this.game.A && DRUID.mana >= this.cost
+			&& !this.game.druid.casting) {
 			DRUID.mana -= this.cost;
 			let druidCenter = this.game.druid.worldBB.centerPoint();
 			if (DRUID.facing === 0) { // shoot left

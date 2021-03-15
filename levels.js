@@ -453,7 +453,7 @@ var levelOne = {
 	],
 	door: [
 		(game, params) => Door.construct(game, params),
-		{ x: 47, y: 22 },
+		{ x: 47, y: 23 },
 		{ x: 5, y: 117 },
 		{ x: -91, y: 117 },
 		{ x: -91, y: 107 },

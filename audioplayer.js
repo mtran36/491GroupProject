@@ -78,7 +78,7 @@ class AudioPlayer {
      */
     unpauseAudio() {
         this.playing.forEach((audio) => {
-            audio.play();
+            if (!audio.ended) audio.play();
         });
         this.music.forEach((audio) => {
             audio.play();
@@ -86,13 +86,27 @@ class AudioPlayer {
     }
 
     /**
+ * Stops music by pausing all currently playing audio and then makes a fresh playing array.
+ */
+    stopSounds() {
+        this.pauseSounds();
+        this.playing = [];
+    }
+
+    /**
+ * Stops music by pausing all currently playing audio and then makes a fresh playing array.
+ */
+    stopMusic() {
+        this.pauseMusic();
+        this.music = [];
+    }
+
+    /**
      * Stops music by pausing all currently playing audio and then makes a fresh playing array.
      */
     stopAll() {
-        this.pauseSounds();
-        this.pauseMusic();
-        this.playing = [];
-        this.music = [];
+        this.stopSounds();
+        this.stopMusic();
     }
 
     /**

@@ -114,6 +114,7 @@ class GameEngine {
                 case "KeyM":
                     if (!that.mutePressed) {
                         AUDIO_PLAYER.mute = !AUDIO_PLAYER.mute;
+                        PARAMS.MUTE = AUDIO_PLAYER.mute;
                         that.mutePressed = true;
                     }
                     break;
@@ -211,7 +212,9 @@ class GameEngine {
      * Main game loop. Defines the update/render order of the engine. 
      */
     loop() {
-        if (!document.hasFocus() || document.activeElement !== this.canvas) {
+        if (!(this.screen === this.camera.pauseScreen) &&
+            (!document.hasFocus() || document.activeElement !== this.canvas)) {
+            this.camera.pauseScreen.screen = this.screen;
             this.screen = this.camera.pauseScreen;
         } else if (!this.screen) {
             this.clockTick = this.timer.tick();

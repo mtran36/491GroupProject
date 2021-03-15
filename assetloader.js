@@ -2,6 +2,7 @@ class AssetLoader {
     constructor() {
         this.successCount = 0;
         this.errorCount = 0;
+        this.playerCount = 0;
         // Asset storage arrays
         this.imageCache = [];
         this.audioCache = [];
@@ -34,7 +35,7 @@ class AssetLoader {
      * Returns whether or not all downloads have been completed. 
      */
     isDone() {
-        return this.imageQueue.length + this.audioQueue.length
+        return this.imageQueue.length + this.playerCount
             === this.successCount + this.errorCount;
     };
 
@@ -53,6 +54,9 @@ class AssetLoader {
         if (this.imageQueue.length === 0) {
             setTimeout(callback, 10);
         }
+        AUDIO_PATHS.forEach((params) => {
+            this.playerCount += params.players;
+        });
         // Download images.
         for (download = 0; download < this.imageQueue.length; download++) {
             image = new Image();
@@ -65,9 +69,9 @@ class AssetLoader {
                     callback();
                 }
             });
-            image.addEventListener("error", function () {
+            image.addEventListener("error", () => {
                 console.log("Error loading " + this.src);
-                that.errorCount++;
+                this.errorCount++;
                 if (that.isDone()) {
                     callback();
                 }

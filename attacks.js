@@ -172,7 +172,10 @@ class EnergyBallAttack extends Agent {
 
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
-		if (entity instanceof Ground) {
+		if (entity instanceof Ground
+			|| entity instanceof Wood
+			|| entity instanceof Leaves
+			|| entity instanceof Door) {
 			this.removeFromWorld = true;
 			this.playHitAnimation();
 		} else if (entity instanceof HitBreakBlock) {
@@ -267,7 +270,7 @@ class TornadoAttack extends Agent {
 	/** @override */
 	defineWorldCollisions(entity, collisions) {
 		if (collisions.left || collisions.right) {
-			if (entity instanceof Ground) {
+			if (entity instanceof Ground || entity instanceof Door) {
 				this.playHitAnimation(this.pos.x, this.pos.y + this.scaleDim.y / 2, true);
 				this.removeFromWorld = true;
 			} else if (entity instanceof HitBreakBlock) {
@@ -324,8 +327,7 @@ class TornadoAttack extends Agent {
 }
 
 /** 
- * A special attack consists of mutiple ranged attack bounding boxes that would deal a
- * one-time damage. 
+ * A special melee attack would deal one-time damage to each enemy it collides.
  */
 class ThunderAttack extends Agent {
 	/**

@@ -2,7 +2,7 @@
 <html>
 <head>
     <link rel="shortcut icon" href="favicon.png" type="image/png">
-    <title>Hollow Tree Project</title>
+    <title>Hollow Tree</title>
     <meta charset="utf-8">
     <script type="text/javascript" src="./entity.js"></script>
     <script type="text/javascript" src="./attacks.js"></script>
@@ -14,7 +14,6 @@
     <script type="text/javascript" src="./animator.js"></script>
     <script type="text/javascript" src="./gameengine.js"></script>
     <script type="text/javascript" src="./scene.js"></script>
-    <script type="text/javascript" src="./levels.js"></script>
     <script type="text/javascript" src="./items.js"></script>
     <script type="text/javascript" src="./druid.js"></script>
     <script type="text/javascript" src="./enemies.js"></script>
@@ -22,22 +21,23 @@
     <script type="text/javascript" src="./util.js"></script>
     <script type="text/javascript" src="./main.js"></script>
     <script type="text/javascript" src="./mapentities.js"></script>
+    <script type="text/javascript" src="./levels.js"></script>
 </head>
 <body>
     <canvas id="gameWorld" tabindex="0" width="1024" height="768" 
             style="background: black; border: 1px solid black"></canvas>
     <div>
         <b>Music:</b>
-        <input type="range" id="musicVolume" min="0" max="1" step="0.001" value="0.5" />
+        <input type="range" id="musicVolume" min="0" max="1" step="0.001" value="0.15" />
         <br />
         <b>Sound:</b>
-        <input type="range" id="soundVolume" min="0" max="1" step="0.001" value="0.5" />
+        <input type="range" id="soundVolume" min="0" max="1" step="0.001" value="0.3" />
         <br />
         <br />
-        <input type="checkbox" id="debug"> Debug
+        <input type="checkbox" id="debug"> Debug <input type="checkbox" id="mute"> Mute
         <br />
         <br />
-        <b>Temporary Controls:</b> <br />
+        <b>Controls:</b> <br />
         <i>Left</i> - A or Left Arrow &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <i>Pause</i> - P or Escape<br />
         <i>Right</i> - D or Right Arrow &nbsp;&nbsp;&nbsp;
@@ -53,6 +53,8 @@
         <br />
         Music used is by Abstraction who can be found at
         <a href="http://www.abstractionmusic.com/">www.abstractionmusic.com</a>
+        <br />
+        Created by Zitao Yu, Walter Kagel, Lucas Gomez, and Melinda Tran!
     </div>
 </body>
 </html>

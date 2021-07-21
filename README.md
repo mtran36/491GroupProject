@@ -16,9 +16,9 @@ Melinda Tran (mtran36)
 https://mtran36.github.io/491GroupProject/
 
 #### Controls
-A/Left Arrow -> Left
+A/Left Arrow -> Move Left
 
-D/Right Arrow -> Right
+D/Right Arrow -> Move Right
 
 Z/Space -> Jump
 
@@ -38,10 +38,14 @@ M -> Mute Audio
 
 #### Hints!
 1 key open 1 door (Check inventory for how many key you have)
+
 Potions are single use and can be selected in inventory
+
 You can't cast spells that haven't been collected
+
 You can't attack with a sword that hasn't been collected
 
 #### Audio
 By Abstraction 
+
 Website: http://www.abstractionmusic.com/

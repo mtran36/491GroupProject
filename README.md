@@ -4,10 +4,10 @@ Computational World Programming Project.
 <p align="center"><img src="Sprites/game_logo.png" /></p>
 
 # Developed By
-Lucas Gomez
+Lucas Gomez (8BitMissingno)
 
-Walter Kagel
+Walter Kagel (wrkagel)
 
-Zitao (Tommy) Yu
+Zitao (Tommy) Yu (tommy-zitaoy)
 
-Melinda Tran
+Melinda Tran (mtran36)

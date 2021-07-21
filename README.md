@@ -17,14 +17,23 @@ https://mtran36.github.io/491GroupProject/
 
 #### Controls
 A/Left Arrow -> Left
+
 D/Right Arrow -> Right
+
 Z/Space -> Jump
+
 C/L -> Use Sword
+
 X/J -> Cast Spell
+
 Shift button -> Change Spell
+
 I -> Open and Close Inventory
+
 R -> Select Item in Inventory
+
 P/Escape -> Pause Game
+
 M -> Mute Audio
 
 #### Hints!

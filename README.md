@@ -16,25 +16,16 @@ Melinda Tran (mtran36)
 https://mtran36.github.io/491GroupProject/
 
 #### Controls
-A/Left Arrow -> Move Left
-
-D/Right Arrow -> Move Right
-
-Z/Space -> Jump
-
-C/L -> Use Sword
-
-X/J -> Cast Spell
-
-Shift button -> Change Spell
-
-I -> Open and Close Inventory
-
-R -> Select Item in Inventory
-
-P/Escape -> Pause Game
-
-M -> Mute Audio
+- A/Left Arrow -> Move Left
+- D/Right Arrow -> Move Right
+- Z/Space -> Jump
+- C/L -> Use Sword
+- X/J -> Cast Spell
+- Shift button -> Change Spell
+- I -> Open and Close Inventory
+- R -> Select Item in Inventory
+- P/Escape -> Pause Game
+- M -> Mute Audio
 
 #### Hints!
 1 key open 1 door (Check inventory for how many key you have)
